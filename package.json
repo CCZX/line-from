@@ -20,6 +20,7 @@
     "reflect-metadata": "^0.2.2",
     "roughjs": "^4.6.6",
     "rxjs": "^7.8.2",
+    "sketchbook-ui": "^1.0.1",
     "zustand": "^4.3.7"
   },
   "devDependencies": {

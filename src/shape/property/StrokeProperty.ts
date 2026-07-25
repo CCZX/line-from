@@ -12,9 +12,21 @@ const DEFAULT_VALUE: StrokePropertyValue = {
 	style: 'regular',
 };
 
+function withSketchySeed(value: StrokePropertyValue): StrokePropertyValue {
+	if (value.style === 'sketchy' && value.seed == null) {
+		return { ...value, seed: Math.floor(Math.random() * 1_000_000_000) };
+	}
+	return value;
+}
+
 export class StrokeProperty extends AbsProperty<StrokePropertyValue> {
 	constructor(shape: BaseShape, value?: StrokePropertyValue) {
-		super(shape, value || DEFAULT_VALUE);
+		super(shape, withSketchySeed(value || DEFAULT_VALUE));
+	}
+
+	public set(value: StrokePropertyValue): void {
+		this.value = withSketchySeed(value);
+		this.draw();
 	}
 
 	public update(value: Partial<StrokePropertyValue>): void {

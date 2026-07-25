@@ -8,9 +8,21 @@ import { BaseProperty } from './BaseProperty';
 
 const DEFAULT_VALUE: FillPropertyValue = { color: 0x000, alpha: 1, style: 'solid' };
 
+function withSketchySeed(value: FillPropertyValue): FillPropertyValue {
+	if (value.style === 'sketchy' && value.seed == null) {
+		return { ...value, seed: Math.floor(Math.random() * 1_000_000_000) };
+	}
+	return value;
+}
+
 export class FillProperty extends AbsProperty<FillPropertyValue> {
 	constructor(shape: BaseShape, value?: FillPropertyValue) {
-		super(shape, value || DEFAULT_VALUE);
+		super(shape, withSketchySeed(value || DEFAULT_VALUE));
+	}
+
+	public set(value: FillPropertyValue): void {
+		this.value = withSketchySeed(value);
+		this.draw();
 	}
 
 	public update(value: Partial<FillPropertyValue>): void {

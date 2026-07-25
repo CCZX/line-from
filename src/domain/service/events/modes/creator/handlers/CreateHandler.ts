@@ -35,7 +35,7 @@ function nextId(): string {
 const DEFAULT_PROPS = {
 	width: 100,
 	height: 100,
-	stroke: { color: 0x1e1e1e, width: 1, alpha: 1, style: 'regular' as const },
+	stroke: { color: 0x1e1e1e, width: 1, alpha: 1, style: 'sketchy' as const },
 	fill: { color: 0xffffff, alpha: 1, style: 'solid' as const },
 };
 
