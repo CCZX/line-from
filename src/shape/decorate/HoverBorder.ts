@@ -16,6 +16,7 @@ export class HoverBorder extends AbsDecorate {
 	constructor(shape: BaseShape) {
 		super(shape);
 		this.graphics = new Graphics();
+		this.graphics.name = ShapeDecorateTypeEnum.HoverBorder;
 	}
 
 	public onActivate() {

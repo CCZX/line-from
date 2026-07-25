@@ -23,6 +23,7 @@ export class LineSelectedBorder extends AbsDecorate {
 	constructor(shape: BaseShape) {
 		super(shape);
 		this.graphics = new Graphics();
+		this.graphics.name = ShapeDecorateTypeEnum.SelectedBorder;
 	}
 
 	private draw() {

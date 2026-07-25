@@ -76,7 +76,7 @@ export function drawSketchyCircle(
 	r: number,
 	seed: number,
 ): void {
-	const drawable = generator.circle(cx - r, cy - r, r * 2, toRoughOptions(seed));
+	const drawable = generator.circle(cx, cy, r * 2, toRoughOptions(seed));
 	for (const set of drawable.sets) {
 		drawOpSet(g, set);
 	}
@@ -148,7 +148,7 @@ export function drawSketchyFillCircle(
 	alpha: number,
 	seed: number,
 ): void {
-	const drawable = generator.circle(cx - r, cy - r, r * 2, {
+	const drawable = generator.circle(cx, cy, r * 2, {
 		seed,
 		fill: '#ffffff',
 		fillStyle: 'hachure',

@@ -3,10 +3,10 @@ import { BaseShape } from '@/shape/BaseShape';
 import { BaseProperty } from '@/shape/property/BaseProperty';
 import {
 	BasePropertyValue,
+	ShapeDecorateTypeEnum,
 	ShapePropertyEnum,
 	ShapeStateEnum,
 	ShapeTypeEnum,
-	StrokePropertyValue,
 } from '@/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/eventManager';
 import { IActionLogManager, IActionManager } from '@/domain/contract/action';
@@ -15,11 +15,10 @@ import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
 import { inject } from 'inversify';
 import { fluentProvideWithSingle } from '@/common/context';
 import { IocContainerService } from '@/common/contract';
-import { StrokeProperty } from '@/shape/property/StrokeProperty';
+import { SelectedBorder } from '@/shape/decorate/SelectedBorder';
 
 const MIN_SIZE = 10;
 const HANDLE_HIT_RADIUS = 8;
-const BORDER_PADDING = 2;
 
 enum Dir {
 	TL = 'TL',
@@ -45,8 +44,8 @@ const CURSOR_MAP: Record<Dir, string> = {
 
 @fluentProvideWithSingle(IHandlerWithInteraction)
 export class ResizeHandler implements IHandler {
-	type = HandlerEnum.Resize;
-	sort = 20;
+	public type = HandlerEnum.Resize;
+	public sort = 20;
 
 	@inject(IActionManager)
 	private actionManager!: IActionManager;
@@ -63,12 +62,12 @@ export class ResizeHandler implements IHandler {
 	private startViewportPoint: Point | null = null;
 	private originBaseProps: BasePropertyValue | null = null;
 
-	enable(state: InteractionState): boolean {
+	public enable(state: InteractionState): boolean {
 		// 线由 LineEditHandler 负责端点/途经点编辑，不走 bbox resize
 		return state.selectedShapes.length === 1 && state.selectedShapes[0].type !== ShapeTypeEnum.Line;
 	}
 
-	execute(e: PointerEvent, state: InteractionState, payload: EventPayload): boolean {
+	public execute(e: PointerEvent, state: InteractionState, payload: EventPayload): boolean {
 		switch (e.type) {
 			case 'pointermove':
 				// 没有按住主按键时不在 resize 中，清除残留状态
@@ -272,21 +271,18 @@ export class ResizeHandler implements IHandler {
 	}
 
 	private detectHandle(shape: BaseShape, vp: Point, scale: number): Dir | null {
-		const { width, height } = shape.getBounds();
 		const threshold = HANDLE_HIT_RADIUS / scale;
-
-		const stroke = shape.getProperty<StrokeProperty>(ShapePropertyEnum.Stroke).value;
-		const strokeWidth = stroke?.width || 0;
-		const offset = strokeWidth / 2 + BORDER_PADDING;
+		const border = shape.getDecorate(ShapeDecorateTypeEnum.SelectedBorder) as SelectedBorder;
+		const { left, top, right, bottom } = border.getHandleBounds();
 
 		// 转换到容器本地坐标，适配旋转后的 resize 热区检测
 		const local = shape.container.toLocal(new PixiPoint(vp.x, vp.y));
 
 		const corners: { px: number; py: number; dir: Dir }[] = [
-			{ px: 0 - offset, py: 0 - offset, dir: Dir.TL },
-			{ px: width + offset, py: 0 - offset, dir: Dir.TR },
-			{ px: width + offset, py: height + offset, dir: Dir.BR },
-			{ px: 0 - offset, py: height + offset, dir: Dir.BL },
+			{ px: left, py: top, dir: Dir.TL },
+			{ px: right, py: top, dir: Dir.TR },
+			{ px: right, py: bottom, dir: Dir.BR },
+			{ px: left, py: bottom, dir: Dir.BL },
 		];
 
 		for (const c of corners) {
@@ -303,30 +299,30 @@ export class ResizeHandler implements IHandler {
 		}[] = [
 			{
 				check: () =>
-					Math.abs(local.y - (0 - offset)) < threshold &&
-					local.x > cornerExclude &&
-					local.x < width - cornerExclude,
+					Math.abs(local.y - top) < threshold &&
+					local.x > left + cornerExclude &&
+					local.x < right - cornerExclude,
 				dir: Dir.T,
 			},
 			{
 				check: () =>
-					Math.abs(local.x - (width + offset)) < threshold &&
-					local.y > cornerExclude &&
-					local.y < height - cornerExclude,
+					Math.abs(local.x - right) < threshold &&
+					local.y > top + cornerExclude &&
+					local.y < bottom - cornerExclude,
 				dir: Dir.R,
 			},
 			{
 				check: () =>
-					Math.abs(local.y - (height + offset)) < threshold &&
-					local.x > cornerExclude &&
-					local.x < width - cornerExclude,
+					Math.abs(local.y - bottom) < threshold &&
+					local.x > left + cornerExclude &&
+					local.x < right - cornerExclude,
 				dir: Dir.B,
 			},
 			{
 				check: () =>
-					Math.abs(local.x - (0 - offset)) < threshold &&
-					local.y > cornerExclude &&
-					local.y < height - cornerExclude,
+					Math.abs(local.x - left) < threshold &&
+					local.y > top + cornerExclude &&
+					local.y < bottom - cornerExclude,
 				dir: Dir.L,
 			},
 		];

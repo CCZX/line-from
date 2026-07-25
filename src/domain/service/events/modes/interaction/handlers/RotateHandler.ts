@@ -17,19 +17,20 @@ const ROTATE_HANDLE_HIT_RADIUS = 12;
 
 @fluentProvideWithSingle(IHandlerWithInteraction)
 export class RotateHandler implements IHandler {
-	type = HandlerEnum.Rotate;
-	sort = 30;
+	public type = HandlerEnum.Rotate;
+	public sort = 30;
 
 	private isRotating = false;
 	private rotatingShape: BaseShape | null = null;
 	private originRotation = 0;
+	private startPointerAngle = 0;
 
-	enable(state: InteractionState): boolean {
+	public enable(state: InteractionState): boolean {
 		// 线没有旋转手柄（LineSelectedBorder 不提供 getRotateHandleCenter）
 		return state.selectedShapes.length === 1 && state.selectedShapes[0].type !== ShapeTypeEnum.Line;
 	}
 
-	execute(e: PointerEvent, state: InteractionState, payload: EventPayload): boolean {
+	public execute(e: PointerEvent, state: InteractionState, payload: EventPayload): boolean {
 		switch (e.type) {
 			case 'pointermove':
 				return this.handlePointerMove(state, payload);
@@ -65,6 +66,7 @@ export class RotateHandler implements IHandler {
 
 		const p = shape.getProperty<BaseProperty>(ShapePropertyEnum.Base).get() as BasePropertyValue;
 		this.originRotation = p.rotation || 0;
+		this.startPointerAngle = this.getPointerAngle(shape, payload.viewportPoint);
 
 		this.isRotating = true;
 		this.rotatingShape = shape;
@@ -92,8 +94,8 @@ export class RotateHandler implements IHandler {
 			return;
 		}
 
-		const center = this.getShapeWorldCenter(this.rotatingShape);
-		const angle = Math.atan2(vp.y - center.y, vp.x - center.x) * (180 / Math.PI) + 90;
+		const pointerAngle = this.getPointerAngle(this.rotatingShape, vp);
+		const angle = this.originRotation + pointerAngle - this.startPointerAngle;
 
 		// 规范化角度为 0-360
 		const normalized = ((angle % 360) + 360) % 360;
@@ -117,14 +119,24 @@ export class RotateHandler implements IHandler {
 		return Math.abs(vp.x - global.x) < threshold && Math.abs(vp.y - global.y) < threshold;
 	}
 
-	private getShapeWorldCenter(shape: BaseShape): { x: number; y: number } {
-		// container.x/y 已经是图形中心的世界坐标（BaseProperty.draw 中设置）
-		return { x: shape.container.x, y: shape.container.y };
+	/**
+	 * 正右方：0°
+	 * 正下方：90°
+	 * 正左方：180° 或 -180°
+	 * 正上方：-90°
+	 */
+	private getPointerAngle(shape: BaseShape, vp: Point): number {
+		// pivot 是图形的旋转中心；转成全局坐标后可正确适配视口缩放和平移。
+		const center = shape.container.toGlobal(
+			new PixiPoint(shape.container.pivot.x, shape.container.pivot.y),
+		);
+		return Math.atan2(vp.y - center.y, vp.x - center.x) * (180 / Math.PI);
 	}
 
 	private reset() {
 		this.isRotating = false;
 		this.rotatingShape = null;
 		this.originRotation = 0;
+		this.startPointerAngle = 0;
 	}
 }

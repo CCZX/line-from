@@ -49,6 +49,7 @@ export class MoveHandler implements IHandler {
 	private isDragging = false;
 	private movingShapes: BaseShape[] = [];
 	private startScreenPoint: Point | null = null;
+	private startViewportPoint: Point | null = null;
 	private originBasePropsMap: Map<string, BasePropertyValue> = new Map();
 	private originLinePropsMap: Map<string, LinePropertyValue> = new Map();
 
@@ -116,6 +117,7 @@ export class MoveHandler implements IHandler {
 			}
 		}
 		this.startScreenPoint = payload.screenPoint;
+		this.startViewportPoint = worldPoint;
 		return true;
 	}
 
@@ -141,7 +143,7 @@ export class MoveHandler implements IHandler {
 	private handlePointerMove(state: InteractionState, payload: EventPayload): boolean {
 		if (this.isDragging) {
 			document.body.style.cursor = 'grabbing';
-			this.applyMove(payload.screenPoint);
+			this.applyMove(payload.viewportPoint);
 			return false;
 		}
 
@@ -182,13 +184,17 @@ export class MoveHandler implements IHandler {
 		return true;
 	}
 
-	private applyMove(screenPoint: Point) {
-		if (!this.startScreenPoint) {
+	private applyMove(viewportPoint: Point) {
+		if (!this.startViewportPoint) {
 			return;
 		}
 
-		const dx = screenPoint.x - this.startScreenPoint.x;
-		const dy = screenPoint.y - this.startScreenPoint.y;
+		const currentViewportPoint = this.viewportService.clientToViewportLocal(
+			viewportPoint.x,
+			viewportPoint.y,
+		);
+		const dx = currentViewportPoint.x - this.startViewportPoint.x;
+		const dy = currentViewportPoint.y - this.startViewportPoint.y;
 
 		const shapeDatas: ShapeData[] = [];
 		for (const shape of this.movingShapes) {
@@ -223,6 +229,7 @@ export class MoveHandler implements IHandler {
 		this.isDragging = false;
 		this.movingShapes = [];
 		this.startScreenPoint = null;
+		this.startViewportPoint = null;
 		this.originBasePropsMap.clear();
 		this.originLinePropsMap.clear();
 	}

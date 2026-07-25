@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { Button, Card, Select, Slider } from 'sketchbook-ui';
+import { useState, useEffect, useCallback, useRef, type CSSProperties } from 'react';
 import { ShapePropertyEnum, type FillStyle, type StrokeStyle } from '@/shape/contract';
 import { STROKE_COLOR_PRESETS, FILL_COLOR_PRESETS } from './const';
 import type { PresetColor } from './const';
@@ -22,20 +21,6 @@ const STROKE_WIDTH_OPTIONS = [
 ];
 
 const STROKE_RADIUS_MAP: Record<number, number> = { 0: 1, 1: 2, 3: 5, 5: 7 };
-
-const ACTIVE_COLORS = {
-	bg: '#eeeef6',
-	stroke: '#5b5ea6',
-	text: '#5b5ea6',
-};
-
-const DEFAULT_COLORS = {
-	bg: '#ffffff',
-	stroke: '#2a2a2a',
-	text: '#2a2a2a',
-};
-
-const STYLE_TYPOGRAPHY = { fontSize: '1.8rem' };
 
 export function Property() {
 	const shapeManager = useInject<IShapeManager>(IShapeManager);
@@ -155,12 +140,15 @@ export function Property() {
 
 	return (
 		<div className={`ctx-panel ${visible ? 'ctx-panel--visible' : ''}`}>
-			<Card variant='paper' showBorder className='ctx-card'>
+			<div className='ctx-card'>
 				<div className='ctx-inner'>
+					<div className='ctx-heading'>
+						<span>样式</span>
+						<span className='ctx-heading-mark' aria-hidden='true' />
+					</div>
+
 					{selectedShapeIds.length > 1 && (
-						<div className='ctx-section'>
-							<span className='ctx-label'>{selectedShapeIds.length} shapes selected</span>
-						</div>
+						<div className='ctx-selection-note'>已选择 {selectedShapeIds.length} 个图形</div>
 					)}
 
 					{/* 描边颜色 */}
@@ -175,6 +163,9 @@ export function Property() {
 									}`}
 									data-color={preset.hex}
 									style={{ backgroundColor: preset.hex }}
+									aria-label={`描边颜色：${preset.name}`}
+									aria-pressed={strokeColor === preset.hex}
+									title={preset.name}
 									onClick={() => handleStrokeColor(preset)}
 								/>
 							))}
@@ -195,15 +186,18 @@ export function Property() {
 									fill={strokeWidth === 0 ? '#999' : strokeColor}
 								/>
 							</svg>
-							<div className='ctx-sketch-select-wrap'>
-								<Select
-									key={firstId ?? 'empty'}
-									size='sm'
-									options={STROKE_WIDTH_OPTIONS}
-									defaultValue={String(strokeWidth)}
-									onChange={(v) => handleStrokeWidth(parseInt(v as string, 10))}
-								/>
-							</div>
+							<select
+								className='ctx-select'
+								value={String(strokeWidth)}
+								aria-label='描边宽度'
+								onChange={(e) => handleStrokeWidth(parseInt(e.target.value, 10))}
+							>
+								{STROKE_WIDTH_OPTIONS.map((option) => (
+									<option key={option.value} value={option.value}>
+										{option.label}
+									</option>
+								))}
+							</select>
 						</div>
 					</div>
 
@@ -213,30 +207,22 @@ export function Property() {
 					<div className='ctx-section'>
 						<span className='ctx-label'>描边样式</span>
 						<div className='ctx-style-row'>
-							<span className='ctx-sketch-btn-wrap'>
-								<span className='ctx-sketch-btn-inner'>
-									<Button
-										size='sm'
-										colors={strokeStyle === 'regular' ? ACTIVE_COLORS : DEFAULT_COLORS}
-										typography={STYLE_TYPOGRAPHY}
-										onClick={() => handleStrokeStyle('regular')}
-									>
-										规正
-									</Button>
-								</span>
-							</span>
-							<span className='ctx-sketch-btn-wrap'>
-								<span className='ctx-sketch-btn-inner'>
-									<Button
-										size='sm'
-										colors={strokeStyle === 'sketchy' ? ACTIVE_COLORS : DEFAULT_COLORS}
-										typography={STYLE_TYPOGRAPHY}
-										onClick={() => handleStrokeStyle('sketchy')}
-									>
-										手绘
-									</Button>
-								</span>
-							</span>
+							<button
+								className={`ctx-style-btn${
+									strokeStyle === 'regular' ? ' ctx-style-btn--active' : ''
+								}`}
+								onClick={() => handleStrokeStyle('regular')}
+							>
+								规正
+							</button>
+							<button
+								className={`ctx-style-btn${
+									strokeStyle === 'sketchy' ? ' ctx-style-btn--active' : ''
+								}`}
+								onClick={() => handleStrokeStyle('sketchy')}
+							>
+								手绘
+							</button>
 						</div>
 					</div>
 
@@ -258,6 +244,9 @@ export function Property() {
 										}`}
 										data-color={preset.hex}
 										style={preset.transparent ? undefined : { backgroundColor: preset.hex }}
+										aria-label={`背景颜色：${preset.name}`}
+										aria-pressed={isActive}
+										title={preset.name}
 										onClick={() => handleFillColor(preset)}
 									/>
 								);
@@ -271,13 +260,16 @@ export function Property() {
 					<div className='ctx-section'>
 						<span className='ctx-label'>背景透明度</span>
 						<div className='ctx-alpha-row'>
-							<Slider
-								size='sm'
+							<input
+								className='ctx-range'
+								type='range'
 								min={0}
 								max={100}
 								step={1}
 								value={fillAlpha}
-								onChange={handleFillAlpha}
+								aria-label='背景透明度'
+								style={{ '--ctx-range-value': `${fillAlpha}%` } as CSSProperties}
+								onChange={(e) => handleFillAlpha(Number(e.target.value))}
 							/>
 							<span className='ctx-alpha-value'>{fillAlpha}%</span>
 						</div>
@@ -289,46 +281,30 @@ export function Property() {
 					<div className='ctx-section'>
 						<span className='ctx-label'>填充样式</span>
 						<div className='ctx-style-row'>
-							<span className='ctx-sketch-btn-wrap'>
-								<span className='ctx-sketch-btn-inner'>
-									<Button
-										size='sm'
-										colors={fillStyle === 'solid' ? ACTIVE_COLORS : DEFAULT_COLORS}
-										typography={STYLE_TYPOGRAPHY}
-										onClick={() => handleFillStyle('solid')}
-									>
-										纯色
-									</Button>
-								</span>
-							</span>
-							<span className='ctx-sketch-btn-wrap'>
-								<span className='ctx-sketch-btn-inner'>
-									<Button
-										size='sm'
-										colors={fillStyle === 'hatch' ? ACTIVE_COLORS : DEFAULT_COLORS}
-										typography={STYLE_TYPOGRAPHY}
-										onClick={() => handleFillStyle('hatch')}
-									>
-										斜线
-									</Button>
-								</span>
-							</span>
-							<span className='ctx-sketch-btn-wrap'>
-								<span className='ctx-sketch-btn-inner'>
-									<Button
-										size='sm'
-										colors={fillStyle === 'sketchy' ? ACTIVE_COLORS : DEFAULT_COLORS}
-										typography={STYLE_TYPOGRAPHY}
-										onClick={() => handleFillStyle('sketchy')}
-									>
-										手绘
-									</Button>
-								</span>
-							</span>
+							<button
+								className={`ctx-style-btn${fillStyle === 'solid' ? ' ctx-style-btn--active' : ''}`}
+								onClick={() => handleFillStyle('solid')}
+							>
+								纯色
+							</button>
+							<button
+								className={`ctx-style-btn${fillStyle === 'hatch' ? ' ctx-style-btn--active' : ''}`}
+								onClick={() => handleFillStyle('hatch')}
+							>
+								斜线
+							</button>
+							<button
+								className={`ctx-style-btn${
+									fillStyle === 'sketchy' ? ' ctx-style-btn--active' : ''
+								}`}
+								onClick={() => handleFillStyle('sketchy')}
+							>
+								手绘
+							</button>
 						</div>
 					</div>
 				</div>
-			</Card>
+			</div>
 		</div>
 	);
 }
