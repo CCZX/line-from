@@ -12,7 +12,8 @@ import { fluentProvideWithSingle } from '@/common/context';
 @fluentProvideWithSingle(IHandlerWithInteraction)
 export class SelectHandler implements IHandler {
 	public type: HandlerEnum = HandlerEnum.Select;
-	public sort = 50;
+	// Select 必须在 Move 之前执行，这样 pointerdown 选中图形后，同一次按下的拖拽能被 MoveHandler 接管
+	public sort = 35;
 
 	@inject(IShapeManager)
 	private shapeManager!: IShapeManager;

@@ -24,7 +24,7 @@ export class StrokeProperty extends AbsProperty<StrokePropertyValue> {
 		}
 		this.value = merged;
 		// 触发完整重绘，避免 stroke 叠层
-		this.shape.getProperty<BaseProperty>(ShapePropertyEnum.Base)?.draw();
+		this.shape.getProperty<BaseProperty>(ShapePropertyEnum.Base)?.draw(true);
 	}
 
 	public draw(): void {
