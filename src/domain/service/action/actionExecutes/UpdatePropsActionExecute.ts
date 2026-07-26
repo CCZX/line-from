@@ -40,6 +40,10 @@ export class UpdatePropsActionExecute extends AbsActionExecute {
 				shape.updateProperty(ShapePropertyEnum.Stroke, properties.stroke);
 			}
 
+			if (properties.text) {
+				shape.updateProperty(ShapePropertyEnum.Text, properties.text);
+			}
+
 			if (properties.line) {
 				shape.updateProperty(ShapePropertyEnum.Line, properties.line);
 			}

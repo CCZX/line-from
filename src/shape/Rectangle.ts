@@ -1,9 +1,9 @@
 import { Graphics } from 'pixi.js';
 import { ShapeContext, ShapeTypeEnum } from './contract';
-import { BaseShape } from './BaseShape';
+import { TextEditableShape } from './TextEditableShape';
 
-export class Rectangle extends BaseShape<Graphics> {
-	get type(): ShapeTypeEnum {
+export class Rectangle extends TextEditableShape<Graphics> {
+	public get type(): ShapeTypeEnum {
 		return ShapeTypeEnum.Rectangle;
 	}
 

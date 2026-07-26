@@ -22,7 +22,7 @@ export enum ShapeStateEnum {
 	MultiSelected = 'multiSelected',
 
 	/**
-	 * 编辑态，只有文字拥有此状态
+	 * 文字编辑态
 	 */
 	Edit = 'edit',
 
@@ -97,6 +97,14 @@ export interface StrokePropertyValue {
 
 export interface TextPropertyValue {
 	text: string;
+	color?: number;
+	fontSize?: number;
+	fontFamily?: string;
+	fontWeight?: 'normal' | 'bold';
+	horizontalAlign?: 'left' | 'center' | 'right';
+	verticalAlign?: 'top' | 'middle' | 'bottom';
+	lineHeight?: number;
+	padding?: number;
 }
 
 /** 连线端点：可以是自由坐标，也可以锚定到某个图形 */

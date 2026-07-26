@@ -37,6 +37,14 @@ const DEFAULT_PROPS = {
 	height: 100,
 	stroke: { color: 0x1e1e1e, width: 1, alpha: 1, style: 'sketchy' as const },
 	fill: { color: 0xffffff, alpha: 1, style: 'solid' as const },
+	text: {
+		text: '',
+		color: 0x1e1e1e,
+		fontSize: 16,
+		horizontalAlign: 'center' as const,
+		verticalAlign: 'middle' as const,
+		padding: 8,
+	},
 };
 
 /** 拖拽位移小于该阈值视为单击，回退为默认尺寸 */
@@ -81,7 +89,7 @@ export class CreateHandler implements IHandler {
 	public execute(e: PointerEvent, state: InteractionState, payload: EventPayload): boolean {
 		switch (e.type) {
 			case 'pointerdown':
-				return this.handlePointerDown(payload);
+				return this.handlePointerDown(state, payload);
 			case 'pointermove':
 				// 拖拽过程中丢失了 pointerup（如鼠标移出窗口松开），主动收尾
 				if (e.buttons !== 1 && this.isCreating) {
@@ -96,7 +104,7 @@ export class CreateHandler implements IHandler {
 		}
 	}
 
-	private handlePointerDown(payload: EventPayload): boolean {
+	private handlePointerDown(state: InteractionState, payload: EventPayload): boolean {
 		const tool = this.toolService.store.getState().activeTool;
 		const localPoint = this.viewportService.clientToViewportLocal(
 			payload.viewportPoint.x,
@@ -146,6 +154,7 @@ export class CreateHandler implements IHandler {
 						base: { x: localPoint.x, y: localPoint.y, width: 0, height: 0 },
 						fill: { ...DEFAULT_PROPS.fill },
 						stroke: { ...DEFAULT_PROPS.stroke },
+						text: { ...DEFAULT_PROPS.text },
 					},
 				};
 
@@ -161,7 +170,7 @@ export class CreateHandler implements IHandler {
 		}
 
 		// 文本：保持点击即创建
-		return this.createImmediate(tool, localPoint);
+		return this.createImmediate(tool, localPoint, state);
 	}
 
 	private handlePointerMove(payload: EventPayload): boolean {
@@ -301,7 +310,11 @@ export class CreateHandler implements IHandler {
 	}
 
 	private selectCreatedShape(state: InteractionState) {
-		const shape = this.shapeManager.getShapeById(this.creatingId!);
+		this.selectShape(state, this.creatingId!);
+	}
+
+	private selectShape(state: InteractionState, shapeId: string) {
+		const shape = this.shapeManager.getShapeById(shapeId);
 		if (!shape) {
 			return;
 		}
@@ -316,9 +329,14 @@ export class CreateHandler implements IHandler {
 		this.selectService.updateMultiSelectOverlay([shape]);
 	}
 
-	private createImmediate(tool: ToolType, localPoint: { x: number; y: number }): boolean {
+	private createImmediate(
+		tool: ToolType,
+		localPoint: { x: number; y: number },
+		state: InteractionState,
+	): boolean {
 		const id = nextId();
 		const shapeType = tool === 'text' ? ShapeTypeEnum.Text : ShapeTypeEnum.Line;
+		const isText = shapeType === ShapeTypeEnum.Text;
 
 		const shapeData: ShapeData = {
 			id,
@@ -330,9 +348,20 @@ export class CreateHandler implements IHandler {
 					width: DEFAULT_PROPS.width,
 					height: DEFAULT_PROPS.height,
 				},
-				fill: { ...DEFAULT_PROPS.fill },
-				stroke: { ...DEFAULT_PROPS.stroke },
-				...(shapeType === ShapeTypeEnum.Text ? { text: { text: '' } } : {}),
+				fill: isText ? { ...DEFAULT_PROPS.fill, alpha: 0 } : { ...DEFAULT_PROPS.fill },
+				stroke: isText
+					? { ...DEFAULT_PROPS.stroke, width: 0, alpha: 0 }
+					: { ...DEFAULT_PROPS.stroke },
+				...(isText
+					? {
+							text: {
+								...DEFAULT_PROPS.text,
+								horizontalAlign: 'left' as const,
+								verticalAlign: 'top' as const,
+								padding: 0,
+							},
+					  }
+					: {}),
 				...(shapeType === ShapeTypeEnum.Line
 					? {
 							line: {
@@ -346,12 +375,11 @@ export class CreateHandler implements IHandler {
 		};
 
 		this.actionManager.push(new CreateShapeAction([shapeData], this.ioc));
+		this.selectShape(state, id);
 
 		// 新建文本后自动进入编辑态
-		if (shapeType === ShapeTypeEnum.Text) {
+		if (isText) {
 			const shape = this.shapeManager.getShapeById(id);
-			shape?.setProperty(ShapePropertyEnum.Fill, { color: 0xffffff, alpha: 0 });
-			shape?.setProperty(ShapePropertyEnum.Stroke, { color: 0x1e1e1e, width: 0, alpha: 0 });
 			shape?.setState(ShapeStateEnum.Edit);
 		}
 

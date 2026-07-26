@@ -6,6 +6,7 @@ export * from './LineAnchorService';
 export * from './SelectService';
 export * from './ViewportService';
 export * from './ToolService';
+export * from './TextEditorService';
 export * from './ShortcutKeyManager';
 export * from './ToolService';
 export * from './action';

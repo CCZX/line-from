@@ -39,12 +39,7 @@ export class CreateShapeActionExecute extends AbsActionExecute {
 				shape = new Rectangle(id, { ioc: this.iocContainerService });
 			}
 
-			shape.setProperty(ShapePropertyEnum.Base, {
-				x: base.x,
-				y: base.y,
-				width: base.width,
-				height: base.height,
-			});
+			shape.setProperty(ShapePropertyEnum.Base, { ...base });
 
 			if (fill) {
 				shape.setProperty(ShapePropertyEnum.Fill, fill);

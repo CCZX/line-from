@@ -20,45 +20,37 @@ export class CanvasInitService implements ICanvasInitService {
 	@inject(IocContainerService)
 	private iocContainerService!: IocContainerService;
 
-	init(data: ShapeData[]) {
+	public init(data: ShapeData[]) {
 		for (let i = 0; i < data.length; i++) {
 			const shapeDataItem = data[i];
+			const { base, fill, stroke, text, line } = shapeDataItem.properties;
 
 			let shape: BaseShape | null = null;
 
 			if (shapeDataItem.type === ShapeTypeEnum.Circle) {
 				shape = new Circle(shapeDataItem.id, { ioc: this.iocContainerService });
-				shape.setProperty(ShapePropertyEnum.Base, shapeDataItem.properties.base);
-				if (shapeDataItem.properties.fill) {
-					shape.setProperty(ShapePropertyEnum.Fill, shapeDataItem.properties.fill);
-				}
 			} else if (shapeDataItem.type === ShapeTypeEnum.Rectangle) {
 				shape = new Rectangle(shapeDataItem.id, { ioc: this.iocContainerService });
-				shape.setProperty(ShapePropertyEnum.Base, shapeDataItem.properties.base);
-				if (shapeDataItem.properties.fill) {
-					shape.setProperty(ShapePropertyEnum.Fill, shapeDataItem.properties.fill);
-				}
 			} else if (shapeDataItem.type === ShapeTypeEnum.Text) {
 				shape = new Text(shapeDataItem.id, { ioc: this.iocContainerService });
-				shape.setProperty(ShapePropertyEnum.Base, shapeDataItem.properties.base);
-				if (shapeDataItem.properties.fill) {
-					shape.setProperty(ShapePropertyEnum.Fill, shapeDataItem.properties.fill);
-				}
-				if (shapeDataItem.properties.text) {
-					shape.setProperty(ShapePropertyEnum.Text, shapeDataItem.properties.text);
-				}
 			} else if (shapeDataItem.type === ShapeTypeEnum.Line) {
 				shape = new Line(shapeDataItem.id, { ioc: this.iocContainerService });
-				shape.setProperty(ShapePropertyEnum.Base, shapeDataItem.properties.base);
-				if (shapeDataItem.properties.stroke) {
-					shape.setProperty(ShapePropertyEnum.Stroke, shapeDataItem.properties.stroke);
-				}
-				if (shapeDataItem.properties.line) {
-					shape.setProperty(ShapePropertyEnum.Line, shapeDataItem.properties.line);
-				}
 			}
 
 			if (shape) {
+				shape.setProperty(ShapePropertyEnum.Base, { ...base });
+				if (fill) {
+					shape.setProperty(ShapePropertyEnum.Fill, fill);
+				}
+				if (stroke) {
+					shape.setProperty(ShapePropertyEnum.Stroke, stroke);
+				}
+				if (text) {
+					shape.setProperty(ShapePropertyEnum.Text, text);
+				}
+				if (line) {
+					shape.setProperty(ShapePropertyEnum.Line, line);
+				}
 				this.shapeManager.setShape(shape);
 			}
 		}

@@ -1,4 +1,4 @@
-import { Graphics, Container, Text as PixiText } from 'pixi.js';
+import { Container } from 'pixi.js';
 import {
 	BasePropertyValue,
 	FillPropertyValue,
@@ -194,7 +194,10 @@ export abstract class BaseShape<T extends Container = Container> {
 		return isPointInRect(localPoint, this.getBounds());
 	}
 
-	// 以下三个方法供 EditState 回调，Text 子类 override
+	/** 供支持文字的图形在尺寸变化后重新布局，默认图形无需处理 */
+	public layoutText(): void {}
+
+	// 以下三个方法供 EditState 回调，TextEditableShape override
 	public showTextInput(): void {}
 	public hideTextInput(): void {}
 	public commitTextInput(): void {}

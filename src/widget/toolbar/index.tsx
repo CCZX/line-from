@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { ToolType, IToolService } from '@/domain/contract';
+import { IActionLogManager, ToolType, IToolService } from '@/domain/contract';
 import { useInject } from '@/common/context';
 import { RoughGenerator } from 'roughjs/bin/generator';
 import './index.less';
@@ -91,6 +91,7 @@ function SketchIcon({ name }: { name: SketchIconName }) {
 
 export function Toolbar() {
 	const toolService = useInject<IToolService>(IToolService);
+	const actionLogManager = useInject<IActionLogManager>(IActionLogManager);
 	const activeTool = toolService.store((s) => s.activeTool);
 	const setActiveTool = toolService.store((s) => s.setActiveTool);
 	const [zoom, setZoom] = useState(100);
@@ -113,6 +114,14 @@ export function Toolbar() {
 	const handleZoomReset = useCallback(() => {
 		setZoom(100);
 	}, []);
+
+	const handleUndo = useCallback(() => {
+		actionLogManager.undo();
+	}, [actionLogManager]);
+
+	const handleRedo = useCallback(() => {
+		actionLogManager.redo();
+	}, [actionLogManager]);
 
 	const ToolButton = ({
 		tool,
@@ -161,10 +170,10 @@ export function Toolbar() {
 		<nav id='toolbar' aria-label='画布工具栏'>
 			{/* Undo / Redo */}
 			<div className='tb-group'>
-				<ActionButton title='撤销 (Ctrl+Z)'>
+				<ActionButton title='撤销 (Ctrl+Z)' onClick={handleUndo}>
 					<SketchIcon name='undo' />
 				</ActionButton>
-				<ActionButton title='重做 (Ctrl+Shift+Z)'>
+				<ActionButton title='重做 (Ctrl+Shift+Z)' onClick={handleRedo}>
 					<SketchIcon name='redo' />
 				</ActionButton>
 			</div>

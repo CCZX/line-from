@@ -1,10 +1,20 @@
-import { ShapeStateEnum, ShapeTypeEnum } from '@/shape/contract';
+import { ShapeStateEnum } from '@/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/eventManager';
 import { IHandlerWithInteraction, IHandler, IShapeManager } from '@/domain/contract';
-import { ISelectService } from '@/domain/contract/SelectService';
 import { IViewportService } from '@/domain/contract/ViewportService';
 import { inject } from 'inversify';
 import { fluentProvideWithSingle } from '@/common/context';
+import { TextEditableShape } from '@/shape/TextEditableShape';
+
+const DOUBLE_CLICK_INTERVAL = 450;
+const DOUBLE_CLICK_DISTANCE = 8;
+
+interface PointerDownSnapshot {
+	shapeId: string;
+	at: number;
+	x: number;
+	y: number;
+}
 
 @fluentProvideWithSingle(IHandlerWithInteraction)
 export class TextEditHandler implements IHandler {
@@ -14,11 +24,10 @@ export class TextEditHandler implements IHandler {
 	@inject(IShapeManager)
 	private shapeManager!: IShapeManager;
 
-	@inject(ISelectService)
-	private selectService!: ISelectService;
-
 	@inject(IViewportService)
 	private viewportService!: IViewportService;
+
+	private lastPointerDown: PointerDownSnapshot | null = null;
 
 	public enable(_state: InteractionState): boolean {
 		return true;
@@ -30,6 +39,7 @@ export class TextEditHandler implements IHandler {
 		}
 
 		if (state.selectedShapes.length !== 1) {
+			this.lastPointerDown = null;
 			return true;
 		}
 
@@ -38,7 +48,36 @@ export class TextEditHandler implements IHandler {
 			payload.viewportPoint.y,
 		);
 		const shapeUnderCursor = this.shapeManager.getShapeByPoint(worldPoint);
-		if (!shapeUnderCursor || shapeUnderCursor.type !== ShapeTypeEnum.Text) {
+		if (!(shapeUnderCursor instanceof TextEditableShape)) {
+			this.lastPointerDown = null;
+			return true;
+		}
+
+		if (state.selectedShapes[0].id !== shapeUnderCursor.id) {
+			this.lastPointerDown = null;
+			return true;
+		}
+
+		const current: PointerDownSnapshot = {
+			shapeId: shapeUnderCursor.id,
+			at: Date.now(),
+			x: e.clientX,
+			y: e.clientY,
+		};
+		const previous = this.lastPointerDown;
+		const distance = previous
+			? Math.hypot(current.x - previous.x, current.y - previous.y)
+			: Number.POSITIVE_INFINITY;
+		const isSequentialDoubleClick =
+			previous?.shapeId === current.shapeId &&
+			current.at - previous.at <= DOUBLE_CLICK_INTERVAL &&
+			distance <= DOUBLE_CLICK_DISTANCE;
+		const isNativeDoubleClick = e.detail === 2;
+
+		this.lastPointerDown = isSequentialDoubleClick || isNativeDoubleClick ? null : current;
+
+		// 单击只负责选中；同一图形上的连续两次点击进入文字编辑
+		if (!isSequentialDoubleClick && !isNativeDoubleClick) {
 			return true;
 		}
 
@@ -46,19 +85,8 @@ export class TextEditHandler implements IHandler {
 			return false;
 		}
 
-		// 取消已有选中
-		state.selectedShapes.forEach((s) => {
-			if (s.id !== shapeUnderCursor.id) {
-				s.setState(ShapeStateEnum.Normal);
-			}
-		});
-
-		this.selectService.clearSelectedShapes();
-
-		// 选中并进入编辑态
 		shapeUnderCursor.setState(ShapeStateEnum.Edit);
 		state.selectedShapes = [shapeUnderCursor];
-		this.selectService.setSelectedShape(shapeUnderCursor);
 
 		return false;
 	}

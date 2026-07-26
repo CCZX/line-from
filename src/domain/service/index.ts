@@ -7,3 +7,4 @@ export * from './shortcutKey';
 export * from './select/SelectService';
 export * from './viewportService';
 export * from './toolService';
+export * from './textEditorService';

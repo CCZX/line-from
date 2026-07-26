@@ -1,9 +1,9 @@
 import { Graphics } from 'pixi.js';
 import { ShapeContext, ShapeTypeEnum } from './contract';
-import { BaseShape } from './BaseShape';
+import { TextEditableShape } from './TextEditableShape';
 
-export class Circle extends BaseShape<Graphics> {
-	get type(): ShapeTypeEnum {
+export class Circle extends TextEditableShape<Graphics> {
+	public get type(): ShapeTypeEnum {
 		return ShapeTypeEnum.Circle;
 	}
 

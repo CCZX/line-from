@@ -24,6 +24,7 @@ export class BaseProperty extends AbsProperty<BasePropertyValue> {
 		this.shape.container.angle = rotation;
 
 		if (this.shape.type === ShapeTypeEnum.Text) {
+			this.shape.layoutText();
 			return;
 		}
 
@@ -66,5 +67,7 @@ export class BaseProperty extends AbsProperty<BasePropertyValue> {
 
 		const stroke = this.shape.getProperty<StrokeProperty>(ShapePropertyEnum.Stroke);
 		stroke?.draw();
+
+		this.shape.layoutText();
 	}
 }
