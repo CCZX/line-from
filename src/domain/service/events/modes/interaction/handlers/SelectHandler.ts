@@ -7,9 +7,9 @@ import { IViewportService } from '@/domain/contract/ViewportService';
 import { isPointInRect } from '@/shape/geometry';
 import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
 import { inject } from 'inversify';
-import { fluentProvideWithSingle } from '@/common/context';
+import { provide } from 'inversify-binding-decorators';
 
-@fluentProvideWithSingle(IHandlerWithInteraction)
+@provide(IHandlerWithInteraction)
 export class SelectHandler implements IHandler {
 	public type: HandlerEnum = HandlerEnum.Select;
 	// Select 必须在 Move 之前执行，这样 pointerdown 选中图形后，同一次按下的拖拽能被 MoveHandler 接管

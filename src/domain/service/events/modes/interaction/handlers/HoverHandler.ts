@@ -3,9 +3,9 @@ import { HandlerEnum, InteractionState, EventPayload } from '../../../../../cont
 import { IHandler, IHandlerWithInteraction, IShapeManager } from '@/domain/contract';
 import { IViewportService } from '@/domain/contract/ViewportService';
 import { inject } from 'inversify';
-import { fluentProvideWithSingle } from '@/common/context';
+import { provide } from 'inversify-binding-decorators';
 
-@fluentProvideWithSingle(IHandlerWithInteraction)
+@provide(IHandlerWithInteraction)
 export class HoverHandler implements IHandler {
 	public type: HandlerEnum = HandlerEnum.Hover;
 	public sort: number = 90;

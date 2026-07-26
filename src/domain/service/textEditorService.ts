@@ -1,6 +1,5 @@
 import { Point } from 'pixi.js';
 import { inject } from 'inversify';
-import { fluentProvideWithSingle } from '@/common/context';
 import { IocContainerService } from '@/common/contract';
 import { IActionManager, ITextEditorService, IViewportService } from '@/domain/contract';
 import { UpdatePropsAction } from './action/actions/UpdatePropsAction';
@@ -13,12 +12,13 @@ import {
 	TextPropertyValue,
 } from '@/shape/contract';
 import type { TextEditableShape } from '@/shape/TextEditableShape';
+import { provide } from 'inversify-binding-decorators';
 
 function numberToHex(color: number): string {
 	return `#${color.toString(16).padStart(6, '0')}`;
 }
 
-@fluentProvideWithSingle(ITextEditorService)
+@provide(ITextEditorService)
 export class TextEditorService implements ITextEditorService {
 	@inject(IActionManager)
 	private actionManager!: IActionManager;

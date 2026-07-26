@@ -57,7 +57,7 @@ domain/
 
 Symbol token naming convention: the token exports the same name as the interface (e.g., `export const IShapeManager = Symbol('IShapeManager')`).
 
-For injecting multiple implementations of the same interface, use `@fluentProvide(IActionExecute).inSingletonScope().done()` on each implementation and `@multiInject(IActionExecute)` in the consumer. (This pattern is in active refactoring — `ActionManager` currently holds a hardcoded execute list.)
+For injecting multiple implementations of the same interface, use `@provide(IActionExecute)` on each implementation and `@multiInject(IActionExecute)` in the consumer. (`ActionManager` currently holds a hardcoded execute list.)
 
 ### Rendering: Canvas → Viewport → Shapes
 

@@ -1,23 +1,23 @@
 import { IActionLogManager, IShortcutKey } from '@/domain/contract';
 import { inject } from 'inversify';
-import { fluentProvideWithSingle } from '@/common/context';
+import { provide } from 'inversify-binding-decorators';
 
-@fluentProvideWithSingle(IShortcutKey)
+@provide(IShortcutKey)
 export class RedoShortcutKey implements IShortcutKey {
 	@inject(IActionLogManager)
 	private actionLogManager!: IActionLogManager;
 
-	name = '重做';
-	key = 'z';
-	fnKeys = ['Ctrl+Shift+Z'];
+	public name = '重做';
+	public key = 'z';
+	public fnKeys = ['Ctrl+Shift+Z'];
 
-	isMatch(e: KeyboardEvent): boolean {
+	public isMatch(e: KeyboardEvent): boolean {
 		return (e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'z';
 	}
 
-	onKeyDown(_e: KeyboardEvent): void {
+	public onKeyDown(_e: KeyboardEvent): void {
 		this.actionLogManager.redo();
 	}
 
-	onKeyUp(_e: KeyboardEvent): void {}
+	public onKeyUp(_e: KeyboardEvent): void {}
 }

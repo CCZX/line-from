@@ -6,28 +6,28 @@ import {
 } from '../../../../contract/eventManager';
 import { IToolService } from '@/domain/contract/ToolService';
 import { inject, multiInject, postConstruct } from 'inversify';
-import { fluentProvideWithSingle } from '@/common/context';
+import { provide } from 'inversify-binding-decorators';
 
-@fluentProvideWithSingle(IEventMode)
+@provide(IEventMode)
 export class CreatorMode implements IEventMode {
-	mode = EventModeEnum.CreatorMode;
+	public mode = EventModeEnum.CreatorMode;
 
 	@multiInject(IHandlerWithCreator)
-	handlerList: IHandler[] = [];
+	public handlerList: IHandler[] = [];
 
 	@postConstruct()
-	sortHandlers() {
+	public sortHandlers() {
 		this.handlerList.sort((a, b) => a.sort - b.sort);
 	}
 
 	@inject(IToolService)
 	private toolService!: IToolService;
 
-	enable(): boolean {
+	public enable(): boolean {
 		const tool = this.toolService.store.getState().activeTool;
 		return tool !== null && tool !== 'select' && tool !== 'pen' && tool !== 'eraser';
 	}
 
-	onActivate(): void {}
-	onDeactivate(): void {}
+	public onActivate(): void {}
+	public onDeactivate(): void {}
 }

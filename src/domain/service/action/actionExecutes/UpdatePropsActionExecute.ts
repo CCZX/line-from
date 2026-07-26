@@ -5,11 +5,11 @@ import { ILineAnchorService } from '@/domain/contract/LineAnchorService';
 import { ISelectService } from '@/domain/contract/SelectService';
 import { ShapePropertyEnum } from '@/shape/contract';
 import { inject } from 'inversify';
-import { fluentProvideWithSingle } from '@/common/context';
+import { provide } from 'inversify-binding-decorators';
 import { UpdatePropsAction } from '../actions/UpdatePropsAction';
 import { BaseShape } from '@/shape/BaseShape';
 
-@fluentProvideWithSingle(IActionExecute)
+@provide(IActionExecute)
 export class UpdatePropsActionExecute extends AbsActionExecute {
 	public type: ActionTypeEnum = ActionTypeEnum.UpdateShapeProps;
 

@@ -18,12 +18,12 @@ import { UpdatePropsAction } from '@/domain/service/action/actions/UpdatePropsAc
 import { isPointInRect } from '@/shape/geometry';
 import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
 import { inject } from 'inversify';
-import { fluentProvideWithSingle } from '@/common/context';
+import { provide } from 'inversify-binding-decorators';
 import { IocContainerService } from '@/common/contract';
 
 const DRAG_THRESHOLD = 3;
 
-@fluentProvideWithSingle(IHandlerWithInteraction)
+@provide(IHandlerWithInteraction)
 export class MoveHandler implements IHandler {
 	public type: HandlerEnum = HandlerEnum.Move;
 	public sort = 40;

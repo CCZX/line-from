@@ -15,7 +15,7 @@ import { IViewportService } from '@/domain/contract/ViewportService';
 import { IShapeManager } from '@/domain/contract';
 import { getShapeAnchorPoint } from '@/shape/geometry';
 import { inject } from 'inversify';
-import { fluentProvideWithSingle } from '@/common/context';
+import { provide } from 'inversify-binding-decorators';
 import { IocContainerService } from '@/common/contract';
 
 const HANDLE_HIT_RADIUS = 8;
@@ -28,7 +28,7 @@ type DragTarget = { kind: 'start' } | { kind: 'end' } | { kind: 'mid'; index: nu
  * 线编辑：拖拽起终点、拖拽途经点、拖拽虚拟中点手柄插入途经点、双击途经点删除。
  * 必须注册在 Select/Move 之前：手柄可能位于线包围盒之外，否则会被误判为点击空白。
  */
-@fluentProvideWithSingle(IHandlerWithInteraction)
+@provide(IHandlerWithInteraction)
 export class LineEditHandler implements IHandler {
 	public type: HandlerEnum.LineEdit = HandlerEnum.LineEdit;
 	public sort: number = 10;

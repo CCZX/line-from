@@ -10,9 +10,9 @@ import { ActionTypeEnum, IActionExecute } from '../../../contract/action';
 import { IShapeManager } from '@/domain/contract';
 import { inject } from 'inversify';
 import { IocContainerService } from '@/common/contract';
-import { fluentProvideWithSingle } from '@/common/context';
+import { provide } from 'inversify-binding-decorators';
 
-@fluentProvideWithSingle(IActionExecute)
+@provide(IActionExecute)
 export class CreateShapeActionExecute extends AbsActionExecute {
 	public type: ActionTypeEnum = ActionTypeEnum.CreateShape;
 

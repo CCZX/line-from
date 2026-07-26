@@ -1,7 +1,7 @@
 import { createContext, useContext, ReactNode } from 'react';
 import { Container, interfaces, multiInject } from 'inversify';
 import { container } from './container';
-import { fluentProvide, provide } from 'inversify-binding-decorators';
+import { provide } from 'inversify-binding-decorators';
 
 const DIContext = createContext<Container | null>(null);
 
@@ -27,13 +27,6 @@ export function useMultiInject<T>(token: symbol): T[] {
 	} catch (error) {
 		return [];
 	}
-}
-
-/**
- * 提供一个单例 service
- */
-export function fluentProvideWithSingle(token: symbol) {
-	return fluentProvide(token).inSingletonScope().done();
 }
 
 /**

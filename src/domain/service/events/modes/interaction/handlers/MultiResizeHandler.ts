@@ -1,4 +1,3 @@
-import { BaseShape } from '@/shape/BaseShape';
 import { BaseProperty } from '@/shape/property/BaseProperty';
 import { BasePropertyValue, ShapeData, ShapePropertyEnum, ShapeStateEnum } from '@/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/eventManager';
@@ -8,7 +7,7 @@ import { IActionLogManager, IActionManager } from '@/domain/contract/action';
 import { UpdatePropsAction } from '@/domain/service/action/actions/UpdatePropsAction';
 import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
 import { inject } from 'inversify';
-import { fluentProvideWithSingle } from '@/common/context';
+import { provide } from 'inversify-binding-decorators';
 import { IocContainerService } from '@/common/contract';
 
 const MIN_SIZE = 10;
@@ -29,10 +28,10 @@ const CURSOR_MAP: Record<Dir, string> = {
 	[Dir.BL]: 'nesw-resize',
 };
 
-@fluentProvideWithSingle(IHandlerWithInteraction)
+@provide(IHandlerWithInteraction)
 export class MultiResizeHandler implements IHandler {
-	type = HandlerEnum.Resize;
-	sort = 80;
+	public type = HandlerEnum.Resize;
+	public sort = 80;
 
 	@inject(ISelectService)
 	private selectService!: ISelectService;
@@ -55,11 +54,11 @@ export class MultiResizeHandler implements IHandler {
 	private originAABB: Rectangle | null = null;
 	private originShapeProps: Map<string, BasePropertyValue> = new Map();
 
-	enable(state: InteractionState): boolean {
+	public enable(state: InteractionState): boolean {
 		return state.selectedShapes.length >= 2;
 	}
 
-	execute(e: PointerEvent, state: InteractionState, payload: EventPayload): boolean {
+	public execute(e: PointerEvent, state: InteractionState, payload: EventPayload): boolean {
 		switch (e.type) {
 			case 'pointermove':
 				if (e.buttons !== 1 && this.isResizing) {

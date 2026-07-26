@@ -11,11 +11,11 @@ import {
 } from '@/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/eventManager';
 import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
-import { fluentProvideWithSingle } from '@/common/context';
+import { provide } from 'inversify-binding-decorators';
 
 const ROTATE_HANDLE_HIT_RADIUS = 12;
 
-@fluentProvideWithSingle(IHandlerWithInteraction)
+@provide(IHandlerWithInteraction)
 export class RotateHandler implements IHandler {
 	public type = HandlerEnum.Rotate;
 	public sort = 30;

@@ -5,9 +5,9 @@ import { IShapeManager } from '@/domain/contract';
 import { ILineAnchorService } from '@/domain/contract/LineAnchorService';
 import { ISelectService } from '@/domain/contract/SelectService';
 import { inject } from 'inversify';
-import { fluentProvideWithSingle } from '@/common/context';
+import { provide } from 'inversify-binding-decorators';
 
-@fluentProvideWithSingle(IActionExecute)
+@provide(IActionExecute)
 export class RemoveShapeActionExecute extends AbsActionExecute {
 	public type: ActionTypeEnum = ActionTypeEnum.RemoveShape;
 

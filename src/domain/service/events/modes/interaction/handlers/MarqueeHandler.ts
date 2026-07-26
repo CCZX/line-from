@@ -6,11 +6,11 @@ import { IViewportService } from '@/domain/contract/ViewportService';
 import { isRectIntersect } from '@/shape/geometry';
 import { ShapeStateEnum } from '@/shape/contract';
 import { inject } from 'inversify';
-import { fluentProvideWithSingle } from '@/common/context';
+import { provide } from 'inversify-binding-decorators';
 
 const DRAG_THRESHOLD = 3;
 
-@fluentProvideWithSingle(IHandlerWithInteraction)
+@provide(IHandlerWithInteraction)
 export class MarqueeHandler implements IHandler {
 	public type: HandlerEnum = HandlerEnum.Marquee;
 	public sort = 60;

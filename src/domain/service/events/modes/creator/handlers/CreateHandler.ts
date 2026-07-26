@@ -25,7 +25,7 @@ import { BaseProperty } from '@/shape/property/BaseProperty';
 import { LineProperty } from '@/shape/property/LineProperty';
 import { inject } from 'inversify';
 import { IocContainerService } from '@/common/contract';
-import { fluentProvideWithSingle } from '@/common/context';
+import { provide } from 'inversify-binding-decorators';
 
 let _idCounter = 0;
 function nextId(): string {
@@ -50,7 +50,7 @@ const DEFAULT_PROPS = {
 /** 拖拽位移小于该阈值视为单击，回退为默认尺寸 */
 const DRAG_THRESHOLD = 3;
 
-@fluentProvideWithSingle(IHandlerWithCreator)
+@provide(IHandlerWithCreator)
 export class CreateHandler implements IHandler {
 	public type: HandlerEnum = HandlerEnum.Select;
 	public sort: number = 10;

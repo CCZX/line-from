@@ -3,7 +3,7 @@ import { HandlerEnum, InteractionState, EventPayload } from '../../../../../cont
 import { IHandlerWithInteraction, IHandler, IShapeManager } from '@/domain/contract';
 import { IViewportService } from '@/domain/contract/ViewportService';
 import { inject } from 'inversify';
-import { fluentProvideWithSingle } from '@/common/context';
+import { provide } from 'inversify-binding-decorators';
 import { TextEditableShape } from '@/shape/TextEditableShape';
 
 const DOUBLE_CLICK_INTERVAL = 450;
@@ -16,7 +16,7 @@ interface PointerDownSnapshot {
 	y: number;
 }
 
-@fluentProvideWithSingle(IHandlerWithInteraction)
+@provide(IHandlerWithInteraction)
 export class TextEditHandler implements IHandler {
 	public type: HandlerEnum = HandlerEnum.TextEdit;
 	public sort = 70;

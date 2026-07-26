@@ -13,7 +13,7 @@ import { IActionLogManager, IActionManager } from '@/domain/contract/action';
 import { UpdatePropsAction } from '@/domain/service/action/actions/UpdatePropsAction';
 import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
 import { inject } from 'inversify';
-import { fluentProvideWithSingle } from '@/common/context';
+import { provide } from 'inversify-binding-decorators';
 import { IocContainerService } from '@/common/contract';
 import { SelectedBorder } from '@/shape/decorate/SelectedBorder';
 
@@ -42,7 +42,7 @@ const CURSOR_MAP: Record<Dir, string> = {
 	[Dir.R]: 'ew-resize',
 };
 
-@fluentProvideWithSingle(IHandlerWithInteraction)
+@provide(IHandlerWithInteraction)
 export class ResizeHandler implements IHandler {
 	public type = HandlerEnum.Resize;
 	public sort = 20;
