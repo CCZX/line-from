@@ -1,4 +1,4 @@
-import { Point } from 'pixi.js';
+import { Point, TextMetrics } from 'pixi.js';
 import { inject } from 'inversify';
 import { IocContainerService } from '@/common/contract';
 import { IActionManager, ITextEditorService, IViewportService } from '@/domain/contract';
@@ -46,8 +46,8 @@ export class TextEditorService implements ITextEditorService {
 
 		textarea.value = this.originalValue.text;
 		this.applyTextStyle(shape);
-		this.syncEditorPosition();
 		textarea.style.display = 'block';
+		this.syncEditorPosition();
 		shape.textView.visible = false;
 
 		this.unsubscribeViewport?.();
@@ -142,6 +142,7 @@ export class TextEditorService implements ITextEditorService {
 		});
 
 		textarea.addEventListener('keydown', this.onKeyDown);
+		textarea.addEventListener('input', this.syncEditorPosition);
 		textarea.addEventListener('blur', this.onBlur);
 		document.body.appendChild(textarea);
 
@@ -164,7 +165,12 @@ export class TextEditorService implements ITextEditorService {
 		this.textarea.style.fontFamily =
 			value.fontFamily ?? "-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif";
 		this.textarea.style.fontWeight = value.fontWeight ?? 'normal';
-		this.textarea.style.lineHeight = value.lineHeight ? `${value.lineHeight}px` : 'normal';
+		const metrics = TextMetrics.measureText(
+			value.text || ' ',
+			shape.textView.style,
+			shape.textView.style.wordWrap,
+		);
+		this.textarea.style.lineHeight = `${metrics.lineHeight}px`;
 		this.textarea.style.textAlign = horizontalAlign;
 	}
 
@@ -175,6 +181,22 @@ export class TextEditorService implements ITextEditorService {
 
 		const shape = this.activeShape;
 		const bounds = shape.getTextLayoutBounds();
+		const value = shape.getTextValue();
+		const isStandaloneText = shape.type === ShapeTypeEnum.Text;
+		const verticalAlign = value.verticalAlign ?? (isStandaloneText ? 'top' : 'middle');
+		const metrics = TextMetrics.measureText(
+			this.textarea.value || ' ',
+			shape.textView.style,
+			shape.textView.style.wordWrap,
+		);
+		const remainingHeight = Math.max(0, bounds.height - metrics.height);
+		const paddingTop =
+			verticalAlign === 'top'
+				? 0
+				: verticalAlign === 'bottom'
+				? remainingHeight
+				: remainingHeight / 2;
+		const paddingBottom = remainingHeight - paddingTop;
 		const origin = shape.container.toGlobal(new Point(bounds.x, bounds.y));
 		const xUnit = shape.container.toGlobal(new Point(bounds.x + 1, bounds.y));
 		const yUnit = shape.container.toGlobal(new Point(bounds.x, bounds.y + 1));
@@ -192,6 +214,8 @@ export class TextEditorService implements ITextEditorService {
 
 		this.textarea.style.width = `${bounds.width}px`;
 		this.textarea.style.height = `${bounds.height}px`;
+		this.textarea.style.paddingTop = `${paddingTop}px`;
+		this.textarea.style.paddingBottom = `${paddingBottom}px`;
 		this.textarea.style.transform = `matrix(${a}, ${b}, ${c}, ${d}, ${tx}, ${ty})`;
 	};
 
