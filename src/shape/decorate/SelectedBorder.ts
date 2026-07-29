@@ -11,6 +11,9 @@ const BORDER_PADDING = 2;
 const CIRCLE_BORDER_INSET = 3;
 const ROTATE_HANDLE_RADIUS = 4;
 const ROTATE_HANDLE_DISTANCE = 16;
+const CONNECTION_HANDLE_RADIUS = 4;
+
+export type ConnectionAnchor = 'top' | 'right' | 'bottom' | 'left';
 
 export class SelectedBorder extends AbsDecorate {
 	public type: ShapeDecorateTypeEnum = ShapeDecorateTypeEnum.SelectedBorder;
@@ -67,6 +70,14 @@ export class SelectedBorder extends AbsDecorate {
 		this.graphics.beginFill(0xffffff, 1);
 		this.graphics.drawCircle(centerX, rotateY, ROTATE_HANDLE_RADIUS);
 		this.graphics.endFill();
+
+		// 四向连线锚点：拖拽任意圆点可快速创建连线
+		this.graphics.lineStyle(1, 0xffffff, 1);
+		this.graphics.beginFill(HOVER_BORDER, 1);
+		for (const point of Object.values(this.getConnectionHandleCenters())) {
+			this.graphics.drawCircle(point.x, point.y, CONNECTION_HANDLE_RADIUS);
+		}
+		this.graphics.endFill();
 	}
 
 	public onActivate() {
@@ -81,6 +92,19 @@ export class SelectedBorder extends AbsDecorate {
 	public getRotateHandleCenter(): { x: number; y: number } {
 		const { left, top, right } = this.getHandleBounds();
 		return { x: (left + right) / 2, y: top - ROTATE_HANDLE_DISTANCE };
+	}
+
+	public getConnectionHandleCenters(): Record<ConnectionAnchor, Point> {
+		const { left, top, right, bottom } = this.getHandleBounds();
+		const centerX = (left + right) / 2;
+		const centerY = (top + bottom) / 2;
+
+		return {
+			top: { x: centerX, y: top },
+			right: { x: right, y: centerY },
+			bottom: { x: centerX, y: bottom },
+			left: { x: left, y: centerY },
+		};
 	}
 
 	public onDeactivate() {

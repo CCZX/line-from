@@ -226,5 +226,30 @@ export function getShapeAnchorPoint(
 	refPoint?: Point,
 ): Point {
 	const base = shape.getProperty<BaseProperty>(ShapePropertyEnum.Base).get();
-	return getAnchorPoint(base, anchor, refPoint);
+	const rotation = base.rotation ?? 0;
+	if (rotation === 0) {
+		return getAnchorPoint(base, anchor, refPoint);
+	}
+
+	const center = {
+		x: base.x + base.width / 2,
+		y: base.y + base.height / 2,
+	};
+	const radians = (rotation * Math.PI) / 180;
+
+	// auto 需要先把参考点逆旋转到图形本地朝向，再判断距离最近的边。
+	const localRef = refPoint ? rotatePoint(refPoint, center, -radians) : undefined;
+	const unrotatedAnchor = getAnchorPoint(base, anchor, localRef);
+	return rotatePoint(unrotatedAnchor, center, radians);
+}
+
+function rotatePoint(point: Point, center: Point, radians: number): Point {
+	const dx = point.x - center.x;
+	const dy = point.y - center.y;
+	const cos = Math.cos(radians);
+	const sin = Math.sin(radians);
+	return {
+		x: center.x + dx * cos - dy * sin,
+		y: center.y + dx * sin + dy * cos,
+	};
 }

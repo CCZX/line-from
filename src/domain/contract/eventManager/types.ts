@@ -14,6 +14,7 @@ export enum HandlerEnum {
 	Marquee = 'marquee',
 	TextEdit = 'textEdit',
 	LineEdit = 'lineEdit',
+	ConnectionCreate = 'connectionCreate',
 }
 
 /**
