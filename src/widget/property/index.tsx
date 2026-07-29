@@ -1,13 +1,23 @@
 import { useState, useEffect, useCallback, useRef, type CSSProperties } from 'react';
-import { ShapePropertyEnum, type FillStyle, type StrokeStyle } from '@/shape/contract';
+import {
+	ShapePropertyEnum,
+	type FillPropertyValue,
+	type FillStyle,
+	type ShapeData,
+	type StrokePropertyValue,
+	type StrokeStyle,
+} from '@/shape/contract';
 import { STROKE_COLOR_PRESETS, FILL_COLOR_PRESETS } from './const';
 import type { PresetColor } from './const';
 import './index.less';
 import { useInject } from '@/common/context';
-import { IShapeManager } from '@/domain/contract';
+import { IActionManager, IShapeManager } from '@/domain/contract';
 import { ISelectService } from '@/domain/contract/SelectService';
 import { StrokeProperty } from '@/shape/property/StrokeProperty';
 import { FillProperty } from '@/shape/property/FillProperty';
+import { BaseProperty } from '@/shape/property/BaseProperty';
+import { IocContainerService } from '@/common/contract';
+import { UpdatePropsAction } from '@/domain/service/action/actions/UpdatePropsAction';
 
 function numberToHex(num: number): string {
 	return '#' + num.toString(16).padStart(6, '0');
@@ -25,8 +35,9 @@ const STROKE_RADIUS_MAP: Record<number, number> = { 0: 1, 1: 2, 3: 5, 5: 7 };
 export function Property() {
 	const shapeManager = useInject<IShapeManager>(IShapeManager);
 	const selectService = useInject<ISelectService>(ISelectService);
+	const actionManager = useInject<IActionManager>(IActionManager);
+	const ioc = useInject<IocContainerService>(IocContainerService);
 	const selectedShapeIds = selectService.store((s) => s.selectedShapeIds);
-	const firstId = selectedShapeIds[0] || null;
 
 	const [strokeColor, setStrokeColor] = useState('#1e1e1e');
 	const [strokeWidth, setStrokeWidth] = useState(1);
@@ -93,32 +104,84 @@ export function Property() {
 		return () => document.removeEventListener('pointerup', onPointerUp);
 	}, [syncFromShape]);
 
-	const shape = firstId ? shapeManager.getShapeById(firstId) : null;
+	const updateSelectedStroke = (patch: Partial<StrokePropertyValue>) => {
+		const data: ShapeData[] = selectedShapeIds.flatMap((id) => {
+			const selectedShape = shapeManager.getShapeById(id);
+			if (!selectedShape) {
+				return [];
+			}
+
+			const base = selectedShape.getProperty<BaseProperty>(ShapePropertyEnum.Base).value;
+			const stroke = selectedShape.getProperty<StrokeProperty>(ShapePropertyEnum.Stroke).value;
+
+			return [
+				{
+					id: selectedShape.id,
+					type: selectedShape.type,
+					properties: {
+						base: { ...base },
+						stroke: { ...stroke, ...patch },
+					},
+				},
+			];
+		});
+
+		if (data.length > 0) {
+			actionManager.push(new UpdatePropsAction(data, ioc));
+		}
+	};
+
+	const updateSelectedFill = (patch: Partial<FillPropertyValue>) => {
+		const data: ShapeData[] = selectedShapeIds.flatMap((id) => {
+			const selectedShape = shapeManager.getShapeById(id);
+			if (!selectedShape) {
+				return [];
+			}
+
+			const base = selectedShape.getProperty<BaseProperty>(ShapePropertyEnum.Base).value;
+			const fill = selectedShape.getProperty<FillProperty>(ShapePropertyEnum.Fill).value;
+
+			return [
+				{
+					id: selectedShape.id,
+					type: selectedShape.type,
+					properties: {
+						base: { ...base },
+						fill: { ...fill, ...patch },
+					},
+				},
+			];
+		});
+
+		if (data.length > 0) {
+			actionManager.push(new UpdatePropsAction(data, ioc));
+		}
+	};
 
 	const handleStrokeColor = (preset: PresetColor) => {
 		setStrokeColor(preset.hex);
-		shape?.updateProperty(ShapePropertyEnum.Stroke, { color: preset.number });
+		updateSelectedStroke({ color: preset.number });
 	};
 
 	const handleStrokeWidth = (w: number) => {
 		setStrokeWidth(w);
-		shape?.updateProperty(ShapePropertyEnum.Stroke, { width: w });
+		updateSelectedStroke({ width: w });
 	};
 
 	const handleStrokeStyle = (style: StrokeStyle) => {
 		setStrokeStyle(style);
-		shape?.updateProperty(ShapePropertyEnum.Stroke, { style });
+		updateSelectedStroke({ style });
 	};
 
 	const handleFillColor = (preset: PresetColor & { transparent?: boolean }) => {
 		if (preset.transparent) {
 			setIsTransparent(true);
 			setFillAlpha(0);
-			shape?.updateProperty(ShapePropertyEnum.Fill, { alpha: 0 });
+			updateSelectedFill({ alpha: 0 });
 		} else {
 			setIsTransparent(false);
 			setFillColor(preset.hex);
-			shape?.updateProperty(ShapePropertyEnum.Fill, {
+			updateSelectedFill({
 				color: preset.number,
 				alpha: fillAlpha / 100,
 			});
@@ -128,12 +191,12 @@ export function Property() {
 	const handleFillAlpha = (alpha: number) => {
 		setFillAlpha(alpha);
 		setIsTransparent(alpha === 0);
-		shape?.updateProperty(ShapePropertyEnum.Fill, { alpha: alpha / 100 });
+		updateSelectedFill({ alpha: alpha / 100 });
 	};
 
 	const handleFillStyle = (style: FillStyle) => {
 		setFillStyle(style);
-		shape?.updateProperty(ShapePropertyEnum.Fill, { style });
+		updateSelectedFill({ style });
 	};
 
 	const previewR = STROKE_RADIUS_MAP[strokeWidth] ?? 2;
