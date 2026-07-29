@@ -6,7 +6,7 @@ import { Circle } from '@/shape/Circle';
 import { Rectangle } from '@/shape/Rectangle';
 import { Line } from '@/shape/Line';
 import { Text } from '@/shape/Text';
-import { ActionTypeEnum, IActionExecute } from '../../../contract/action';
+import { ActionTypeEnum, IActionExecute } from '../../../contract/Action';
 import { IShapeManager } from '@/domain/contract';
 import { inject } from 'inversify';
 import { IocContainerService } from '@/common/contract';

@@ -1,4 +1,4 @@
-import { IActionExecute, IActionLogManager, IActionManager } from './../../contract/action';
+import { IActionExecute, IActionLogManager, IActionManager } from '../../contract/Action';
 import { AbsAction } from './AbsAction';
 import { provide } from 'inversify-binding-decorators';
 import { inject, multiInject } from 'inversify';
@@ -11,7 +11,7 @@ export class ActionManager implements IActionManager {
 	@inject(IActionLogManager)
 	private actionLogManager!: IActionLogManager;
 
-	push(action: AbsAction) {
+	public push(action: AbsAction) {
 		const needAddLog = action.getNeedAddLog();
 		if (needAddLog) {
 			this.actionLogManager.addAction(action);

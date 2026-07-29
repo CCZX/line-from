@@ -1,6 +1,6 @@
 export * from './interface';
-export * from './canvasInitService';
-export * from './eventManager';
+export * from './CanvasInitService';
+export * from './EventManager';
 export * from './ShapeManager';
 export * from './LineAnchorService';
 export * from './SelectService';
@@ -9,4 +9,4 @@ export * from './ToolService';
 export * from './TextEditorService';
 export * from './ShortcutKeyManager';
 export * from './ToolService';
-export * from './action';
+export * from './Action';

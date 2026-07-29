@@ -1,4 +1,4 @@
-import { InteractionState, EventPayload } from '../../contract/eventManager';
+import { InteractionState, EventPayload } from '../../contract/EventManager';
 import { IEventManager, IEventMode, IViewportService } from '../../contract';
 import { inject, multiInject } from 'inversify';
 import { provideMultiple } from '@/common/context';

@@ -9,7 +9,7 @@ import {
 	ShapeStateEnum,
 	ShapeTypeEnum,
 } from '@/shape/contract';
-import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/eventManager';
+import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
 import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
 import { provide } from 'inversify-binding-decorators';
 

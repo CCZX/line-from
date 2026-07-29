@@ -1,9 +1,9 @@
 import { BaseProperty } from '@/shape/property/BaseProperty';
 import { BasePropertyValue, ShapeData, ShapePropertyEnum, ShapeStateEnum } from '@/shape/contract';
-import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/eventManager';
+import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
 import { ISelectService } from '@/domain/contract/SelectService';
 import { IViewportService } from '@/domain/contract/ViewportService';
-import { IActionLogManager, IActionManager } from '@/domain/contract/action';
+import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
 import { UpdatePropsAction } from '@/domain/service/action/actions/UpdatePropsAction';
 import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
 import { inject } from 'inversify';

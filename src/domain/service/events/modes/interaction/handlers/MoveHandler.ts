@@ -9,11 +9,11 @@ import {
 	ShapeStateEnum,
 	ShapeTypeEnum,
 } from '@/shape/contract';
-import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/eventManager';
+import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
 import { IShapeManager } from '@/domain/contract';
 import { ISelectService } from '@/domain/contract/SelectService';
 import { IViewportService } from '@/domain/contract/ViewportService';
-import { IActionLogManager, IActionManager } from '@/domain/contract/action';
+import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
 import { UpdatePropsAction } from '@/domain/service/action/actions/UpdatePropsAction';
 import { isPointInRect } from '@/shape/geometry';
 import { IHandlerWithInteraction, IHandler } from '@/domain/contract';

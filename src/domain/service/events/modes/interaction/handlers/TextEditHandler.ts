@@ -1,5 +1,5 @@
 import { ShapeStateEnum } from '@/shape/contract';
-import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/eventManager';
+import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
 import { IHandlerWithInteraction, IHandler, IShapeManager } from '@/domain/contract';
 import { IViewportService } from '@/domain/contract/ViewportService';
 import { inject } from 'inversify';

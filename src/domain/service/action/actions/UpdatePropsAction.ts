@@ -1,5 +1,5 @@
 import { AbsAction } from '../AbsAction';
-import { ActionTypeEnum } from '../../../contract/action';
+import { ActionTypeEnum } from '../../../contract/Action';
 import { ShapeData, ShapePropertyEnum } from '@/shape/contract';
 import { IocContainerService } from '@/common/contract';
 import { IShapeManager } from '@/domain/contract';

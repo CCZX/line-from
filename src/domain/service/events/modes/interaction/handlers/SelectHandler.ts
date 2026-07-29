@@ -1,6 +1,6 @@
 import { BaseShape } from '@/shape/BaseShape';
 import { ShapeStateEnum } from '@/shape/contract';
-import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/eventManager';
+import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
 import { IShapeManager } from '@/domain/contract';
 import { ISelectService } from '@/domain/contract/SelectService';
 import { IViewportService } from '@/domain/contract/ViewportService';

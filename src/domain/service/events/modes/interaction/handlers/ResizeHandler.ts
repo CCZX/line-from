@@ -8,8 +8,8 @@ import {
 	ShapeStateEnum,
 	ShapeTypeEnum,
 } from '@/shape/contract';
-import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/eventManager';
-import { IActionLogManager, IActionManager } from '@/domain/contract/action';
+import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
+import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
 import { UpdatePropsAction } from '@/domain/service/action/actions/UpdatePropsAction';
 import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
 import { inject } from 'inversify';

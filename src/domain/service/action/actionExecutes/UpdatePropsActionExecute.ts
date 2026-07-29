@@ -1,5 +1,5 @@
 import { AbsActionExecute } from '../AbsActionExecute';
-import { ActionTypeEnum, IActionExecute } from '../../../contract/action';
+import { ActionTypeEnum, IActionExecute } from '../../../contract/Action';
 import { IShapeManager } from '@/domain/contract';
 import { ILineAnchorService } from '@/domain/contract/LineAnchorService';
 import { ISelectService } from '@/domain/contract/SelectService';

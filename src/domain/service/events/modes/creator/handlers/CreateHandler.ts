@@ -13,10 +13,10 @@ import {
 	EventPayload,
 	IHandler,
 	IHandlerWithCreator,
-} from '../../../../../contract/eventManager';
+} from '../../../../../contract/EventManager';
 import { CreateShapeAction } from '@/domain/service/action/actions/CreateShapeAction';
 import { UpdatePropsAction } from '@/domain/service/action/actions/UpdatePropsAction';
-import { IActionLogManager, IActionManager } from '@/domain/contract/action';
+import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
 import { IShapeManager } from '@/domain/contract';
 import { ISelectService } from '@/domain/contract/SelectService';
 import { IViewportService } from '@/domain/contract/ViewportService';
