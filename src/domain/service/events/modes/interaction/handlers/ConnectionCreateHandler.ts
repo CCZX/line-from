@@ -178,6 +178,7 @@ export class ConnectionCreateHandler implements IHandler {
 					start,
 					end,
 					routing: 'straight',
+					endArrow: true,
 				},
 			},
 		};

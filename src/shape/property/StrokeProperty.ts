@@ -1,8 +1,7 @@
 import { Graphics } from 'pixi.js';
 import { AbsProperty } from './AbsProperty';
-import { StrokePropertyValue, ShapePropertyEnum, ShapeTypeEnum } from '../contract';
+import { StrokePropertyValue, ShapeTypeEnum } from '../contract';
 import { BaseShape } from '../BaseShape';
-import { BaseProperty } from './BaseProperty';
 import { applyLineStyle, drawSketchyCircle, drawSketchyRect } from './style';
 
 const DEFAULT_VALUE: StrokePropertyValue = {
@@ -26,7 +25,7 @@ export class StrokeProperty extends AbsProperty<StrokePropertyValue> {
 
 	public set(value: StrokePropertyValue): void {
 		this.value = withSketchySeed(value);
-		this.draw();
+		this.shape.redraw();
 	}
 
 	public update(value: Partial<StrokePropertyValue>): void {
@@ -36,7 +35,7 @@ export class StrokeProperty extends AbsProperty<StrokePropertyValue> {
 		}
 		this.value = merged;
 		// 触发完整重绘，避免 stroke 叠层
-		this.shape.getProperty<BaseProperty>(ShapePropertyEnum.Base)?.draw(true);
+		this.shape.redraw();
 	}
 
 	public draw(): void {

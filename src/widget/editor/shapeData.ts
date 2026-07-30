@@ -24,7 +24,8 @@ export const MOCK_SHAPE_DATA: ShapeData[] = [
 		type: ShapeTypeEnum.Rectangle,
 		properties: {
 			base: { x: 0, y: 0, width: 100, height: 100 },
-			fill: { color: 0x1ae70f, alpha: 1 },
+			fill: { color: 0x1971c2, alpha: 1, seed: 0x9b7f26, style: 'sketchy' },
+			stroke: { color: 0x1e1e1e, width: 1, alpha: 1, style: 'sketchy' },
 		},
 	},
 	// {
@@ -40,7 +41,7 @@ export const MOCK_SHAPE_DATA: ShapeData[] = [
 		type: ShapeTypeEnum.Line,
 		properties: {
 			base: { x: 120, y: 120, width: 160, height: 60 },
-			stroke: { color: 0xff0000, width: 2, alpha: 1 },
+			stroke: { color: 0xff0000, width: 1, alpha: 1, style: 'sketchy' },
 			line: {
 				start: { x: 120, y: 120 },
 				end: { x: 280, y: 180 },

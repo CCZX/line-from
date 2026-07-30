@@ -1,4 +1,4 @@
-import { Container } from 'pixi.js';
+import { Container, Graphics } from 'pixi.js';
 import {
 	BasePropertyValue,
 	FillPropertyValue,
@@ -22,6 +22,7 @@ import { AbsProperty } from './property/AbsProperty';
 import { BaseProperty } from './property/BaseProperty';
 import { FillProperty } from './property/FillProperty';
 import { StrokeProperty } from './property/StrokeProperty';
+import { LineProperty } from './property/LineProperty';
 import { SelectedBorder } from './decorate/SelectedBorder';
 import { ISelectService } from '@/domain/contract/SelectService';
 
@@ -85,6 +86,47 @@ export abstract class BaseShape<T extends Container = Container> {
 			property.update(value);
 			this.refreshDecorates();
 		}
+	}
+
+	/**
+	 * 图形级统一重绘入口。
+	 * 属性只维护自身数据和绘制细节，由 Shape 负责清理画布并编排完整绘制顺序。
+	 */
+	public redraw(): void {
+		if (this.type === ShapeTypeEnum.Text) {
+			this.layoutText();
+			return;
+		}
+
+		if (this.type === ShapeTypeEnum.Line) {
+			this.getProperty<LineProperty>(ShapePropertyEnum.Line)?.draw();
+			return;
+		}
+
+		const base = this.propertyMap.get(ShapePropertyEnum.Base) as BaseProperty | undefined;
+		if (!base) {
+			return;
+		}
+
+		const { width, height } = base.get();
+		const graphics = this.graphics as unknown as Graphics;
+		graphics.clear();
+
+		if (this.type === ShapeTypeEnum.Rectangle) {
+			graphics.position.set(0, 0);
+			// 保留完整矩形几何，手绘填充的空隙也能正常命中。
+			graphics.beginFill(0, 0);
+			graphics.drawRect(0, 0, width, height);
+			graphics.endFill();
+		}
+
+		if (this.type === ShapeTypeEnum.Circle) {
+			graphics.position.set(width / 2, height / 2);
+		}
+
+		this.getProperty<FillProperty>(ShapePropertyEnum.Fill)?.draw();
+		this.getProperty<StrokeProperty>(ShapePropertyEnum.Stroke)?.draw();
+		this.layoutText();
 	}
 
 	private refreshDecorates() {

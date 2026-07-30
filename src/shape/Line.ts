@@ -10,7 +10,7 @@ import { distToSegment, sampleCurvePoints } from './geometry';
 const MIN_HIT_DISTANCE = 6;
 
 export class Line extends BaseShape<Graphics> {
-	get type(): ShapeTypeEnum {
+	public get type(): ShapeTypeEnum {
 		return ShapeTypeEnum.Line;
 	}
 
@@ -30,7 +30,7 @@ export class Line extends BaseShape<Graphics> {
 	}
 
 	/** 线的包围盒可能高/宽为 0，改用点到路径距离判断命中 */
-	containsPoint(localPoint: Point): boolean {
+	public containsPoint(localPoint: Point): boolean {
 		const line = this.getProperty<LineProperty>(ShapePropertyEnum.Line);
 		if (!line) {
 			return false;

@@ -1,10 +1,9 @@
 import { Graphics } from 'pixi.js';
 import { AbsProperty } from './AbsProperty';
-import { FillPropertyValue, ShapePropertyEnum, ShapeTypeEnum } from '../contract';
+import { FillPropertyValue, ShapeTypeEnum } from '../contract';
 import { BaseShape } from '../BaseShape';
 import { getHatchTexture } from './hatch';
 import { drawSketchyFillCircle, drawSketchyFillRect } from './style';
-import { BaseProperty } from './BaseProperty';
 
 const DEFAULT_VALUE: FillPropertyValue = { color: 0x000, alpha: 1, style: 'solid' };
 
@@ -22,7 +21,7 @@ export class FillProperty extends AbsProperty<FillPropertyValue> {
 
 	public set(value: FillPropertyValue): void {
 		this.value = withSketchySeed(value);
-		this.draw();
+		this.shape.redraw();
 	}
 
 	public update(value: Partial<FillPropertyValue>): void {
@@ -32,7 +31,7 @@ export class FillProperty extends AbsProperty<FillPropertyValue> {
 		}
 		this.value = merged;
 		// 触发完整重绘，避免填充叠层
-		this.shape.getProperty<BaseProperty>(ShapePropertyEnum.Base)?.draw(true);
+		this.shape.redraw();
 	}
 
 	public draw(): void {
