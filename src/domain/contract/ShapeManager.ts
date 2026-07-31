@@ -11,6 +11,8 @@ export interface IShapeManager {
 
 	getAllShapes(): BaseShape[];
 
+	clearShapes(): void;
+
 	removeShape(id: string): void;
 }
 export const IShapeManager = Symbol('IShapeManager');

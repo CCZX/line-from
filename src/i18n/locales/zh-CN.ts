@@ -20,6 +20,9 @@ export default {
 		zoomIn: '放大',
 		zoomReset: '重置缩放',
 		clear: '清空画布',
+		importJson: '导入 ShapeData JSON',
+		importError: '导入失败：请选择有效的 ShapeData JSON 文件。',
+		exportJson: '导出 ShapeData JSON',
 	},
 	property: {
 		title: '样式',

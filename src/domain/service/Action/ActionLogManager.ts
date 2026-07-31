@@ -54,6 +54,13 @@ export class ActionLogManager implements IActionLogManager {
 		actionManager.push(forwardAction);
 	}
 
+	public clear(): void {
+		this.undoStack = [];
+		this.redoStack = [];
+		this.streaming = false;
+		this.streamLastAction = null;
+	}
+
 	public addAction(action: IAction<unknown>) {
 		if (this.streaming) {
 			// 流式操作中只记录第一条的 back action（代表操作前的原始状态）

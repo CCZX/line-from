@@ -39,6 +39,15 @@ export class ShapeManager implements IShapeManager {
 		return Array.from(this.shapes.values());
 	}
 
+	public clearShapes(): void {
+		const stage = this.viewportService.getStage();
+		for (const shape of this.shapes.values()) {
+			stage.removeShape(shape.container);
+			shape.container.destroy({ children: true });
+		}
+		this.shapes.clear();
+	}
+
 	public removeShape(id: string) {
 		const shape = this.shapes.get(id);
 		if (shape) {

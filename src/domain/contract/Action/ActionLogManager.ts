@@ -18,6 +18,8 @@ export interface IActionLogManager {
 
 	redo(): void;
 
+	clear(): void;
+
 	addAction(action: IAction<unknown>): void;
 }
 export const IActionLogManager = Symbol('IActionLogManager');

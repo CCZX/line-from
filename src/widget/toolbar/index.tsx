@@ -1,9 +1,16 @@
-import { useState, useCallback, useMemo } from 'react';
-import { IActionLogManager, ToolType, IToolService } from '@/domain/contract';
+import { useState, useCallback, useMemo, useRef, type ChangeEvent } from 'react';
+import {
+	IActionLogManager,
+	ToolType,
+	IToolService,
+	IShapeManager,
+	ICanvasInitService,
+} from '@/domain/contract';
 import { useInject } from '@/common/context';
 import { RoughGenerator } from 'roughjs/bin/generator';
 import { useTranslation } from 'react-i18next';
 import type { Locale } from '@/i18n';
+import { parseShapeDataJson } from './shapeDataJson';
 import './index.less';
 
 type SketchIconName =
@@ -19,6 +26,8 @@ type SketchIconName =
 	| 'eraser'
 	| 'zoomOut'
 	| 'zoomIn'
+	| 'upload'
+	| 'download'
 	| 'trash';
 
 const ICON_PATHS: Record<SketchIconName, string> = {
@@ -38,6 +47,8 @@ const ICON_PATHS: Record<SketchIconName, string> = {
 		'M18 18 L21 21 M11 18 C7.1 18 4 14.9 4 11 C4 7.1 7.1 4 11 4 C14.9 4 18 7.1 18 11 C18 14.9 14.9 18 11 18 Z M8 11 L14 11',
 	zoomIn:
 		'M18 18 L21 21 M11 18 C7.1 18 4 14.9 4 11 C4 7.1 7.1 4 11 4 C14.9 4 18 7.1 18 11 C18 14.9 14.9 18 11 18 Z M8 11 L14 11 M11 8 L11 14',
+	upload: 'M12 15 L12 4 M8 8 L12 4 L16 8 M5 17 L5 20 L19 20 L19 17',
+	download: 'M12 4 L12 15 M8 11 L12 15 L16 11 M5 17 L5 20 L19 20 L19 17',
 	trash:
 		'M5 7 L19 7 M9 7 L9 4.5 L15 4.5 L15 7 M7 7 L8 20 L16 20 L17 7 M10.5 10 L10.7 17 M13.5 10 L13.3 17',
 };
@@ -55,8 +66,23 @@ const ICON_SEEDS: Record<SketchIconName, number> = {
 	eraser: 53,
 	zoomOut: 59,
 	zoomIn: 61,
+	upload: 73,
+	download: 71,
 	trash: 67,
 };
+
+function getExportFileName(date: Date): string {
+	const parts = [
+		date.getFullYear(),
+		date.getMonth() + 1,
+		date.getDate(),
+		date.getHours(),
+		date.getMinutes(),
+		date.getSeconds(),
+	].map((part) => String(part).padStart(2, '0'));
+
+	return `shape-data-${parts.slice(0, 3).join('')}-${parts.slice(3).join('')}.json`;
+}
 
 function SketchIcon({ name }: { name: SketchIconName }) {
 	const paths = useMemo(() => {
@@ -96,9 +122,12 @@ export function Toolbar() {
 	const { t, i18n } = useTranslation();
 	const toolService = useInject<IToolService>(IToolService);
 	const actionLogManager = useInject<IActionLogManager>(IActionLogManager);
+	const shapeManager = useInject<IShapeManager>(IShapeManager);
+	const canvasInitService = useInject<ICanvasInitService>(ICanvasInitService);
 	const activeTool = toolService.store((s) => s.activeTool);
 	const setActiveTool = toolService.store((s) => s.setActiveTool);
 	const [zoom, setZoom] = useState(100);
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const handleToolClick = useCallback(
 		(tool: ToolType) => {
@@ -126,6 +155,47 @@ export function Toolbar() {
 	const handleRedo = useCallback(() => {
 		actionLogManager.redo();
 	}, [actionLogManager]);
+
+	const handleExport = useCallback(() => {
+		const shapeData = shapeManager.getAllShapes().map((shape) => shape.toData());
+		const blob = new Blob([JSON.stringify(shapeData, null, 2)], {
+			type: 'application/json;charset=utf-8',
+		});
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+
+		link.href = url;
+		link.download = getExportFileName(new Date());
+		document.body.appendChild(link);
+		link.click();
+		link.remove();
+		window.setTimeout(() => URL.revokeObjectURL(url), 0);
+	}, [shapeManager]);
+
+	const handleImportClick = useCallback(() => {
+		fileInputRef.current?.click();
+	}, []);
+
+	const handleImportFile = useCallback(
+		async (event: ChangeEvent<HTMLInputElement>) => {
+			const input = event.currentTarget;
+			const file = input.files?.[0];
+			input.value = '';
+
+			if (!file) {
+				return;
+			}
+
+			try {
+				const shapeData = parseShapeDataJson(await file.text());
+				canvasInitService.replace(shapeData);
+			} catch (error) {
+				console.error('Failed to import ShapeData JSON.', error);
+				window.alert(t('toolbar.importError'));
+			}
+		},
+		[canvasInitService, t],
+	);
 
 	const ToolButton = ({
 		tool,
@@ -219,6 +289,24 @@ export function Toolbar() {
 				<ActionButton title={t('toolbar.zoomIn')} onClick={handleZoomIn}>
 					<SketchIcon name='zoomIn' />
 				</ActionButton>
+			</div>
+
+			<div className='tb-sep' />
+
+			<div className='tb-group'>
+				<ActionButton title={t('toolbar.importJson')} onClick={handleImportClick}>
+					<SketchIcon name='upload' />
+				</ActionButton>
+				<ActionButton title={t('toolbar.exportJson')} onClick={handleExport}>
+					<SketchIcon name='download' />
+				</ActionButton>
+				<input
+					ref={fileInputRef}
+					type='file'
+					accept='.json,application/json'
+					hidden
+					onChange={handleImportFile}
+				/>
 			</div>
 
 			<div className='tb-sep' />

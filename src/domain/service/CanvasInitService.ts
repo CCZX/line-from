@@ -4,7 +4,13 @@ import { Circle } from '@/shape/Circle';
 import { Rectangle } from '@/shape/Rectangle';
 import { Line } from '@/shape/Line';
 import { Text } from '@/shape/Text';
-import { ICanvasInitService, IShapeManager } from '../contract';
+import {
+	IActionLogManager,
+	ICanvasInitService,
+	IEventManager,
+	ISelectService,
+	IShapeManager,
+} from '../contract';
 import { provide } from 'inversify-binding-decorators';
 import { inject } from 'inversify';
 import { IocContainerService, ILoggerService } from '@/common/contract';
@@ -16,6 +22,15 @@ export class CanvasInitService implements ICanvasInitService {
 
 	@inject(IShapeManager)
 	private shapeManager!: IShapeManager;
+
+	@inject(ISelectService)
+	private selectService!: ISelectService;
+
+	@inject(IEventManager)
+	private eventManager!: IEventManager;
+
+	@inject(IActionLogManager)
+	private actionLogManager!: IActionLogManager;
 
 	@inject(IocContainerService)
 	private iocContainerService!: IocContainerService;
@@ -54,5 +69,14 @@ export class CanvasInitService implements ICanvasInitService {
 				this.shapeManager.setShape(shape);
 			}
 		}
+	}
+
+	public replace(data: ShapeData[]): void {
+		this.selectService.clearSelectedShapes();
+		this.selectService.hideMultiSelectOverlay();
+		this.eventManager.clearSelection();
+		this.actionLogManager.clear();
+		this.shapeManager.clearShapes();
+		this.init(data);
 	}
 }

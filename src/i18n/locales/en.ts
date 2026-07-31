@@ -20,6 +20,9 @@ export default {
 		zoomIn: 'Zoom in',
 		zoomReset: 'Reset zoom',
 		clear: 'Clear canvas',
+		importJson: 'Import ShapeData JSON',
+		importError: 'Import failed. Choose a valid ShapeData JSON file.',
+		exportJson: 'Export ShapeData JSON',
 	},
 	property: {
 		title: 'Style',
