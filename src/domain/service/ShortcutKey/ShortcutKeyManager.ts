@@ -27,7 +27,7 @@ export class ShortcutKeyManager implements IShortcutKeyManager, IDestroyable {
 		});
 	};
 
-	start() {
+	public start() {
 		if (this.started) {
 			return;
 		}
@@ -37,7 +37,7 @@ export class ShortcutKeyManager implements IShortcutKeyManager, IDestroyable {
 		window.addEventListener('keyup', this.onKeyUp);
 	}
 
-	destroy() {
+	public destroy() {
 		this.started = false;
 		window.removeEventListener('keydown', this.onKeyDown);
 		window.removeEventListener('keyup', this.onKeyUp);

@@ -17,7 +17,7 @@ import { StrokeProperty } from '@/shape/property/StrokeProperty';
 import { FillProperty } from '@/shape/property/FillProperty';
 import { BaseProperty } from '@/shape/property/BaseProperty';
 import { IocContainerService } from '@/common/contract';
-import { UpdatePropsAction } from '@/domain/service/action/Actions/UpdatePropsAction';
+import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
 
 function numberToHex(num: number): string {
 	return '#' + num.toString(16).padStart(6, '0');

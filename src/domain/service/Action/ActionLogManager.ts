@@ -16,17 +16,17 @@ export class ActionLogManager implements IActionLogManager {
 	/** 流式操作中最后一条 action，用于 redo */
 	private streamLastAction: IAction<unknown> | null = null;
 
-	setStreamStart() {
+	public setStreamStart() {
 		this.streaming = true;
 		this.streamLastAction = null;
 	}
 
-	setStreamEnd() {
+	public setStreamEnd() {
 		this.streaming = false;
 		this.streamLastAction = null;
 	}
 
-	undo() {
+	public undo() {
 		if (this.undoStack.length === 0) {
 			return;
 		}
@@ -42,7 +42,7 @@ export class ActionLogManager implements IActionLogManager {
 		actionManager.push(action);
 	}
 
-	redo() {
+	public redo() {
 		if (this.redoStack.length === 0) {
 			return;
 		}
@@ -54,7 +54,7 @@ export class ActionLogManager implements IActionLogManager {
 		actionManager.push(forwardAction);
 	}
 
-	addAction(action: IAction<unknown>) {
+	public addAction(action: IAction<unknown>) {
 		if (this.streaming) {
 			// 流式操作中只记录第一条的 back action（代表操作前的原始状态）
 			if (this.streamLastAction === null) {

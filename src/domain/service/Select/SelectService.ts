@@ -44,36 +44,36 @@ export class SelectService implements ISelectService {
 
 	public store = selectStore;
 
-	setSelectedShape(shape: BaseShape) {
+	public setSelectedShape(shape: BaseShape) {
 		this.selectedShapes.set(shape.id, shape);
 		selectStore.getState().addSelectedShapeId(shape.id);
 	}
 
-	setMultipleSelectedShapes(shapes: BaseShape[]) {
+	public setMultipleSelectedShapes(shapes: BaseShape[]) {
 		this.selectedShapes.clear();
 		shapes.forEach((shape) => this.selectedShapes.set(shape.id, shape));
 		selectStore.getState().setSelectedShapeIds(shapes.map((s) => s.id));
 	}
 
-	clearSelectedShapes() {
+	public clearSelectedShapes() {
 		this.selectedShapes.clear();
 		selectStore.getState().clearSelectedShapeIds();
 	}
 
-	getSelectedShapeById(id: string) {
+	public getSelectedShapeById(id: string) {
 		return this.selectedShapes.get(id);
 	}
 
-	getSelectedShapes() {
+	public getSelectedShapes() {
 		return this.selectedShapes;
 	}
 
-	removeSelectedShapeById(id: string) {
+	public removeSelectedShapeById(id: string) {
 		this.selectedShapes.delete(id);
 		selectStore.getState().removeSelectedShapeId(id);
 	}
 
-	showMultiSelectOverlay(rect: Rectangle) {
+	public showMultiSelectOverlay(rect: Rectangle) {
 		this.overlayRect = rect;
 		if (!this.multiSelectOverlay) {
 			this.multiSelectOverlay = new Graphics();
@@ -83,7 +83,7 @@ export class SelectService implements ISelectService {
 		this.drawOverlay(rect);
 	}
 
-	hideMultiSelectOverlay() {
+	public hideMultiSelectOverlay() {
 		if (this.multiSelectOverlay) {
 			this.multiSelectOverlay.removeFromParent();
 			this.multiSelectOverlay.destroy();
@@ -92,7 +92,7 @@ export class SelectService implements ISelectService {
 		}
 	}
 
-	updateMultiSelectOverlay(shapes: BaseShape[]) {
+	public updateMultiSelectOverlay(shapes: BaseShape[]) {
 		if (shapes.length < 2) {
 			this.hideMultiSelectOverlay();
 			return;
@@ -101,7 +101,7 @@ export class SelectService implements ISelectService {
 		this.showMultiSelectOverlay(rect);
 	}
 
-	getMultiSelectOverlayRect(): Rectangle | null {
+	public getMultiSelectOverlayRect(): Rectangle | null {
 		return this.overlayRect;
 	}
 
@@ -134,7 +134,7 @@ export class SelectService implements ISelectService {
 		g.endFill();
 	}
 
-	addMarqueeGraphics(graphics: Graphics) {
+	public addMarqueeGraphics(graphics: Graphics) {
 		const stage = this.viewportService.getStage();
 		stage.getViewport().addChild(graphics);
 	}
