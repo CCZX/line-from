@@ -9,7 +9,7 @@ import {
 } from '@/domain/contract/EventManager';
 import { IShapeManager } from '@/domain/contract/ShapeManager';
 import { IViewportService } from '@/domain/contract/ViewportService';
-import { CreateShapeAction } from '@/domain/service/action/actions/CreateShapeAction';
+import { CreateShapeAction } from '@/domain/service/action/Actions/CreateShapeAction';
 import { BaseShape } from '@/shape/BaseShape';
 import {
 	LineEndpointValue,

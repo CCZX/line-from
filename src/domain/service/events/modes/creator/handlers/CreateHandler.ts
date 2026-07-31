@@ -14,8 +14,8 @@ import {
 	IHandler,
 	IHandlerWithCreator,
 } from '../../../../../contract/EventManager';
-import { CreateShapeAction } from '@/domain/service/action/actions/CreateShapeAction';
-import { UpdatePropsAction } from '@/domain/service/action/actions/UpdatePropsAction';
+import { CreateShapeAction } from '@/domain/service/action/Actions/CreateShapeAction';
+import { UpdatePropsAction } from '@/domain/service/action/Actions/UpdatePropsAction';
 import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
 import { IShapeManager } from '@/domain/contract';
 import { ISelectService } from '@/domain/contract/SelectService';

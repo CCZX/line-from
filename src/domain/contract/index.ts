@@ -2,7 +2,6 @@ export * from './interface';
 export * from './CanvasInitService';
 export * from './EventManager';
 export * from './ShapeManager';
-export * from './LineAnchorService';
 export * from './SelectService';
 export * from './ViewportService';
 export * from './ToolService';

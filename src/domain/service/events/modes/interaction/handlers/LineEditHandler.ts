@@ -9,7 +9,7 @@ import {
 } from '@/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
 import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
-import { UpdatePropsAction } from '@/domain/service/action/actions/UpdatePropsAction';
+import { UpdatePropsAction } from '@/domain/service/action/Actions/UpdatePropsAction';
 import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
 import { IViewportService } from '@/domain/contract/ViewportService';
 import { IShapeManager } from '@/domain/contract';

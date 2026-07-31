@@ -14,7 +14,7 @@ import { IShapeManager } from '@/domain/contract';
 import { ISelectService } from '@/domain/contract/SelectService';
 import { IViewportService } from '@/domain/contract/ViewportService';
 import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
-import { UpdatePropsAction } from '@/domain/service/action/actions/UpdatePropsAction';
+import { UpdatePropsAction } from '@/domain/service/action/Actions/UpdatePropsAction';
 import { isPointInRect } from '@/shape/geometry';
 import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
 import { inject } from 'inversify';

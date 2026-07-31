@@ -2,7 +2,7 @@ import { Point, TextMetrics } from 'pixi.js';
 import { inject } from 'inversify';
 import { IocContainerService } from '@/common/contract';
 import { IActionManager, ITextEditorService, IViewportService } from '@/domain/contract';
-import { UpdatePropsAction } from './action/actions/UpdatePropsAction';
+import { UpdatePropsAction } from './action/Actions/UpdatePropsAction';
 import { BaseProperty } from '@/shape/property/BaseProperty';
 import { TextProperty } from '@/shape/property/TextProperty';
 import {

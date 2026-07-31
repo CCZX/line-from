@@ -4,7 +4,7 @@ import { HandlerEnum, InteractionState, EventPayload } from '../../../../../cont
 import { ISelectService } from '@/domain/contract/SelectService';
 import { IViewportService } from '@/domain/contract/ViewportService';
 import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
-import { UpdatePropsAction } from '@/domain/service/action/actions/UpdatePropsAction';
+import { UpdatePropsAction } from '@/domain/service/action/Actions/UpdatePropsAction';
 import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
