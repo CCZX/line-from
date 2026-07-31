@@ -2,6 +2,8 @@ import { useState, useCallback, useMemo } from 'react';
 import { IActionLogManager, ToolType, IToolService } from '@/domain/contract';
 import { useInject } from '@/common/context';
 import { RoughGenerator } from 'roughjs/bin/generator';
+import { useTranslation } from 'react-i18next';
+import type { Locale } from '@/i18n';
 import './index.less';
 
 type SketchIconName =
@@ -20,8 +22,8 @@ type SketchIconName =
 	| 'trash';
 
 const ICON_PATHS: Record<SketchIconName, string> = {
-	undo: 'M9 7 L4 7 L4 12 M4 7 C7 4.5 11 3.5 15 5 C19 6.5 21 10 20 14 C19 17.5 16 19.5 12 19',
-	redo: 'M15 7 L20 7 L20 12 M20 7 C17 4.5 13 3.5 9 5 C5 6.5 3 10 4 14 C5 17.5 8 19.5 12 19',
+	undo: 'M9.5 4.8 L5 8.2 L9.5 11.6 M5.4 8.2 L12.4 8.2 C16.5 8.2 19.3 10.6 19.3 14.1 C19.3 17.4 16.7 19.6 13.4 19.6 C10.5 19.6 8.2 18.3 6.7 16.1',
+	redo: 'M14.5 4.8 L19 8.2 L14.5 11.6 M18.6 8.2 L11.6 8.2 C7.5 8.2 4.7 10.6 4.7 14.1 C4.7 17.4 7.3 19.6 10.6 19.6 C13.5 19.6 15.8 18.3 17.3 16.1',
 	select: 'M5 3.5 L10.5 20 L13 13.5 L19.5 11 Z M13 13.5 L20 20.5',
 	pen: 'M5 19 L7 14.5 L16.8 4.7 C17.7 3.8 19.1 3.8 20 4.7 C20.9 5.6 20.9 7 20 7.9 L10.2 17.7 Z M7 14.5 L10.2 17.7 M4 20 L13 20',
 	rect: 'M4 5 C8 4.5 15.5 4.8 20 5.2 L19.7 19 C15 19.5 8.5 19.2 4.2 18.8 Z',
@@ -59,12 +61,13 @@ const ICON_SEEDS: Record<SketchIconName, number> = {
 function SketchIcon({ name }: { name: SketchIconName }) {
 	const paths = useMemo(() => {
 		const generator = new RoughGenerator();
+		const isHistoryIcon = name === 'undo' || name === 'redo';
 		const drawable = generator.path(ICON_PATHS[name], {
 			stroke: 'currentColor',
-			strokeWidth: 1.25,
-			roughness: 0.62,
-			bowing: 0.7,
-			maxRandomnessOffset: 0.48,
+			strokeWidth: isHistoryIcon ? 1.55 : 1.25,
+			roughness: isHistoryIcon ? 0.38 : 0.62,
+			bowing: isHistoryIcon ? 0.45 : 0.7,
+			maxRandomnessOffset: isHistoryIcon ? 0.28 : 0.48,
 			preserveVertices: true,
 			seed: ICON_SEEDS[name],
 			disableMultiStroke: false,
@@ -90,6 +93,7 @@ function SketchIcon({ name }: { name: SketchIconName }) {
 }
 
 export function Toolbar() {
+	const { t, i18n } = useTranslation();
 	const toolService = useInject<IToolService>(IToolService);
 	const actionLogManager = useInject<IActionLogManager>(IActionLogManager);
 	const activeTool = toolService.store((s) => s.activeTool);
@@ -167,13 +171,13 @@ export function Toolbar() {
 	);
 
 	return (
-		<nav id='toolbar' aria-label='画布工具栏'>
+		<nav id='toolbar' aria-label={t('toolbar.label')}>
 			{/* Undo / Redo */}
 			<div className='tb-group'>
-				<ActionButton title='撤销 (Ctrl+Z)' onClick={handleUndo}>
+				<ActionButton title={t('toolbar.undo')} onClick={handleUndo}>
 					<SketchIcon name='undo' />
 				</ActionButton>
-				<ActionButton title='重做 (Ctrl+Shift+Z)' onClick={handleRedo}>
+				<ActionButton title={t('toolbar.redo')} onClick={handleRedo}>
 					<SketchIcon name='redo' />
 				</ActionButton>
 			</div>
@@ -182,29 +186,23 @@ export function Toolbar() {
 
 			{/* Tools */}
 			<div className='tb-group'>
-				<ToolButton tool={ToolType.Select} title='选择 (V)'>
+				<ToolButton tool={ToolType.Select} title={t('toolbar.select')}>
 					<SketchIcon name='select' />
 				</ToolButton>
-				<ToolButton tool={ToolType.Pen} title='画笔 (P)'>
-					<SketchIcon name='pen' />
-				</ToolButton>
-				<ToolButton tool={ToolType.Rect} title='矩形 (R)'>
+				<ToolButton tool={ToolType.Rect} title={t('toolbar.rect')}>
 					<SketchIcon name='rect' />
 				</ToolButton>
-				<ToolButton tool={ToolType.Circle} title='圆形 (C)'>
+				<ToolButton tool={ToolType.Circle} title={t('toolbar.circle')}>
 					<SketchIcon name='circle' />
 				</ToolButton>
-				<ToolButton tool={ToolType.Line} title='直线 (L)'>
+				<ToolButton tool={ToolType.Line} title={t('toolbar.line')}>
 					<SketchIcon name='line' />
 				</ToolButton>
-				<ToolButton tool={ToolType.Arrow} title='箭头 (A)'>
+				<ToolButton tool={ToolType.Arrow} title={t('toolbar.arrow')}>
 					<SketchIcon name='arrow' />
 				</ToolButton>
-				<ToolButton tool={ToolType.Text} title='文字 (T)'>
+				<ToolButton tool={ToolType.Text} title={t('toolbar.text')}>
 					<SketchIcon name='text' />
-				</ToolButton>
-				<ToolButton tool={ToolType.Eraser} title='橡皮擦 (E)'>
-					<SketchIcon name='eraser' />
 				</ToolButton>
 			</div>
 
@@ -212,23 +210,29 @@ export function Toolbar() {
 
 			{/* Zoom */}
 			<div className='zoom-wrap'>
-				<ActionButton title='缩小' onClick={handleZoomOut}>
+				<ActionButton title={t('toolbar.zoomOut')} onClick={handleZoomOut}>
 					<SketchIcon name='zoomOut' />
 				</ActionButton>
-				<span className='zoom-label' title='重置缩放' onClick={handleZoomReset}>
+				<span className='zoom-label' title={t('toolbar.zoomReset')} onClick={handleZoomReset}>
 					{zoom}%
 				</span>
-				<ActionButton title='放大' onClick={handleZoomIn}>
+				<ActionButton title={t('toolbar.zoomIn')} onClick={handleZoomIn}>
 					<SketchIcon name='zoomIn' />
 				</ActionButton>
 			</div>
 
 			<div className='tb-sep' />
 
-			{/* Clear */}
-			<ActionButton title='清空画布'>
-				<SketchIcon name='trash' />
-			</ActionButton>
+			<select
+				className='language-select'
+				value={i18n.resolvedLanguage ?? i18n.language}
+				title={t('language.label')}
+				aria-label={t('language.label')}
+				onChange={(event) => void i18n.changeLanguage(event.target.value as Locale)}
+			>
+				<option value='zh-CN'>{t('language.zhCN')}</option>
+				<option value='en'>{t('language.en')}</option>
+			</select>
 		</nav>
 	);
 }

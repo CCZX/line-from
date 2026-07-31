@@ -167,6 +167,32 @@
 	}
 }
 
+.language-select {
+	appearance: none;
+	height: 32px;
+	min-width: 68px;
+	padding: 0 24px 0 10px;
+	color: #403b35;
+	font: 600 13px/1 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	background:
+		linear-gradient(45deg, transparent 50%, #6f675d 50%) calc(100% - 13px) 13px / 5px 5px no-repeat,
+		linear-gradient(135deg, #6f675d 50%, transparent 50%) calc(100% - 8px) 13px / 5px 5px no-repeat,
+		#fffefa;
+	border: 1px solid rgba(73, 67, 57, 0.34);
+	border-radius: 9px 8px 10px 7px;
+	outline: none;
+	cursor: pointer;
+
+	&:hover {
+		background-color: #f5f0e8;
+		border-color: #7a7165;
+	}
+
+	&:focus-visible {
+		box-shadow: 0 0 0 3px rgba(92, 84, 163, 0.18);
+	}
+}
+
 @media (max-width: 720px) {
 	#toolbar {
 		top: 12px;

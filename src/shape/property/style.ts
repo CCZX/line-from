@@ -94,6 +94,26 @@ export function drawSketchyLine(g: Graphics, points: Point[], seed: number): voi
 	}
 }
 
+/** 从两侧箭翼分别向尖端落笔，形成开放式手绘箭头。 */
+export function drawSketchyArrowhead(
+	g: Graphics,
+	tip: Point,
+	wings: [Point, Point],
+	seed: number,
+): void {
+	for (let i = 0; i < wings.length; i++) {
+		const wing = wings[i];
+		const drawable = generator.line(wing.x, wing.y, tip.x, tip.y, {
+			seed: seed + i,
+			roughness: 0.95,
+			bowing: 0.6,
+		});
+		for (const set of drawable.sets) {
+			drawOpSet(g, set);
+		}
+	}
+}
+
 function drawHachureFill(
 	g: Graphics,
 	drawable: ReturnType<typeof generator.rectangle>,

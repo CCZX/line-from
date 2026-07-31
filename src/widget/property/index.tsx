@@ -18,21 +18,23 @@ import { FillProperty } from '@/shape/property/FillProperty';
 import { BaseProperty } from '@/shape/property/BaseProperty';
 import { IocContainerService } from '@/common/contract';
 import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
+import { useTranslation } from 'react-i18next';
 
 function numberToHex(num: number): string {
 	return '#' + num.toString(16).padStart(6, '0');
 }
 
 const STROKE_WIDTH_OPTIONS = [
-	{ label: '无 (0)', value: '0' },
-	{ label: '小 (1)', value: '1' },
-	{ label: '中 (3)', value: '3' },
-	{ label: '大 (5)', value: '5' },
+	{ labelKey: 'property.width.none', value: '0' },
+	{ labelKey: 'property.width.small', value: '1' },
+	{ labelKey: 'property.width.medium', value: '3' },
+	{ labelKey: 'property.width.large', value: '5' },
 ];
 
 const STROKE_RADIUS_MAP: Record<number, number> = { 0: 1, 1: 2, 3: 5, 5: 7 };
 
 export function Property() {
+	const { t } = useTranslation();
 	const shapeManager = useInject<IShapeManager>(IShapeManager);
 	const selectService = useInject<ISelectService>(ISelectService);
 	const actionManager = useInject<IActionManager>(IActionManager);
@@ -206,17 +208,19 @@ export function Property() {
 			<div className='ctx-card'>
 				<div className='ctx-inner'>
 					<div className='ctx-heading'>
-						<span>样式</span>
+						<span>{t('property.title')}</span>
 						<span className='ctx-heading-mark' aria-hidden='true' />
 					</div>
 
 					{selectedShapeIds.length > 1 && (
-						<div className='ctx-selection-note'>已选择 {selectedShapeIds.length} 个图形</div>
+						<div className='ctx-selection-note'>
+							{t('property.selected', { count: selectedShapeIds.length })}
+						</div>
 					)}
 
 					{/* 描边颜色 */}
 					<div className='ctx-section'>
-						<span className='ctx-label'>描边</span>
+						<span className='ctx-label'>{t('property.stroke')}</span>
 						<div className='ctx-colors'>
 							{STROKE_COLOR_PRESETS.map((preset) => (
 								<button
@@ -226,9 +230,9 @@ export function Property() {
 									}`}
 									data-color={preset.hex}
 									style={{ backgroundColor: preset.hex }}
-									aria-label={`描边颜色：${preset.name}`}
+									aria-label={t('property.strokeColor', { color: t(preset.nameKey) })}
 									aria-pressed={strokeColor === preset.hex}
-									title={preset.name}
+									title={t(preset.nameKey)}
 									onClick={() => handleStrokeColor(preset)}
 								/>
 							))}
@@ -239,7 +243,7 @@ export function Property() {
 
 					{/* 描边宽度 */}
 					<div className='ctx-section'>
-						<span className='ctx-label'>描边宽度</span>
+						<span className='ctx-label'>{t('property.strokeWidth')}</span>
 						<div className='ctx-stroke'>
 							<svg width='22' height='22' viewBox='0 0 22 22'>
 								<circle
@@ -252,12 +256,12 @@ export function Property() {
 							<select
 								className='ctx-select'
 								value={String(strokeWidth)}
-								aria-label='描边宽度'
+								aria-label={t('property.strokeWidth')}
 								onChange={(e) => handleStrokeWidth(parseInt(e.target.value, 10))}
 							>
 								{STROKE_WIDTH_OPTIONS.map((option) => (
 									<option key={option.value} value={option.value}>
-										{option.label}
+										{t(option.labelKey)}
 									</option>
 								))}
 							</select>
@@ -268,7 +272,7 @@ export function Property() {
 
 					{/* 描边样式 */}
 					<div className='ctx-section'>
-						<span className='ctx-label'>描边样式</span>
+						<span className='ctx-label'>{t('property.strokeStyle')}</span>
 						<div className='ctx-style-row'>
 							<button
 								className={`ctx-style-btn${
@@ -276,7 +280,7 @@ export function Property() {
 								}`}
 								onClick={() => handleStrokeStyle('regular')}
 							>
-								规正
+								{t('property.regular')}
 							</button>
 							<button
 								className={`ctx-style-btn${
@@ -284,7 +288,7 @@ export function Property() {
 								}`}
 								onClick={() => handleStrokeStyle('sketchy')}
 							>
-								手绘
+								{t('property.sketchy')}
 							</button>
 						</div>
 					</div>
@@ -293,7 +297,7 @@ export function Property() {
 
 					{/* 背景色 */}
 					<div className='ctx-section'>
-						<span className='ctx-label'>背景色</span>
+						<span className='ctx-label'>{t('property.background')}</span>
 						<div className='ctx-colors'>
 							{FILL_COLOR_PRESETS.map((preset) => {
 								const isActive = preset.transparent
@@ -307,9 +311,11 @@ export function Property() {
 										}`}
 										data-color={preset.hex}
 										style={preset.transparent ? undefined : { backgroundColor: preset.hex }}
-										aria-label={`背景颜色：${preset.name}`}
+										aria-label={t('property.backgroundColor', {
+											color: t(preset.nameKey),
+										})}
 										aria-pressed={isActive}
-										title={preset.name}
+										title={t(preset.nameKey)}
 										onClick={() => handleFillColor(preset)}
 									/>
 								);
@@ -321,7 +327,7 @@ export function Property() {
 
 					{/* 背景透明度 */}
 					<div className='ctx-section'>
-						<span className='ctx-label'>背景透明度</span>
+						<span className='ctx-label'>{t('property.backgroundAlpha')}</span>
 						<div className='ctx-alpha-row'>
 							<input
 								className='ctx-range'
@@ -330,7 +336,7 @@ export function Property() {
 								max={100}
 								step={1}
 								value={fillAlpha}
-								aria-label='背景透明度'
+								aria-label={t('property.backgroundAlpha')}
 								style={{ '--ctx-range-value': `${fillAlpha}%` } as CSSProperties}
 								onChange={(e) => handleFillAlpha(Number(e.target.value))}
 							/>
@@ -342,19 +348,19 @@ export function Property() {
 
 					{/* 填充样式 */}
 					<div className='ctx-section'>
-						<span className='ctx-label'>填充样式</span>
+						<span className='ctx-label'>{t('property.fillStyle')}</span>
 						<div className='ctx-style-row'>
 							<button
 								className={`ctx-style-btn${fillStyle === 'solid' ? ' ctx-style-btn--active' : ''}`}
 								onClick={() => handleFillStyle('solid')}
 							>
-								纯色
+								{t('property.solid')}
 							</button>
 							<button
 								className={`ctx-style-btn${fillStyle === 'hatch' ? ' ctx-style-btn--active' : ''}`}
 								onClick={() => handleFillStyle('hatch')}
 							>
-								斜线
+								{t('property.hatch')}
 							</button>
 							<button
 								className={`ctx-style-btn${
@@ -362,7 +368,7 @@ export function Property() {
 								}`}
 								onClick={() => handleFillStyle('sketchy')}
 							>
-								手绘
+								{t('property.sketchy')}
 							</button>
 						</div>
 					</div>

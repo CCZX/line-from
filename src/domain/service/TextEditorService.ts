@@ -13,6 +13,7 @@ import {
 } from '@/shape/contract';
 import type { TextEditableShape } from '@/shape/TextEditableShape';
 import { provide } from 'inversify-binding-decorators';
+import i18n from '@/i18n';
 
 function numberToHex(color: number): string {
 	return `#${color.toString(16).padStart(6, '0')}`;
@@ -120,7 +121,7 @@ export class TextEditorService implements ITextEditorService {
 		}
 
 		const textarea = document.createElement('textarea');
-		textarea.setAttribute('aria-label', '编辑图形文字');
+		textarea.setAttribute('aria-label', i18n.t('editor.editText'));
 		textarea.spellcheck = false;
 		textarea.wrap = 'soft';
 
@@ -145,6 +146,9 @@ export class TextEditorService implements ITextEditorService {
 		textarea.addEventListener('input', this.syncEditorPosition);
 		textarea.addEventListener('blur', this.onBlur);
 		document.body.appendChild(textarea);
+		i18n.on('languageChanged', () => {
+			textarea.setAttribute('aria-label', i18n.t('editor.editText'));
+		});
 
 		this.textarea = textarea;
 		return textarea;

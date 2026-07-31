@@ -3,7 +3,7 @@ import { LineEndpointValue, LinePropertyValue, ShapePropertyEnum, StrokeStyle } 
 import { BaseShape } from '../BaseShape';
 import { BaseProperty } from './BaseProperty';
 import { StrokeProperty } from './StrokeProperty';
-import { applyLineStyle, drawSketchyLine } from './style';
+import { applyLineStyle, drawSketchyArrowhead, drawSketchyLine } from './style';
 import { catmullRomToBezier, cubicBezierPoint, getShapeAnchorPoint } from '../geometry';
 import { Graphics } from 'pixi.js';
 import { IShapeManager } from '@/domain/contract';
@@ -136,46 +136,144 @@ export class LineProperty extends AbsProperty<LinePropertyValue> {
 		// 箭头切线方向的参考点
 		let startTangentFrom = end;
 		let endTangentFrom = start;
-
-		if (strokeStyle === 'sketchy' && seed != null) {
-			drawSketchyLine(g, points, seed);
-			startTangentFrom = end;
-			endTangentFrom = start;
-		} else if (points.length === 2) {
-			g.moveTo(start.x, start.y);
-			g.lineTo(end.x, end.y);
-		} else {
+		if (points.length > 2) {
 			const segments = catmullRomToBezier(points);
-			g.moveTo(start.x, start.y);
-			for (const seg of segments) {
-				g.bezierCurveTo(seg.c1.x, seg.c1.y, seg.c2.x, seg.c2.y, seg.to.x, seg.to.y);
-			}
 			startTangentFrom = segments[0].c1;
 			endTangentFrom = segments[segments.length - 1].c2;
 		}
+
+		const startArrowLength = this.getArrowLength(width, startTangentFrom, start);
+		const endArrowLength = this.getArrowLength(width, endTangentFrom, end);
+		const isSketchy = strokeStyle === 'sketchy' && seed != null;
+		const shaftPoints = points.map((point) => ({ ...point }));
+		if (v.startArrow && !isSketchy) {
+			shaftPoints[0] = this.insetArrowShaft(start, startTangentFrom, startArrowLength);
+		}
+		if (v.endArrow && !isSketchy) {
+			shaftPoints[shaftPoints.length - 1] = this.insetArrowShaft(
+				end,
+				endTangentFrom,
+				endArrowLength,
+			);
+		}
+
+		if (isSketchy) {
+			drawSketchyLine(g, shaftPoints, seed);
+		} else if (points.length === 2) {
+			g.moveTo(shaftPoints[0].x, shaftPoints[0].y);
+			g.lineTo(shaftPoints[1].x, shaftPoints[1].y);
+		} else {
+			const segments = catmullRomToBezier(shaftPoints);
+			g.moveTo(shaftPoints[0].x, shaftPoints[0].y);
+			for (const seg of segments) {
+				g.bezierCurveTo(seg.c1.x, seg.c1.y, seg.c2.x, seg.c2.y, seg.to.x, seg.to.y);
+			}
+		}
 		g.lineStyle(0);
 
-		// 箭头（实心三角）
+		// 普通模式使用实心燕尾箭头；手绘模式使用开放式双笔箭翼。
 		if (v.startArrow) {
-			g.beginFill(color, alpha);
-			this.drawArrowhead(startTangentFrom.x, startTangentFrom.y, start.x, start.y, g);
-			g.endFill();
+			this.drawArrowhead(
+				g,
+				startTangentFrom.x,
+				startTangentFrom.y,
+				start.x,
+				start.y,
+				startArrowLength,
+				strokeStyle,
+				seed == null ? undefined : seed + 101,
+				width,
+				color,
+				alpha,
+			);
 		}
 		if (v.endArrow) {
-			g.beginFill(color, alpha);
-			this.drawArrowhead(endTangentFrom.x, endTangentFrom.y, end.x, end.y, g);
-			g.endFill();
+			this.drawArrowhead(
+				g,
+				endTangentFrom.x,
+				endTangentFrom.y,
+				end.x,
+				end.y,
+				endArrowLength,
+				strokeStyle,
+				seed == null ? undefined : seed + 202,
+				width,
+				color,
+				alpha,
+			);
 		}
 	}
 
-	private drawArrowhead(fromX: number, fromY: number, toX: number, toY: number, g: Graphics) {
-		const angle = Math.atan2(toY - fromY, toX - fromX);
-		const size = 10;
-		const spread = Math.PI / 6;
+	private getArrowLength(strokeWidth: number, from: Point, to: Point): number {
+		const preferredLength = Math.min(20, Math.max(14, strokeWidth * 4 + 8));
+		const tangentLength = Math.hypot(to.x - from.x, to.y - from.y);
+		return Math.min(preferredLength, tangentLength * 0.6);
+	}
 
-		g.moveTo(toX, toY);
-		g.lineTo(toX - size * Math.cos(angle - spread), toY - size * Math.sin(angle - spread));
-		g.lineTo(toX - size * Math.cos(angle + spread), toY - size * Math.sin(angle + spread));
-		g.lineTo(toX, toY);
+	private insetArrowShaft(tip: Point, toward: Point, arrowLength: number): Point {
+		const dx = toward.x - tip.x;
+		const dy = toward.y - tip.y;
+		const distance = Math.hypot(dx, dy);
+		if (distance === 0) {
+			return { ...tip };
+		}
+
+		const inset = Math.min(arrowLength * 0.62, distance * 0.45);
+		return {
+			x: tip.x + (dx / distance) * inset,
+			y: tip.y + (dy / distance) * inset,
+		};
+	}
+
+	private drawArrowhead(
+		g: Graphics,
+		fromX: number,
+		fromY: number,
+		toX: number,
+		toY: number,
+		length: number,
+		strokeStyle: StrokeStyle,
+		seed: number | undefined,
+		width: number,
+		color: number,
+		alpha: number,
+	): void {
+		const dx = toX - fromX;
+		const dy = toY - fromY;
+		const distance = Math.hypot(dx, dy);
+		if (distance === 0 || length === 0) {
+			return;
+		}
+
+		const ux = dx / distance;
+		const uy = dy / distance;
+		const nx = -uy;
+		const ny = ux;
+		const halfWidth = length * 0.38;
+		const baseX = toX - ux * length;
+		const baseY = toY - uy * length;
+		const notchX = toX - ux * length * 0.62;
+		const notchY = toY - uy * length * 0.62;
+		const points = [
+			{ x: toX, y: toY },
+			{ x: baseX + nx * halfWidth, y: baseY + ny * halfWidth },
+			{ x: notchX, y: notchY },
+			{ x: baseX - nx * halfWidth, y: baseY - ny * halfWidth },
+		];
+
+		if (strokeStyle === 'sketchy' && seed != null) {
+			applyLineStyle(g, { width, color, alpha });
+			drawSketchyArrowhead(g, points[0], [points[1], points[3]], seed);
+			g.lineStyle(0);
+			return;
+		}
+
+		g.beginFill(color, alpha);
+		g.moveTo(points[0].x, points[0].y);
+		for (let i = 1; i < points.length; i++) {
+			g.lineTo(points[i].x, points[i].y);
+		}
+		g.lineTo(points[0].x, points[0].y);
+		g.endFill();
 	}
 }
