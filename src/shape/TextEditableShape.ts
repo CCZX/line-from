@@ -1,10 +1,13 @@
-import { Container, Text as PixiText } from 'pixi.js';
+import { Container, Graphics, Text as PixiText } from 'pixi.js';
 import { ITextEditorService } from '@/domain/contract';
 import { BaseShape } from './BaseShape';
 import { ShapeContext, ShapePropertyEnum, ShapeTypeEnum, TextPropertyValue } from './contract';
+import { FillProperty } from './property/FillProperty';
 import { TextProperty } from './property/TextProperty';
 
 const DEFAULT_PADDING = 8;
+const TEXT_BACKGROUND_PADDING = 2;
+const TEXT_BACKGROUND_COLOR = 0xffffff;
 
 export interface TextLayoutBounds {
 	x: number;
@@ -14,6 +17,8 @@ export interface TextLayoutBounds {
 }
 
 export abstract class TextEditableShape<T extends Container = Container> extends BaseShape<T> {
+	/** 非纯色填充时隔开文字和填充线条的净空层。 */
+	public readonly textBackgroundView = new Graphics();
 	public readonly textView: PixiText;
 
 	constructor(id: string, graphics: T, context: ShapeContext, textView = new PixiText()) {
@@ -25,7 +30,9 @@ export abstract class TextEditableShape<T extends Container = Container> extends
 		this.textView.resolution = Math.max(2, window.devicePixelRatio);
 
 		if ((textView as Container) !== graphics) {
-			this.container.addChild(textView);
+			this.textBackgroundView.name = 'SHAPE_TEXT_BACKGROUND';
+			this.textBackgroundView.eventMode = 'none';
+			this.container.addChild(this.textBackgroundView, textView);
 		}
 
 		this.propertyMap.set(ShapePropertyEnum.Text, new TextProperty(this));
@@ -90,6 +97,39 @@ export abstract class TextEditableShape<T extends Container = Container> extends
 		this.textView.style.wordWrap = true;
 		this.textView.style.wordWrapWidth = bounds.width;
 		this.textView.style.align = horizontalAlign;
+		this.layoutTextBackground();
+	}
+
+	private layoutTextBackground(): void {
+		const background = this.textBackgroundView;
+		background.clear();
+
+		if (this.type === ShapeTypeEnum.Text || !this.textView.text) {
+			return;
+		}
+
+		const fill = this.getProperty<FillProperty>(ShapePropertyEnum.Fill)?.value;
+		if (!fill || (fill.style ?? 'solid') === 'solid' || fill.alpha <= 0) {
+			return;
+		}
+
+		const width = this.textView.width;
+		const height = this.textView.height;
+		if (width <= 0 || height <= 0) {
+			return;
+		}
+
+		const x = this.textView.x - this.textView.anchor.x * width - TEXT_BACKGROUND_PADDING;
+		const y = this.textView.y - this.textView.anchor.y * height - TEXT_BACKGROUND_PADDING;
+
+		background.beginFill(TEXT_BACKGROUND_COLOR);
+		background.drawRect(
+			x,
+			y,
+			width + TEXT_BACKGROUND_PADDING * 2,
+			height + TEXT_BACKGROUND_PADDING * 2,
+		);
+		background.endFill();
 	}
 
 	public showTextInput(): void {
