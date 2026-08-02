@@ -6,7 +6,7 @@ export default tseslint.config(
 	js.configs.recommended,
 	prettier,
 	{
-		files: ['src/**/*.{ts,tsx}'],
+		files: ['src/**/*.{ts,tsx}', 'tests/**/*.ts', 'vitest.config.ts'],
 		languageOptions: {
 			parser: tseslint.parser,
 			globals: {

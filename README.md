@@ -49,6 +49,23 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 pnpm build
 ```
 
+### Testing
+
+Run the unit test suite once:
+
+```bash
+pnpm test
+```
+
+Run tests in watch mode or type-check the test suite:
+
+```bash
+pnpm test:watch
+pnpm test:typecheck
+```
+
+Unit tests live under `tests/unit` and share their global setup from `tests/setup.ts`.
+
 ## Project Structure
 
 ```
