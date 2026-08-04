@@ -3,7 +3,7 @@ import { HOVER_BORDER } from '../color';
 import { ShapeDecorateTypeEnum, ShapePropertyEnum } from '../contract';
 import type { StrokePropertyValue } from '../contract';
 import { BaseShape } from '../BaseShape';
-import { AbsDecorate } from './AbsDecorate';
+import { AbsDecorate, type DecorateViewport } from './AbsDecorate';
 import { StrokeProperty } from '../property/StrokeProperty';
 
 const BORDER_PADDING = 2;
@@ -13,29 +13,37 @@ export class HoverBorder extends AbsDecorate {
 
 	public graphics: Graphics;
 
-	constructor(shape: BaseShape) {
-		super(shape);
+	constructor(shape: BaseShape, viewport: DecorateViewport) {
+		super(shape, viewport);
 		this.graphics = new Graphics();
 		this.graphics.name = ShapeDecorateTypeEnum.HoverBorder;
 	}
 
-	public onActivate() {
+	private draw(): void {
 		const { width, height } = this.shape.getBounds();
-
 		const stroke = this.shape.getProperty<StrokeProperty>(ShapePropertyEnum.Stroke).value;
 		const strokeWidth = stroke?.width || 0;
-		const offset = strokeWidth / 2 + BORDER_PADDING;
+		const scale = this.getViewportScale();
+		const offset = strokeWidth / 2 + BORDER_PADDING / scale;
 
-		const graphics = new Graphics();
-		this.graphics = graphics;
-		this.graphics.lineStyle(2, HOVER_BORDER, 1);
+		this.graphics.clear();
+		this.graphics.lineStyle(2 / scale, HOVER_BORDER, 1);
 		this.graphics.beginFill(0xfff, 0);
 		this.graphics.drawRect(0 - offset, 0 - offset, width + offset * 2, height + offset * 2);
+	}
 
+	public onActivate() {
+		this.draw();
 		this.shape.container.addChild(this.graphics);
+		this.startViewportScaleSync();
+	}
+
+	public refresh(): void {
+		this.draw();
 	}
 
 	public onDeactivate() {
+		this.stopViewportScaleSync();
 		this.shape.container.removeChild(this.graphics);
 	}
 }

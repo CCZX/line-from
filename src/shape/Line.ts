@@ -5,6 +5,7 @@ import { LineProperty } from './property/LineProperty';
 import { StrokeProperty } from './property/StrokeProperty';
 import { HoverBorder } from './decorate/HoverBorder';
 import { LineSelectedBorder } from './decorate/LineSelectedBorder';
+import type { DecorateViewport } from './decorate/AbsDecorate';
 import { distToSegment, sampleCurvePoints } from './geometry';
 
 const MIN_HIT_DISTANCE = 6;
@@ -24,9 +25,12 @@ export class Line extends BaseShape<Graphics> {
 		this.propertyMap.set(ShapePropertyEnum.Line, new LineProperty(this));
 	}
 
-	protected initDecorate() {
-		this.decorateMap.set(ShapeDecorateTypeEnum.HoverBorder, new HoverBorder(this));
-		this.decorateMap.set(ShapeDecorateTypeEnum.SelectedBorder, new LineSelectedBorder(this));
+	protected initDecorate(viewport: DecorateViewport) {
+		this.decorateMap.set(ShapeDecorateTypeEnum.HoverBorder, new HoverBorder(this, viewport));
+		this.decorateMap.set(
+			ShapeDecorateTypeEnum.SelectedBorder,
+			new LineSelectedBorder(this, viewport),
+		);
 	}
 
 	/** 线的包围盒可能高/宽为 0，改用点到路径距离判断命中 */

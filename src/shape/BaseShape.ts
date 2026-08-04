@@ -12,7 +12,7 @@ import {
 	StrokePropertyValue,
 	TextPropertyValue,
 } from './contract';
-import { AbsDecorate } from './decorate/AbsDecorate';
+import { AbsDecorate, createDecorateViewport, type DecorateViewport } from './decorate/AbsDecorate';
 import { HoverBorder } from './decorate/HoverBorder';
 import { isPointInRect } from './geometry';
 import { AbsState } from './state/AbsState';
@@ -25,6 +25,7 @@ import { StrokeProperty } from './property/StrokeProperty';
 import { LineProperty } from './property/LineProperty';
 import { SelectedBorder } from './decorate/SelectedBorder';
 import { ISelectService } from '@/domain/contract/SelectService';
+import { IViewportService } from '@/domain/contract/ViewportService';
 
 export abstract class BaseShape<T extends Container = Container> {
 	/**
@@ -62,7 +63,8 @@ export abstract class BaseShape<T extends Container = Container> {
 		this.container.addChild(this.graphics);
 		this.container.name = 'SHAPE_CONTAINER';
 		this.stateMachine = new StateMachine(this);
-		this.initDecorate();
+		const viewportService = this.context.ioc.get<IViewportService>(IViewportService);
+		this.initDecorate(createDecorateViewport(viewportService));
 		this.initProperty();
 	}
 
@@ -174,9 +176,9 @@ export abstract class BaseShape<T extends Container = Container> {
 		return { id: this.id, type: this.type, properties };
 	}
 
-	protected initDecorate() {
-		this.decorateMap.set(ShapeDecorateTypeEnum.HoverBorder, new HoverBorder(this));
-		this.decorateMap.set(ShapeDecorateTypeEnum.SelectedBorder, new SelectedBorder(this));
+	protected initDecorate(viewport: DecorateViewport) {
+		this.decorateMap.set(ShapeDecorateTypeEnum.HoverBorder, new HoverBorder(this, viewport));
+		this.decorateMap.set(ShapeDecorateTypeEnum.SelectedBorder, new SelectedBorder(this, viewport));
 	}
 
 	public getDecorate(type: ShapeDecorateTypeEnum) {

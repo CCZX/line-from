@@ -50,7 +50,7 @@ export class RotateHandler implements IHandler {
 			return false;
 		}
 
-		if (this.isOverRotateHandle(state.selectedShapes[0]!, payload.viewportPoint, payload.scale)) {
+		if (this.isOverRotateHandle(state.selectedShapes[0]!, payload.viewportPoint)) {
 			document.body.style.cursor = 'grabbing';
 			return false;
 		}
@@ -60,7 +60,7 @@ export class RotateHandler implements IHandler {
 
 	private handlePointerDown(state: InteractionState, payload: EventPayload): boolean {
 		const shape = state.selectedShapes[0]!;
-		if (!this.isOverRotateHandle(shape, payload.viewportPoint, payload.scale)) {
+		if (!this.isOverRotateHandle(shape, payload.viewportPoint)) {
 			return true;
 		}
 
@@ -105,7 +105,7 @@ export class RotateHandler implements IHandler {
 		});
 	}
 
-	private isOverRotateHandle(shape: BaseShape, vp: Point, scale: number): boolean {
+	private isOverRotateHandle(shape: BaseShape, vp: Point): boolean {
 		const border = shape.getDecorate(ShapeDecorateTypeEnum.SelectedBorder) as SelectedBorder;
 		if (!border) {
 			return false;
@@ -114,7 +114,7 @@ export class RotateHandler implements IHandler {
 		const localCenter = border.getRotateHandleCenter();
 		// 转换到世界坐标
 		const global = shape.container.toGlobal(new PixiPoint(localCenter.x, localCenter.y));
-		const threshold = ROTATE_HANDLE_HIT_RADIUS / scale;
+		const threshold = ROTATE_HANDLE_HIT_RADIUS;
 
 		return Math.abs(vp.x - global.x) < threshold && Math.abs(vp.y - global.y) < threshold;
 	}

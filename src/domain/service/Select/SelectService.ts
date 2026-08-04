@@ -41,6 +41,7 @@ export class SelectService implements ISelectService {
 	private selectedShapes: Map<string, BaseShape> = new Map();
 	private multiSelectOverlay: Graphics | null = null;
 	private overlayRect: Rectangle | null = null;
+	private unsubscribeViewportScale: (() => void) | null = null;
 
 	public store = selectStore;
 
@@ -79,12 +80,21 @@ export class SelectService implements ISelectService {
 			this.multiSelectOverlay = new Graphics();
 			const stage = this.viewportService.getStage();
 			stage.getViewport().addChild(this.multiSelectOverlay);
+			this.unsubscribeViewportScale = this.viewportService.store.subscribe(
+				(state, previousState) => {
+					if (state.scale !== previousState.scale && this.overlayRect) {
+						this.drawOverlay(this.overlayRect);
+					}
+				},
+			);
 		}
 		this.drawOverlay(rect);
 	}
 
 	public hideMultiSelectOverlay() {
 		if (this.multiSelectOverlay) {
+			this.unsubscribeViewportScale?.();
+			this.unsubscribeViewportScale = null;
 			this.multiSelectOverlay.removeFromParent();
 			this.multiSelectOverlay.destroy();
 			this.multiSelectOverlay = null;
@@ -109,19 +119,20 @@ export class SelectService implements ISelectService {
 		const g = this.multiSelectOverlay!;
 		g.clear();
 
-		const offset = 4;
+		const scale = Math.max(this.viewportService.store.getState().scale, Number.EPSILON);
+		const offset = 4 / scale;
 		const x = rect.x - offset;
 		const y = rect.y - offset;
 		const w = rect.width + offset * 2;
 		const h = rect.height + offset * 2;
 
-		g.lineStyle(1, MULTI_SELECT_COLOR, 0.8);
+		g.lineStyle(1 / scale, MULTI_SELECT_COLOR, 0.8);
 		g.beginFill(0x4a90d9, 0.05);
 		g.drawRect(x, y, w, h);
 		g.endFill();
 
 		g.beginFill(MULTI_SELECT_COLOR, 1);
-		const hs = HANDLE_SIZE;
+		const hs = HANDLE_SIZE / scale;
 		const corners = [
 			{ x: x - hs / 2, y: y - hs / 2 },
 			{ x: x + w - hs / 2, y: y - hs / 2 },
