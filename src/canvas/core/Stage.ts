@@ -1,5 +1,6 @@
 import { Application, Container, Graphics } from 'pixi.js';
 import { Viewport } from './Viewport';
+import { CANVAS_COLORS, colorToHex } from '@/common/color';
 
 export class Stage {
 	private app: Application;
@@ -17,7 +18,7 @@ export class Stage {
 			autoDensity: true,
 			antialias: true,
 			resolution: window.devicePixelRatio,
-			backgroundColor: '#ffffff',
+			backgroundColor: colorToHex(CANVAS_COLORS.background),
 			preserveDrawingBuffer: true,
 		});
 
@@ -33,23 +34,23 @@ export class Stage {
 		(globalThis as any).__PIXI_APP__ = app;
 	}
 
-	static createStage(el: HTMLDivElement) {
+	public static createStage(el: HTMLDivElement) {
 		return new Stage(el);
 	}
 
-	appendShape(shape: Container) {
+	public appendShape(shape: Container) {
 		this.viewport.addChild(shape);
 	}
 
-	removeShape(shape: Container) {
+	public removeShape(shape: Container) {
 		this.viewport.removeChild(shape);
 	}
 
-	getViewport() {
+	public getViewport() {
 		return this.viewport;
 	}
 
-	destroy() {
+	public destroy() {
 		this.el.removeChild(this.app.view as unknown as HTMLCanvasElement);
 		this.app.destroy();
 		this.viewport.destroy();

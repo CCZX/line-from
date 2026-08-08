@@ -4,8 +4,13 @@ import { FillPropertyValue, ShapeTypeEnum } from '../contract';
 import { BaseShape } from '../BaseShape';
 import { getHatchTexture } from './hatch';
 import { drawSketchyFillCircle, drawSketchyFillRect } from './style';
+import { SHAPE_COLORS } from '@/common/color';
 
-const DEFAULT_VALUE: FillPropertyValue = { color: 0x000, alpha: 1, style: 'solid' };
+const DEFAULT_VALUE: FillPropertyValue = {
+	color: SHAPE_COLORS.background.fallback,
+	alpha: 1,
+	style: 'solid',
+};
 
 function withSketchySeed(value: FillPropertyValue): FillPropertyValue {
 	if (value.style === 'sketchy' && value.seed == null) {

@@ -2,6 +2,7 @@ import { AbsProperty } from './AbsProperty';
 import { ShapeTypeEnum, TextPropertyValue } from '../contract';
 import { TextStyle } from 'pixi.js';
 import type { TextEditableShape } from '../TextEditableShape';
+import { SHAPE_COLORS } from '@/common/color';
 
 const DEFAULT_VALUE: TextPropertyValue = { text: '' };
 
@@ -18,7 +19,7 @@ export class TextProperty extends AbsProperty<TextPropertyValue> {
 
 		this.shape.textView.text = this.value.text;
 		this.shape.textView.style = new TextStyle({
-			fill: this.value.color ?? 0x1e1e1e,
+			fill: this.value.color ?? SHAPE_COLORS.text.default,
 			fontSize: this.value.fontSize ?? 16,
 			fontFamily:
 				this.value.fontFamily ??

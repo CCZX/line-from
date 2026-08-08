@@ -4,10 +4,11 @@ import { BaseShape } from './BaseShape';
 import { ShapeContext, ShapePropertyEnum, ShapeTypeEnum, TextPropertyValue } from './contract';
 import { FillProperty } from './property/FillProperty';
 import { TextProperty } from './property/TextProperty';
+import { SHAPE_COLORS } from '@/common/color';
 
 const DEFAULT_PADDING = 8;
 const TEXT_BACKGROUND_PADDING = 2;
-const TEXT_BACKGROUND_COLOR = 0xffffff;
+const TEXT_BACKGROUND_COLOR = SHAPE_COLORS.text.background;
 
 export interface TextLayoutBounds {
 	x: number;

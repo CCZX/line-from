@@ -24,6 +24,7 @@ import { getShapeAnchorPoint } from '@/shape/geometry';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 import { IHandlerWithInteraction } from '@/domain/contract';
+import { SHAPE_COLORS } from '@/common/color';
 
 const HANDLE_HIT_RADIUS = 9;
 const DRAG_THRESHOLD = 3;
@@ -169,7 +170,7 @@ export class ConnectionCreateHandler implements IHandler {
 			properties: {
 				base: this.getLineBounds(start, end),
 				stroke: {
-					color: 0x1e1e1e,
+					color: SHAPE_COLORS.border.default,
 					width: 1,
 					alpha: 1,
 					style: 'sketchy',

@@ -1,20 +1,33 @@
+import {
+	BACKGROUND_COLOR_NAMES,
+	BORDER_COLOR_NAMES,
+	COLOR_PALETTE,
+	colorToHex,
+} from '@/common/color';
+import type { PaletteColorName } from '@/common/color';
+
 export interface PresetColor {
 	nameKey: string;
 	hex: string;
 	number: number;
 }
 
-export const STROKE_COLOR_PRESETS: PresetColor[] = [
-	{ nameKey: 'color.black', hex: '#1e1e1e', number: 0x1e1e1e },
-	{ nameKey: 'color.red', hex: '#e03131', number: 0xe03131 },
-	{ nameKey: 'color.orange', hex: '#f08c00', number: 0xf08c00 },
-	{ nameKey: 'color.green', hex: '#2f9e44', number: 0x2f9e44 },
-	{ nameKey: 'color.blue', hex: '#1971c2', number: 0x1971c2 },
-	{ nameKey: 'color.purple', hex: '#9c36b5', number: 0x9c36b5 },
-	{ nameKey: 'color.white', hex: '#ffffff', number: 0xffffff },
-];
+function createColorPresets(names: PaletteColorName[]): PresetColor[] {
+	return names.map((name) => ({
+		nameKey: `color.${name}`,
+		hex: colorToHex(COLOR_PALETTE[name]),
+		number: COLOR_PALETTE[name],
+	}));
+}
 
-export const FILL_COLOR_PRESETS: (PresetColor & { transparent?: boolean })[] = [
-	{ nameKey: 'color.transparent', hex: 'transparent', number: 0xffffff, transparent: true },
-	...STROKE_COLOR_PRESETS,
+export const BORDER_COLOR_PRESETS = createColorPresets(BORDER_COLOR_NAMES);
+
+export const BACKGROUND_COLOR_PRESETS: (PresetColor & { transparent?: boolean })[] = [
+	{
+		nameKey: 'color.transparent',
+		hex: 'transparent',
+		number: COLOR_PALETTE.white,
+		transparent: true,
+	},
+	...createColorPresets(BACKGROUND_COLOR_NAMES),
 ];

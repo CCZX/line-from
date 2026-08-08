@@ -1,5 +1,6 @@
 import { Graphics, LINE_CAP, LINE_JOIN } from 'pixi.js';
 import rough from 'roughjs';
+import { colorToHex, SHAPE_COLORS } from '@/common/color';
 
 const generator = rough.generator();
 
@@ -149,7 +150,7 @@ export function drawSketchyFillRect(
 ): void {
 	const drawable = generator.rectangle(x, y, w, h, {
 		seed,
-		fill: '#ffffff',
+		fill: colorToHex(SHAPE_COLORS.background.patternBase),
 		fillStyle: 'hachure',
 		hachureAngle: 45,
 		hachureGap: 6,
@@ -170,7 +171,7 @@ export function drawSketchyFillCircle(
 ): void {
 	const drawable = generator.circle(cx, cy, r * 2, {
 		seed,
-		fill: '#ffffff',
+		fill: colorToHex(SHAPE_COLORS.background.patternBase),
 		fillStyle: 'hachure',
 		hachureAngle: 45,
 		hachureGap: 6,

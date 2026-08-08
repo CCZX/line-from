@@ -3,9 +3,10 @@ import { AbsProperty } from './AbsProperty';
 import { StrokePropertyValue, ShapeTypeEnum } from '../contract';
 import { BaseShape } from '../BaseShape';
 import { applyLineStyle, drawSketchyCircle, drawSketchyRect } from './style';
+import { SHAPE_COLORS } from '@/common/color';
 
 const DEFAULT_VALUE: StrokePropertyValue = {
-	color: 0x000000,
+	color: SHAPE_COLORS.border.fallback,
 	width: 0,
 	alpha: 1,
 	style: 'regular',

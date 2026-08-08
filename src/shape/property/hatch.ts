@@ -1,4 +1,5 @@
 import { Texture, WRAP_MODES } from 'pixi.js';
+import { colorToHex, SHAPE_COLORS } from '@/common/color';
 
 let hatchTexture: Texture | null = null;
 
@@ -17,7 +18,7 @@ export function getHatchTexture(): Texture {
 	}
 
 	ctx.clearRect(0, 0, 64, 64);
-	ctx.strokeStyle = '#ffffff';
+	ctx.strokeStyle = colorToHex(SHAPE_COLORS.background.patternBase);
 	ctx.lineWidth = 2;
 	ctx.lineCap = 'round';
 	ctx.beginPath();

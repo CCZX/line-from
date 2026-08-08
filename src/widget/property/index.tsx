@@ -7,7 +7,7 @@ import {
 	type StrokePropertyValue,
 	type StrokeStyle,
 } from '@/shape/contract';
-import { STROKE_COLOR_PRESETS, FILL_COLOR_PRESETS } from './const';
+import { BACKGROUND_COLOR_PRESETS, BORDER_COLOR_PRESETS } from './const';
 import type { PresetColor } from './const';
 import './index.less';
 import { useInject } from '@/common/context';
@@ -19,10 +19,7 @@ import { BaseProperty } from '@/shape/property/BaseProperty';
 import { IocContainerService } from '@/common/contract';
 import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
 import { useTranslation } from 'react-i18next';
-
-function numberToHex(num: number): string {
-	return '#' + num.toString(16).padStart(6, '0');
-}
+import { colorToHex, SHAPE_COLORS, WIDGET_COLORS } from '@/common/color';
 
 const STROKE_WIDTH_OPTIONS = [
 	{ labelKey: 'property.width.none', value: '0' },
@@ -41,10 +38,10 @@ export function Property() {
 	const ioc = useInject<IocContainerService>(IocContainerService);
 	const selectedShapeIds = selectService.store((s) => s.selectedShapeIds);
 
-	const [strokeColor, setStrokeColor] = useState('#1e1e1e');
+	const [strokeColor, setStrokeColor] = useState(colorToHex(SHAPE_COLORS.border.default));
 	const [strokeWidth, setStrokeWidth] = useState(1);
 	const [strokeStyle, setStrokeStyle] = useState<StrokeStyle>('regular');
-	const [fillColor, setFillColor] = useState('#ffffff');
+	const [fillColor, setFillColor] = useState(colorToHex(SHAPE_COLORS.background.default));
 	const [fillAlpha, setFillAlpha] = useState(100);
 	const [fillStyle, setFillStyle] = useState<FillStyle>('solid');
 	const [isTransparent, setIsTransparent] = useState(false);
@@ -64,7 +61,7 @@ export function Property() {
 
 		const stroke = shape.getProperty<StrokeProperty>(ShapePropertyEnum.Stroke).value;
 		if (stroke) {
-			setStrokeColor(numberToHex(stroke.color));
+			setStrokeColor(colorToHex(stroke.color));
 			setStrokeWidth(stroke.width);
 			setStrokeStyle(stroke.style ?? 'regular');
 		}
@@ -74,11 +71,11 @@ export function Property() {
 			setFillStyle(fill.style ?? 'solid');
 			if (fill.alpha === 0) {
 				setIsTransparent(true);
-				setFillColor('#ffffff');
+				setFillColor(colorToHex(SHAPE_COLORS.background.transparentFallback));
 				setFillAlpha(0);
 			} else {
 				setIsTransparent(false);
-				setFillColor(numberToHex(fill.color));
+				setFillColor(colorToHex(fill.color));
 				setFillAlpha(Math.round(fill.alpha * 100));
 			}
 		}
@@ -222,7 +219,7 @@ export function Property() {
 					<div className='ctx-section'>
 						<span className='ctx-label'>{t('property.stroke')}</span>
 						<div className='ctx-colors'>
-							{STROKE_COLOR_PRESETS.map((preset) => (
+							{BORDER_COLOR_PRESETS.map((preset) => (
 								<button
 									key={preset.hex}
 									className={`ctx-dot${
@@ -250,7 +247,7 @@ export function Property() {
 									cx='11'
 									cy='11'
 									r={previewR}
-									fill={strokeWidth === 0 ? '#999' : strokeColor}
+									fill={strokeWidth === 0 ? colorToHex(WIDGET_COLORS.mutedControl) : strokeColor}
 								/>
 							</svg>
 							<select
@@ -299,7 +296,7 @@ export function Property() {
 					<div className='ctx-section'>
 						<span className='ctx-label'>{t('property.background')}</span>
 						<div className='ctx-colors'>
-							{FILL_COLOR_PRESETS.map((preset) => {
+							{BACKGROUND_COLOR_PRESETS.map((preset) => {
 								const isActive = preset.transparent
 									? isTransparent
 									: fillColor === preset.hex && !isTransparent;

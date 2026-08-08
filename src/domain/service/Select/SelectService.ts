@@ -7,8 +7,8 @@ import { provide } from 'inversify-binding-decorators';
 import { create } from 'zustand';
 import { IViewportService } from '@/domain/contract';
 import { inject } from 'inversify';
+import { DECORATE_COLORS } from '@/common/color';
 
-const MULTI_SELECT_COLOR = 0x4a90d9;
 const HANDLE_SIZE = 8;
 
 const selectStore = create<SelectionState>((set) => ({
@@ -126,12 +126,12 @@ export class SelectService implements ISelectService {
 		const w = rect.width + offset * 2;
 		const h = rect.height + offset * 2;
 
-		g.lineStyle(1 / scale, MULTI_SELECT_COLOR, 0.8);
-		g.beginFill(0x4a90d9, 0.05);
+		g.lineStyle(1 / scale, DECORATE_COLORS.selection, 0.8);
+		g.beginFill(DECORATE_COLORS.selection, 0.05);
 		g.drawRect(x, y, w, h);
 		g.endFill();
 
-		g.beginFill(MULTI_SELECT_COLOR, 1);
+		g.beginFill(DECORATE_COLORS.selection, 1);
 		const hs = HANDLE_SIZE / scale;
 		const corners = [
 			{ x: x - hs / 2, y: y - hs / 2 },

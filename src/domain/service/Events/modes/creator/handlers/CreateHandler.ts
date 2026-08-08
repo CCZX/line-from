@@ -26,6 +26,7 @@ import { LineProperty } from '@/shape/property/LineProperty';
 import { inject } from 'inversify';
 import { IocContainerService } from '@/common/contract';
 import { provide } from 'inversify-binding-decorators';
+import { SHAPE_COLORS } from '@/common/color';
 
 let _idCounter = 0;
 function nextId(): string {
@@ -35,11 +36,11 @@ function nextId(): string {
 const DEFAULT_PROPS = {
 	width: 100,
 	height: 100,
-	stroke: { color: 0x1e1e1e, width: 1, alpha: 1, style: 'sketchy' as const },
-	fill: { color: 0xffffff, alpha: 1, style: 'solid' as const },
+	stroke: { color: SHAPE_COLORS.border.default, width: 1, alpha: 1, style: 'sketchy' as const },
+	fill: { color: SHAPE_COLORS.background.default, alpha: 1, style: 'sketchy' as const },
 	text: {
 		text: '',
-		color: 0x1e1e1e,
+		color: SHAPE_COLORS.text.default,
 		fontSize: 16,
 		horizontalAlign: 'center' as const,
 		verticalAlign: 'middle' as const,

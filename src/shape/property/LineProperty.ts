@@ -8,6 +8,7 @@ import { catmullRomToBezier, cubicBezierPoint, getShapeAnchorPoint } from '../ge
 import { Graphics } from 'pixi.js';
 import { IShapeManager } from '@/domain/contract';
 import { IocContainerService } from '@/common/contract';
+import { SHAPE_COLORS } from '@/common/color';
 
 const DEFAULT_VALUE: LinePropertyValue = {
 	start: { x: 0, y: 0 },
@@ -122,7 +123,7 @@ export class LineProperty extends AbsProperty<LinePropertyValue> {
 		// stroke
 		const stroke = this.shape.getProperty<StrokeProperty>(ShapePropertyEnum.Stroke);
 		const sv = stroke?.value;
-		const color = sv?.color ?? 0x000000;
+		const color = sv?.color ?? SHAPE_COLORS.border.fallback;
 		const alpha = sv?.alpha ?? 1;
 		const width = sv?.width ?? 1;
 		const strokeStyle: StrokeStyle = sv?.style ?? 'regular';

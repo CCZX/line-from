@@ -7,6 +7,7 @@ import { isRectIntersect } from '@/shape/geometry';
 import { ShapeStateEnum } from '@/shape/contract';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
+import { DECORATE_COLORS } from '@/common/color';
 
 const DRAG_THRESHOLD = 3;
 
@@ -123,8 +124,8 @@ export class MarqueeHandler implements IHandler {
 		}
 
 		this.marquee.clear();
-		this.marquee.lineStyle(1, 0x4a90d9, 1);
-		this.marquee.beginFill(0x4a90d9, 0.1);
+		this.marquee.lineStyle(1, DECORATE_COLORS.selection, 1);
+		this.marquee.beginFill(DECORATE_COLORS.selection, 0.1);
 		this.marquee.drawRect(x, y, w, h);
 		this.marquee.endFill();
 	}

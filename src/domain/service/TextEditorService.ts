@@ -14,10 +14,7 @@ import {
 import type { TextEditableShape } from '@/shape/TextEditableShape';
 import { provide } from 'inversify-binding-decorators';
 import i18n from '@/i18n';
-
-function numberToHex(color: number): string {
-	return `#${color.toString(16).padStart(6, '0')}`;
-}
+import { colorToHex, SHAPE_COLORS } from '@/common/color';
 
 @provide(ITextEditorService)
 export class TextEditorService implements ITextEditorService {
@@ -163,8 +160,8 @@ export class TextEditorService implements ITextEditorService {
 		const isStandaloneText = shape.type === ShapeTypeEnum.Text;
 		const horizontalAlign = value.horizontalAlign ?? (isStandaloneText ? 'left' : 'center');
 
-		this.textarea.style.color = numberToHex(value.color ?? 0x1e1e1e);
-		this.textarea.style.caretColor = numberToHex(value.color ?? 0x1e1e1e);
+		this.textarea.style.color = colorToHex(value.color ?? SHAPE_COLORS.text.default);
+		this.textarea.style.caretColor = colorToHex(value.color ?? SHAPE_COLORS.text.default);
 		this.textarea.style.fontSize = `${value.fontSize ?? 16}px`;
 		this.textarea.style.fontFamily =
 			value.fontFamily ?? "-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif";

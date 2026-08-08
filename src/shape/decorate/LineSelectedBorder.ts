@@ -1,5 +1,5 @@
 import { Graphics } from 'pixi.js';
-import { ACTIVE_ACCENT, CONTROL_SURFACE, HOVER_BORDER } from '../color';
+import { DECORATE_COLORS } from '@/common/color';
 import { ShapeDecorateTypeEnum, ShapePropertyEnum } from '../contract';
 import { BaseShape } from '../BaseShape';
 import { AbsDecorate, type DecorateViewport } from './AbsDecorate';
@@ -44,16 +44,16 @@ export class LineSelectedBorder extends AbsDecorate {
 
 		// 虚拟中点手柄（半透明）
 		for (const p of line.getLocalVirtualHandles()) {
-			this.graphics.lineStyle(lineWidth, HOVER_BORDER, VIRTUAL_HANDLE_ALPHA);
-			this.graphics.beginFill(0xffffff, VIRTUAL_HANDLE_ALPHA);
+			this.graphics.lineStyle(lineWidth, DECORATE_COLORS.hoverBorder, VIRTUAL_HANDLE_ALPHA);
+			this.graphics.beginFill(DECORATE_COLORS.handleSurface, VIRTUAL_HANDLE_ALPHA);
 			this.graphics.drawCircle(p.x, p.y, VIRTUAL_HANDLE_RADIUS / scale);
 			this.graphics.endFill();
 		}
 
 		// 途经点（实心）
 		for (const p of midPoints) {
-			this.graphics.lineStyle(lineWidth, 0xffffff, 1);
-			this.graphics.beginFill(HOVER_BORDER, 1);
+			this.graphics.lineStyle(lineWidth, DECORATE_COLORS.handleSurface, 1);
+			this.graphics.beginFill(DECORATE_COLORS.hoverBorder, 1);
 			this.graphics.drawCircle(p.x, p.y, MID_POINT_RADIUS / scale);
 			this.graphics.endFill();
 		}
@@ -67,17 +67,17 @@ export class LineSelectedBorder extends AbsDecorate {
 	private drawEndpoint(p: Point, anchored: boolean, scale: number) {
 		if (anchored) {
 			// 与工具栏选中态保持一致：柔和底色 + 紫色描边和中心点。
-			this.graphics.lineStyle(2 / scale, ACTIVE_ACCENT, 1);
-			this.graphics.beginFill(CONTROL_SURFACE, 1);
+			this.graphics.lineStyle(2 / scale, DECORATE_COLORS.activeAccent, 1);
+			this.graphics.beginFill(DECORATE_COLORS.controlSurface, 1);
 			this.graphics.drawCircle(p.x, p.y, ENDPOINT_RADIUS / scale);
 			this.graphics.endFill();
 
 			this.graphics.lineStyle(0);
-			this.graphics.beginFill(ACTIVE_ACCENT, 1);
+			this.graphics.beginFill(DECORATE_COLORS.activeAccent, 1);
 			this.graphics.drawCircle(p.x, p.y, ANCHORED_ENDPOINT_INNER_RADIUS / scale);
 		} else {
-			this.graphics.lineStyle(1 / scale, HOVER_BORDER, 1);
-			this.graphics.beginFill(CONTROL_SURFACE, 1);
+			this.graphics.lineStyle(1 / scale, DECORATE_COLORS.hoverBorder, 1);
+			this.graphics.beginFill(DECORATE_COLORS.controlSurface, 1);
 			this.graphics.drawCircle(p.x, p.y, ENDPOINT_RADIUS / scale);
 		}
 		this.graphics.endFill();

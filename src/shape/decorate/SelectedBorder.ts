@@ -1,5 +1,5 @@
 import { Graphics } from 'pixi.js';
-import { HOVER_BORDER } from '../color';
+import { DECORATE_COLORS } from '@/common/color';
 import { ShapeDecorateTypeEnum, ShapePropertyEnum, ShapeTypeEnum } from '../contract';
 import type { StrokePropertyValue } from '../contract';
 import { BaseShape } from '../BaseShape';
@@ -54,8 +54,8 @@ export class SelectedBorder extends AbsDecorate {
 		const halfPixel = 0.5 / scale;
 
 		this.graphics.clear();
-		this.graphics.lineStyle(lineWidth, HOVER_BORDER, 1);
-		this.graphics.beginFill(0xfff, 0);
+		this.graphics.lineStyle(lineWidth, DECORATE_COLORS.hoverBorder, 1);
+		this.graphics.beginFill(DECORATE_COLORS.handleSurface, 0);
 		this.graphics.drawRect(
 			left - halfPixel,
 			top - halfPixel,
@@ -63,8 +63,8 @@ export class SelectedBorder extends AbsDecorate {
 			height + halfPixel,
 		);
 
-		this.graphics.beginFill(0xffffff, 1);
-		this.graphics.lineStyle(lineWidth, HOVER_BORDER, 1);
+		this.graphics.beginFill(DECORATE_COLORS.handleSurface, 1);
+		this.graphics.lineStyle(lineWidth, DECORATE_COLORS.hoverBorder, 1);
 		this.graphics.drawCircle(left, top, HANDLE_RADIUS / scale);
 		this.graphics.drawCircle(right, top, HANDLE_RADIUS / scale);
 		this.graphics.drawCircle(right, bottom, HANDLE_RADIUS / scale);
@@ -73,16 +73,16 @@ export class SelectedBorder extends AbsDecorate {
 		// 旋转 handle：顶部中间的圆点 + 连接线
 		const centerX = (left + right) / 2;
 		const rotateY = top - ROTATE_HANDLE_DISTANCE / scale;
-		this.graphics.lineStyle(lineWidth, HOVER_BORDER, 1);
+		this.graphics.lineStyle(lineWidth, DECORATE_COLORS.hoverBorder, 1);
 		this.graphics.moveTo(centerX, top);
 		this.graphics.lineTo(centerX, rotateY);
-		this.graphics.beginFill(0xffffff, 1);
+		this.graphics.beginFill(DECORATE_COLORS.handleSurface, 1);
 		this.graphics.drawCircle(centerX, rotateY, ROTATE_HANDLE_RADIUS / scale);
 		this.graphics.endFill();
 
 		// 四向连线锚点：拖拽任意圆点可快速创建连线
-		this.graphics.lineStyle(lineWidth, 0xffffff, 1);
-		this.graphics.beginFill(HOVER_BORDER, 1);
+		this.graphics.lineStyle(lineWidth, DECORATE_COLORS.handleSurface, 1);
+		this.graphics.beginFill(DECORATE_COLORS.hoverBorder, 1);
 		for (const point of Object.values(this.getConnectionHandleCenters())) {
 			this.graphics.drawCircle(point.x, point.y, CONNECTION_HANDLE_RADIUS / scale);
 		}

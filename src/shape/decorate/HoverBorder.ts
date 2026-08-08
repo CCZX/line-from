@@ -1,5 +1,5 @@
 import { Graphics } from 'pixi.js';
-import { HOVER_BORDER } from '../color';
+import { DECORATE_COLORS } from '@/common/color';
 import { ShapeDecorateTypeEnum, ShapePropertyEnum } from '../contract';
 import type { StrokePropertyValue } from '../contract';
 import { BaseShape } from '../BaseShape';
@@ -27,8 +27,8 @@ export class HoverBorder extends AbsDecorate {
 		const offset = strokeWidth / 2 + BORDER_PADDING / scale;
 
 		this.graphics.clear();
-		this.graphics.lineStyle(2 / scale, HOVER_BORDER, 1);
-		this.graphics.beginFill(0xfff, 0);
+		this.graphics.lineStyle(2 / scale, DECORATE_COLORS.hoverBorder, 1);
+		this.graphics.beginFill(DECORATE_COLORS.handleSurface, 0);
 		this.graphics.drawRect(0 - offset, 0 - offset, width + offset * 2, height + offset * 2);
 	}
 
