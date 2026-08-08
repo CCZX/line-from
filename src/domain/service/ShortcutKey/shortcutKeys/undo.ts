@@ -12,10 +12,11 @@ export class UndoShortcutKey implements IShortcutKey {
 	public fnKeys = ['Ctrl+Z'];
 
 	public isMatch(e: KeyboardEvent): boolean {
-		return (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z';
+		return (e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z';
 	}
 
-	public onKeyDown(_e: KeyboardEvent): void {
+	public onKeyDown(e: KeyboardEvent): void {
+		e.preventDefault();
 		this.actionLogManager.undo();
 	}
 

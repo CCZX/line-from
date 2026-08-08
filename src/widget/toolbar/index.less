@@ -111,6 +111,18 @@
 		box-shadow: 0 0 0 3px rgba(92, 84, 163, 0.18);
 	}
 
+	&:disabled {
+		color: #b8afa1;
+		cursor: not-allowed;
+		transform: none;
+
+		.tb-button-frame {
+			fill: rgba(245, 240, 232, 0.35);
+			stroke: #b8afa1;
+			opacity: 0.58;
+		}
+	}
+
 	&--active {
 		color: #514c9a;
 		background: transparent;
@@ -145,6 +157,7 @@
 }
 
 .zoom-label {
+	appearance: none;
 	font-family: 'Caveat', 'Comic Sans MS', cursive;
 	font-size: 15px;
 	font-weight: 600;
@@ -155,6 +168,9 @@
 	font-variant-numeric: tabular-nums;
 	cursor: pointer;
 	padding: 0 4px;
+	background: transparent;
+	border: 0;
+	outline: none;
 	border-radius: 8px 7px 9px 6px;
 	user-select: none;
 	transition:
@@ -164,6 +180,10 @@
 	&:hover {
 		color: #29251f;
 		background: #f5f0e8;
+	}
+
+	&:focus-visible {
+		box-shadow: 0 0 0 3px rgba(92, 84, 163, 0.18);
 	}
 }
 

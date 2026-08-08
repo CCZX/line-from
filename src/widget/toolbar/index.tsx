@@ -1,16 +1,18 @@
-import { useState, useCallback, useMemo, useRef, type ChangeEvent } from 'react';
+import { useCallback, useMemo, useRef, type ChangeEvent } from 'react';
 import {
 	IActionLogManager,
 	ToolType,
 	IToolService,
 	IShapeManager,
 	ICanvasInitService,
+	IViewportService,
 } from '@/domain/contract';
 import { useInject } from '@/common/context';
 import { RoughGenerator } from 'roughjs/bin/generator';
 import { useTranslation } from 'react-i18next';
 import type { Locale } from '@/i18n';
 import { parseShapeDataJson } from './shapeDataJson';
+import { MAX_ZOOM_SCALE, MIN_ZOOM_SCALE } from '@/canvas/core/Viewport';
 import './index.less';
 
 type SketchIconName =
@@ -124,9 +126,15 @@ export function Toolbar() {
 	const actionLogManager = useInject<IActionLogManager>(IActionLogManager);
 	const shapeManager = useInject<IShapeManager>(IShapeManager);
 	const canvasInitService = useInject<ICanvasInitService>(ICanvasInitService);
+	const viewportService = useInject<IViewportService>(IViewportService);
 	const activeTool = toolService.store((s) => s.activeTool);
 	const setActiveTool = toolService.store((s) => s.setActiveTool);
-	const [zoom, setZoom] = useState(100);
+	const canUndo = actionLogManager.store((s) => s.canUndo);
+	const canRedo = actionLogManager.store((s) => s.canRedo);
+	const viewportScale = viewportService.store((s) => s.scale);
+	const zoom = Math.round(viewportScale * 100);
+	const canZoomOut = viewportScale > MIN_ZOOM_SCALE;
+	const canZoomIn = viewportScale < MAX_ZOOM_SCALE;
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const handleToolClick = useCallback(
@@ -137,16 +145,16 @@ export function Toolbar() {
 	);
 
 	const handleZoomIn = useCallback(() => {
-		setZoom((z) => Math.round(Math.min(1000, z * 1.25)));
-	}, []);
+		viewportService.zoomIn();
+	}, [viewportService]);
 
 	const handleZoomOut = useCallback(() => {
-		setZoom((z) => Math.round(Math.max(1, z / 1.25)));
-	}, []);
+		viewportService.zoomOut();
+	}, [viewportService]);
 
 	const handleZoomReset = useCallback(() => {
-		setZoom(100);
-	}, []);
+		viewportService.resetZoom();
+	}, [viewportService]);
 
 	const handleUndo = useCallback(() => {
 		actionLogManager.undo();
@@ -226,12 +234,21 @@ export function Toolbar() {
 		title,
 		children,
 		onClick,
+		disabled = false,
 	}: {
 		title: string;
 		children: React.ReactNode;
 		onClick?: () => void;
+		disabled?: boolean;
 	}) => (
-		<button type='button' className='tb-button' title={title} aria-label={title} onClick={onClick}>
+		<button
+			type='button'
+			className='tb-button'
+			title={title}
+			aria-label={title}
+			disabled={disabled}
+			onClick={onClick}
+		>
 			<svg className='tb-button-frame' viewBox='0 0 40 40' aria-hidden='true'>
 				<path d='M7 3.5 C15 2.7 28 3 34 4.2 C37 9 36.8 29 34.8 35 C27 37 12 36.8 5 35 C3 28 3.2 10 5.2 5 Z' />
 				<path d='M6 4.6 C15 3.6 29 3.8 35 5 C36 13 36.2 28 34 34 C25 35.8 12 35.5 5.8 34 C4.2 25 4 12 6 4.6 Z' />
@@ -244,10 +261,10 @@ export function Toolbar() {
 		<nav id='toolbar' aria-label={t('toolbar.label')}>
 			{/* Undo / Redo */}
 			<div className='tb-group'>
-				<ActionButton title={t('toolbar.undo')} onClick={handleUndo}>
+				<ActionButton title={t('toolbar.undo')} onClick={handleUndo} disabled={!canUndo}>
 					<SketchIcon name='undo' />
 				</ActionButton>
-				<ActionButton title={t('toolbar.redo')} onClick={handleRedo}>
+				<ActionButton title={t('toolbar.redo')} onClick={handleRedo} disabled={!canRedo}>
 					<SketchIcon name='redo' />
 				</ActionButton>
 			</div>
@@ -280,13 +297,19 @@ export function Toolbar() {
 
 			{/* Zoom */}
 			<div className='zoom-wrap'>
-				<ActionButton title={t('toolbar.zoomOut')} onClick={handleZoomOut}>
+				<ActionButton title={t('toolbar.zoomOut')} onClick={handleZoomOut} disabled={!canZoomOut}>
 					<SketchIcon name='zoomOut' />
 				</ActionButton>
-				<span className='zoom-label' title={t('toolbar.zoomReset')} onClick={handleZoomReset}>
+				<button
+					type='button'
+					className='zoom-label'
+					title={t('toolbar.zoomReset')}
+					aria-label={`${t('toolbar.zoomReset')}，${zoom}%`}
+					onClick={handleZoomReset}
+				>
 					{zoom}%
-				</span>
-				<ActionButton title={t('toolbar.zoomIn')} onClick={handleZoomIn}>
+				</button>
+				<ActionButton title={t('toolbar.zoomIn')} onClick={handleZoomIn} disabled={!canZoomIn}>
 					<SketchIcon name='zoomIn' />
 				</ActionButton>
 			</div>

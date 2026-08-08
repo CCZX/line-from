@@ -1,6 +1,14 @@
 import { IAction } from './Action';
+import { StoreApi, UseBoundStore } from 'zustand';
+
+export interface ActionHistoryState {
+	canUndo: boolean;
+	canRedo: boolean;
+}
 
 export interface IActionLogManager {
+	store: UseBoundStore<StoreApi<ActionHistoryState>>;
+
 	/**
 	 * 设置流式操作开始
 	 *

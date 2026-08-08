@@ -17,6 +17,9 @@ export interface IViewportService {
 
 	setStage(stage: Stage): void;
 	getStage(): Stage;
+	zoomIn(): void;
+	zoomOut(): void;
+	resetZoom(): void;
 
 	clientToViewportLocal(clientX: number, clientY: number): PixiPoint;
 }

@@ -3,10 +3,10 @@ import floor from 'lodash/floor';
 import { last } from 'lodash';
 import { Subject } from 'rxjs';
 
-const ZOOM_SCALE_LIST = [0.1, 0.3, 0.5, 1.0, 2.0, 3.0, 4.0];
+export const ZOOM_SCALE_LIST = [0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4];
 
-const MIN_ZOOM_SCALE = ZOOM_SCALE_LIST[0];
-const MAX_ZOOM_SCALE = last(ZOOM_SCALE_LIST)!;
+export const MIN_ZOOM_SCALE = ZOOM_SCALE_LIST[0];
+export const MAX_ZOOM_SCALE = last(ZOOM_SCALE_LIST)!;
 
 /**
  *
@@ -35,7 +35,7 @@ export class Viewport extends Container {
 
 	public positionChangeEvent$ = new Subject<{ x: number; y: number }>();
 
-	get canvasEl(): HTMLCanvasElement {
+	public get canvasEl(): HTMLCanvasElement {
 		return this.canvas;
 	}
 
@@ -66,15 +66,17 @@ export class Viewport extends Container {
 		this.canvas.addEventListener('wheel', this.onWheel);
 	}
 
-	private setScale(scale: number, point?: Point) {
+	public setScale(scale: number, point?: Point) {
 		scale = floor(formatZoomScale(scale), 2);
+		if (scale === this.scale.x) {
+			return;
+		}
 
 		const { width, height } = this.canvas.getBoundingClientRect();
 		point = point || new Point(width / 2, height / 2);
 
 		const prevPoint = this.toLocal(point);
 
-		this.scaleChangeEvent$.next({ scale });
 		this.scale.set(scale, scale);
 
 		const nextPoint = this.toLocal(point);
@@ -82,20 +84,36 @@ export class Viewport extends Container {
 		const offsetX = (prevPoint.x - nextPoint.x) * scale;
 		const offsetY = (prevPoint.y - nextPoint.y) * scale;
 
-		if (offsetX !== 0 && offsetY !== 0) {
+		if (offsetX !== 0 || offsetY !== 0) {
 			this.setPosition(this.x - offsetX, this.y - offsetY);
 		}
+
+		this.scaleChangeEvent$.next({ scale });
+	}
+
+	public zoomIn(point?: Point): void {
+		const nextScale = ZOOM_SCALE_LIST.find((scale) => scale > this.scale.x + 0.001);
+		this.setScale(nextScale ?? MAX_ZOOM_SCALE, point);
+	}
+
+	public zoomOut(point?: Point): void {
+		const nextScale = [...ZOOM_SCALE_LIST].reverse().find((scale) => scale < this.scale.x - 0.001);
+		this.setScale(nextScale ?? MIN_ZOOM_SCALE, point);
+	}
+
+	public resetZoom(point?: Point): void {
+		this.setScale(1, point);
 	}
 
 	private setPosition(x: number, y: number) {
 		x = floor(x, 2);
 		y = floor(y, 2);
 
-		this.positionChangeEvent$.next({ x, y });
 		this.position.set(x, y);
+		this.positionChangeEvent$.next({ x, y });
 	}
 
-	destroy(options?: boolean | IDestroyOptions | undefined): void {
+	public destroy(options?: boolean | IDestroyOptions | undefined): void {
 		super.destroy(options);
 
 		this.canvas.removeEventListener('wheel', this.onWheel);

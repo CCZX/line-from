@@ -1,5 +1,5 @@
 import { Graphics } from 'pixi.js';
-import { HOVER_BORDER } from '../color';
+import { ACTIVE_ACCENT, CONTROL_SURFACE, HOVER_BORDER } from '../color';
 import { ShapeDecorateTypeEnum, ShapePropertyEnum } from '../contract';
 import { BaseShape } from '../BaseShape';
 import { AbsDecorate, type DecorateViewport } from './AbsDecorate';
@@ -9,7 +9,7 @@ const ENDPOINT_RADIUS = 5;
 const MID_POINT_RADIUS = 5;
 const VIRTUAL_HANDLE_RADIUS = 4;
 const VIRTUAL_HANDLE_ALPHA = 0.4;
-const ANCHOR_COLOR = 0x4caf50;
+const ANCHORED_ENDPOINT_INNER_RADIUS = 2;
 
 /**
  * 线的选中装饰：端点手柄 + 途经点手柄 + 虚拟中点手柄（拖动可生成途经点）。
@@ -66,13 +66,20 @@ export class LineSelectedBorder extends AbsDecorate {
 
 	private drawEndpoint(p: Point, anchored: boolean, scale: number) {
 		if (anchored) {
-			this.graphics.lineStyle(1 / scale, ANCHOR_COLOR, 1);
-			this.graphics.beginFill(ANCHOR_COLOR, 1);
+			// 与工具栏选中态保持一致：柔和底色 + 紫色描边和中心点。
+			this.graphics.lineStyle(2 / scale, ACTIVE_ACCENT, 1);
+			this.graphics.beginFill(CONTROL_SURFACE, 1);
+			this.graphics.drawCircle(p.x, p.y, ENDPOINT_RADIUS / scale);
+			this.graphics.endFill();
+
+			this.graphics.lineStyle(0);
+			this.graphics.beginFill(ACTIVE_ACCENT, 1);
+			this.graphics.drawCircle(p.x, p.y, ANCHORED_ENDPOINT_INNER_RADIUS / scale);
 		} else {
 			this.graphics.lineStyle(1 / scale, HOVER_BORDER, 1);
-			this.graphics.beginFill(0xffffff, 1);
+			this.graphics.beginFill(CONTROL_SURFACE, 1);
+			this.graphics.drawCircle(p.x, p.y, ENDPOINT_RADIUS / scale);
 		}
-		this.graphics.drawCircle(p.x, p.y, ENDPOINT_RADIUS / scale);
 		this.graphics.endFill();
 	}
 

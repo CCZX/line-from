@@ -9,13 +9,17 @@ export class RedoShortcutKey implements IShortcutKey {
 
 	public name = '重做';
 	public key = 'z';
-	public fnKeys = ['Ctrl+Shift+Z'];
+	public fnKeys = ['Ctrl+Shift+Z', 'Ctrl+Y'];
 
 	public isMatch(e: KeyboardEvent): boolean {
-		return (e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'z';
+		return (
+			(e.ctrlKey || e.metaKey) &&
+			((e.shiftKey && e.key.toLowerCase() === 'z') || (!e.shiftKey && e.key.toLowerCase() === 'y'))
+		);
 	}
 
-	public onKeyDown(_e: KeyboardEvent): void {
+	public onKeyDown(e: KeyboardEvent): void {
+		e.preventDefault();
 		this.actionLogManager.redo();
 	}
 

@@ -2,6 +2,7 @@ import { inject } from 'inversify';
 import { IAction, IActionLogManager, IActionManager } from '../../contract';
 import { provide } from 'inversify-binding-decorators';
 import { IocContainerService } from '@/common/contract';
+import { create } from 'zustand';
 
 @provide(IActionLogManager)
 export class ActionLogManager implements IActionLogManager {
@@ -11,9 +12,14 @@ export class ActionLogManager implements IActionLogManager {
 	private undoStack: IAction<unknown>[] = [];
 	private redoStack: IAction<unknown>[] = [];
 
+	public store = create(() => ({
+		canUndo: false,
+		canRedo: false,
+	}));
+
 	/** 是否处于流式操作中（如拖拽过程） */
 	private streaming = false;
-	/** 流式操作中最后一条 action，用于 redo */
+	/** 流式操作中最后一条 action，用于标记本次流式操作已写入历史 */
 	private streamLastAction: IAction<unknown> | null = null;
 
 	public setStreamStart() {
@@ -40,6 +46,7 @@ export class ActionLogManager implements IActionLogManager {
 
 		const actionManager = this.ioc.get<IActionManager>(IActionManager);
 		actionManager.push(action);
+		this.syncState();
 	}
 
 	public redo() {
@@ -48,10 +55,13 @@ export class ActionLogManager implements IActionLogManager {
 		}
 
 		const forwardAction = this.redoStack.pop()!;
-		this.undoStack.push(forwardAction);
+		const backAction = forwardAction.genBackAction();
+		backAction.setNeedAddLog(false);
+		this.undoStack.push(backAction);
 
 		const actionManager = this.ioc.get<IActionManager>(IActionManager);
 		actionManager.push(forwardAction);
+		this.syncState();
 	}
 
 	public clear(): void {
@@ -59,6 +69,7 @@ export class ActionLogManager implements IActionLogManager {
 		this.redoStack = [];
 		this.streaming = false;
 		this.streamLastAction = null;
+		this.syncState();
 	}
 
 	public addAction(action: IAction<unknown>) {
@@ -75,5 +86,13 @@ export class ActionLogManager implements IActionLogManager {
 		}
 
 		this.redoStack = [];
+		this.syncState();
+	}
+
+	private syncState(): void {
+		this.store.setState({
+			canUndo: this.undoStack.length > 0,
+			canRedo: this.redoStack.length > 0,
+		});
 	}
 }
