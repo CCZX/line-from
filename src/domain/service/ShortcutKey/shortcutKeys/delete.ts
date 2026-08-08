@@ -19,15 +19,19 @@ export class DeleteShortcutKey implements IShortcutKey {
 	private ioc!: IocContainerService;
 
 	public name = '删除';
-	public key = 'Delete';
-	public fnKeys = ['Delete', 'Backspace'];
+	public key = ['Delete', 'Backspace'];
+	public fnKeys = [];
 
-	public isMatch(e: KeyboardEvent): boolean {
-		// 正在文本输入框内编辑时，退格/删除交给输入框，不删除图形
-		if (this.isEditingText()) {
-			return false;
+	public isMatch(_e: KeyboardEvent): boolean {
+		const element = document.activeElement as HTMLElement | null;
+		if (!element) {
+			return true;
 		}
-		return e.key === 'Delete' || e.key === 'Backspace';
+		return !(
+			element.tagName === 'INPUT' ||
+			element.tagName === 'TEXTAREA' ||
+			element.isContentEditable
+		);
 	}
 
 	public onKeyDown(e: KeyboardEvent): void {
@@ -47,12 +51,4 @@ export class DeleteShortcutKey implements IShortcutKey {
 	}
 
 	public onKeyUp(_e: KeyboardEvent): void {}
-
-	private isEditingText(): boolean {
-		const el = document.activeElement as HTMLElement | null;
-		if (!el) {
-			return false;
-		}
-		return el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable;
-	}
 }

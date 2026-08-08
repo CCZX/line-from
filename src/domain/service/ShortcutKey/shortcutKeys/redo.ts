@@ -1,4 +1,4 @@
-import { IActionLogManager, IShortcutKey } from '@/domain/contract';
+import { control, IActionLogManager, IShortcutKey, meta, shift } from '@/domain/contract';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 
@@ -9,14 +9,7 @@ export class RedoShortcutKey implements IShortcutKey {
 
 	public name = '重做';
 	public key = 'z';
-	public fnKeys = ['Ctrl+Shift+Z', 'Ctrl+Y'];
-
-	public isMatch(e: KeyboardEvent): boolean {
-		return (
-			(e.ctrlKey || e.metaKey) &&
-			((e.shiftKey && e.key.toLowerCase() === 'z') || (!e.shiftKey && e.key.toLowerCase() === 'y'))
-		);
-	}
+	public fnKeys = [meta | shift, control | shift];
 
 	public onKeyDown(e: KeyboardEvent): void {
 		e.preventDefault();

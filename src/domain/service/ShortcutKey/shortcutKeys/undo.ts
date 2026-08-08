@@ -1,4 +1,4 @@
-import { IActionLogManager, IShortcutKey } from '@/domain/contract';
+import { control, IActionLogManager, IShortcutKey, meta } from '@/domain/contract';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 
@@ -9,11 +9,7 @@ export class UndoShortcutKey implements IShortcutKey {
 
 	public name = '撤销';
 	public key = 'z';
-	public fnKeys = ['Ctrl+Z'];
-
-	public isMatch(e: KeyboardEvent): boolean {
-		return (e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z';
-	}
+	public fnKeys = [meta, control];
 
 	public onKeyDown(e: KeyboardEvent): void {
 		e.preventDefault();
