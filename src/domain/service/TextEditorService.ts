@@ -1,4 +1,5 @@
-import { Point, TextMetrics } from 'pixi.js';
+import { Point } from '@pixi/core';
+import { TextMetrics } from '@pixi/text';
 import { inject } from 'inversify';
 import { IocContainerService } from '@/common/contract';
 import { IActionManager, ITextEditorService, IViewportService } from '@/domain/contract';

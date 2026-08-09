@@ -1,4 +1,6 @@
-import { Container, Graphics, Text as PixiText } from 'pixi.js';
+import { Container } from '@pixi/display';
+import { Graphics } from '@pixi/graphics';
+import { Text as PixiText } from '@pixi/text';
 import { ITextEditorService } from '@/domain/contract';
 import { BaseShape } from './BaseShape';
 import { ShapeContext, ShapePropertyEnum, ShapeTypeEnum, TextPropertyValue } from './contract';
@@ -26,13 +28,9 @@ export abstract class TextEditableShape<T extends Container = Container> extends
 		super(id, graphics, context);
 
 		this.textView = textView;
-		this.textView.name = 'SHAPE_TEXT';
-		this.textView.eventMode = 'none';
 		this.textView.resolution = Math.max(2, window.devicePixelRatio);
 
 		if ((textView as Container) !== graphics) {
-			this.textBackgroundView.name = 'SHAPE_TEXT_BACKGROUND';
-			this.textBackgroundView.eventMode = 'none';
 			this.container.addChild(this.textBackgroundView, textView);
 		}
 

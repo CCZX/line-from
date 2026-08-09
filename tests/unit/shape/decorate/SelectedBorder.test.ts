@@ -4,7 +4,7 @@ import { ShapePropertyEnum, ShapeTypeEnum } from '@/shape/contract';
 import { SelectedBorder } from '@/shape/decorate/SelectedBorder';
 import type { DecorateViewport } from '@/shape/decorate/AbsDecorate';
 
-vi.mock('pixi.js', () => {
+vi.mock('@pixi/graphics', () => {
 	class GraphicsMock {
 		public name = '';
 		public geometry: {

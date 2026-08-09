@@ -1,4 +1,4 @@
-import { Graphics } from 'pixi.js';
+import { Graphics } from '@pixi/graphics';
 import { ShapeContext, ShapeTypeEnum } from './contract';
 import { TextEditableShape } from './TextEditableShape';
 
@@ -9,6 +9,5 @@ export class Circle extends TextEditableShape<Graphics> {
 
 	constructor(id: string, context: ShapeContext) {
 		super(id, new Graphics(), context);
-		this.graphics.interactive = true;
 	}
 }

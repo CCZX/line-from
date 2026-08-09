@@ -1,5 +1,5 @@
 import { Stage } from '@/canvas/core/Stage';
-import { Point as PixiPoint } from 'pixi.js';
+import { Point as PixiPoint } from '@pixi/core';
 import { StoreApi, UseBoundStore } from 'zustand';
 
 export interface ViewportState {

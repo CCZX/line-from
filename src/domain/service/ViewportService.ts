@@ -1,4 +1,4 @@
-import { Point as PixiPoint } from 'pixi.js';
+import { Point as PixiPoint } from '@pixi/core';
 import { Stage } from '@/canvas/core/Stage';
 import { IViewportService, ViewportState } from '@/domain/contract/ViewportService';
 import { provide } from 'inversify-binding-decorators';

@@ -1,4 +1,4 @@
-import { Graphics } from 'pixi.js';
+import { Graphics } from '@pixi/graphics';
 import { ShapeContext, ShapeDecorateTypeEnum, ShapePropertyEnum, ShapeTypeEnum } from './contract';
 import { BaseShape } from './BaseShape';
 import { LineProperty } from './property/LineProperty';
@@ -17,7 +17,6 @@ export class Line extends BaseShape<Graphics> {
 
 	constructor(id: string, context: ShapeContext) {
 		super(id, new Graphics(), context);
-		this.graphics.interactive = true;
 	}
 
 	protected initProperty() {

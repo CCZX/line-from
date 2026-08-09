@@ -5,7 +5,7 @@ import { BaseProperty } from './BaseProperty';
 import { StrokeProperty } from './StrokeProperty';
 import { applyLineStyle, drawSketchyArrowhead, drawSketchyLine } from './style';
 import { catmullRomToBezier, cubicBezierPoint, getShapeAnchorPoint } from '../geometry';
-import { Graphics } from 'pixi.js';
+import { Graphics } from '@pixi/graphics';
 import { IShapeManager } from '@/domain/contract';
 import { IocContainerService } from '@/common/contract';
 import { SHAPE_COLORS } from '@/common/color';

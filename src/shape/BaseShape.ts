@@ -1,4 +1,5 @@
-import { Container, Graphics } from 'pixi.js';
+import { Container } from '@pixi/display';
+import { Graphics } from '@pixi/graphics';
 import {
 	BasePropertyValue,
 	FillPropertyValue,
@@ -61,7 +62,6 @@ export abstract class BaseShape<T extends Container = Container> {
 		this.context = context;
 
 		this.container.addChild(this.graphics);
-		this.container.name = 'SHAPE_CONTAINER';
 		this.stateMachine = new StateMachine(this);
 		const viewportService = this.context.ioc.get<IViewportService>(IViewportService);
 		this.initDecorate(createDecorateViewport(viewportService));

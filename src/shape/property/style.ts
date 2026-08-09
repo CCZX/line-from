@@ -1,4 +1,4 @@
-import { Graphics, LINE_CAP, LINE_JOIN } from 'pixi.js';
+import { Graphics, LINE_CAP, LINE_JOIN } from '@pixi/graphics';
 import rough from 'roughjs';
 import { colorToHex, SHAPE_COLORS } from '@/common/color';
 

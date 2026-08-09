@@ -1,4 +1,4 @@
-import { Point as PixiPoint } from 'pixi.js';
+import { Point as PixiPoint } from '@pixi/core';
 import { BaseShape } from '@/shape/BaseShape';
 import { BaseProperty } from '@/shape/property/BaseProperty';
 import { SelectedBorder } from '@/shape/decorate/SelectedBorder';

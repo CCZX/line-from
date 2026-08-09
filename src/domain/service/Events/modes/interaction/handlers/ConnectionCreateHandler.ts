@@ -1,4 +1,4 @@
-import { Point as PixiPoint } from 'pixi.js';
+import { Point as PixiPoint } from '@pixi/core';
 import { IocContainerService } from '@/common/contract';
 import { IActionManager } from '@/domain/contract/Action';
 import {

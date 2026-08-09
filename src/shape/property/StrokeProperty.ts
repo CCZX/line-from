@@ -1,4 +1,4 @@
-import { Graphics } from 'pixi.js';
+import { Graphics } from '@pixi/graphics';
 import { AbsProperty } from './AbsProperty';
 import { StrokePropertyValue, ShapeTypeEnum } from '../contract';
 import { BaseShape } from '../BaseShape';

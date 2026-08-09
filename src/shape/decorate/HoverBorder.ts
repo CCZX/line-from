@@ -1,4 +1,4 @@
-import { Graphics } from 'pixi.js';
+import { Graphics } from '@pixi/graphics';
 import { DECORATE_COLORS } from '@/common/color';
 import { ShapeDecorateTypeEnum, ShapePropertyEnum } from '../contract';
 import type { StrokePropertyValue } from '../contract';
@@ -16,7 +16,6 @@ export class HoverBorder extends AbsDecorate {
 	constructor(shape: BaseShape, viewport: DecorateViewport) {
 		super(shape, viewport);
 		this.graphics = new Graphics();
-		this.graphics.name = ShapeDecorateTypeEnum.HoverBorder;
 	}
 
 	private draw(): void {

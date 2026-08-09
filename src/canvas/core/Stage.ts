@@ -1,4 +1,6 @@
-import { Application, Container, Graphics } from 'pixi.js';
+import { Application } from '@pixi/app';
+import { Container } from '@pixi/display';
+import { Graphics } from '@pixi/graphics';
 import { Viewport } from './Viewport';
 import { CANVAS_COLORS, colorToHex } from '@/common/color';
 

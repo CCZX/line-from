@@ -1,6 +1,6 @@
 import { Stage } from '@/canvas/core/Stage';
 import { BaseShape } from '@/shape/BaseShape';
-import { Graphics } from 'pixi.js';
+import { Graphics } from '@pixi/graphics';
 import { StoreApi, UseBoundStore } from 'zustand';
 
 export interface SelectionState {

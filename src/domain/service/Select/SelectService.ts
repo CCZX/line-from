@@ -1,4 +1,4 @@
-import { Graphics } from 'pixi.js';
+import { Graphics } from '@pixi/graphics';
 import { getShapesAABB } from '@/shape/geometry';
 import { BaseShape } from '@/shape/BaseShape';
 import { Stage } from '@/canvas/core/Stage';

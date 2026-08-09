@@ -1,6 +1,6 @@
 import { AbsProperty } from './AbsProperty';
 import { ShapeTypeEnum, TextPropertyValue } from '../contract';
-import { TextStyle } from 'pixi.js';
+import { TextStyle } from '@pixi/text';
 import type { TextEditableShape } from '../TextEditableShape';
 import { SHAPE_COLORS } from '@/common/color';
 

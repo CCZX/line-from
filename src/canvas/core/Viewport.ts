@@ -1,12 +1,15 @@
-import { Container, IDestroyOptions, Point } from 'pixi.js';
-import floor from 'lodash/floor';
-import { last } from 'lodash';
+import { Point } from '@pixi/core';
+import { Container, type IDestroyOptions } from '@pixi/display';
 import { Subject } from 'rxjs';
 
 export const ZOOM_SCALE_LIST = [0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4];
 
 export const MIN_ZOOM_SCALE = ZOOM_SCALE_LIST[0];
-export const MAX_ZOOM_SCALE = last(ZOOM_SCALE_LIST)!;
+export const MAX_ZOOM_SCALE = ZOOM_SCALE_LIST[ZOOM_SCALE_LIST.length - 1];
+
+function floorToTwoDecimals(value: number): number {
+	return Math.floor(value * 100) / 100;
+}
 
 /**
  *
@@ -22,7 +25,7 @@ export function formatZoomScale(scale: number) {
 		scale = MAX_ZOOM_SCALE;
 	}
 
-	return floor(scale, 2);
+	return floorToTwoDecimals(scale);
 }
 
 /**
@@ -198,7 +201,7 @@ export class Viewport extends Container {
 	}
 
 	public setScale(scale: number, point?: Point) {
-		scale = floor(formatZoomScale(scale), 2);
+		scale = formatZoomScale(scale);
 		if (scale === this.scale.x) {
 			return;
 		}
@@ -237,8 +240,8 @@ export class Viewport extends Container {
 	}
 
 	private setPosition(x: number, y: number) {
-		x = floor(x, 2);
-		y = floor(y, 2);
+		x = floorToTwoDecimals(x);
+		y = floorToTwoDecimals(y);
 
 		this.position.set(x, y);
 		this.positionChangeEvent$.next({ x, y });

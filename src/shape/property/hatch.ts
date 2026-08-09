@@ -1,4 +1,4 @@
-import { Texture, WRAP_MODES } from 'pixi.js';
+import { Texture, WRAP_MODES } from '@pixi/core';
 import { colorToHex, SHAPE_COLORS } from '@/common/color';
 
 let hatchTexture: Texture | null = null;

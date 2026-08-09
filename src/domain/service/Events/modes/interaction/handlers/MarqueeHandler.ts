@@ -1,4 +1,4 @@
-import { Graphics } from 'pixi.js';
+import { Graphics } from '@pixi/graphics';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
 import { IHandler, IHandlerWithInteraction, IShapeManager } from '@/domain/contract';
 import { ISelectService } from '@/domain/contract/SelectService';

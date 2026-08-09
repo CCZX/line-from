@@ -1,4 +1,4 @@
-import { Graphics } from 'pixi.js';
+import { Graphics } from '@pixi/graphics';
 import { ShapeContext, ShapeTypeEnum } from './contract';
 import { TextEditableShape } from './TextEditableShape';
 
