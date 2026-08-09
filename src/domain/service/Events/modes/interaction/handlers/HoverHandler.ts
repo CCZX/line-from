@@ -1,6 +1,11 @@
 import { ShapeStateEnum } from '@/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
-import { IHandler, IHandlerWithInteraction, IShapeManager } from '@/domain/contract';
+import {
+	IHandler,
+	IHandlerWithInteraction,
+	ISelectService,
+	IShapeManager,
+} from '@/domain/contract';
 import { IViewportService } from '@/domain/contract/ViewportService';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
@@ -15,6 +20,9 @@ export class HoverHandler implements IHandler {
 
 	@inject(IViewportService)
 	private viewportService!: IViewportService;
+
+	@inject(ISelectService)
+	private selectService!: ISelectService;
 
 	public enable(_state: InteractionState): boolean {
 		return true;
@@ -41,7 +49,7 @@ export class HoverHandler implements IHandler {
 			state.hoveredShape.setState(ShapeStateEnum.Normal);
 		}
 
-		const isSelected = nextShape && state.selectedShapes.some((s) => s.id === nextShape.id);
+		const isSelected = nextShape && !!this.selectService.getSelectedShapeById(nextShape.id);
 		if (nextShape?.getState() === ShapeStateEnum.Normal && !isSelected) {
 			nextShape.setState(ShapeStateEnum.Hover);
 		}

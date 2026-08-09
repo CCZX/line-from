@@ -38,9 +38,10 @@ export class SelectHandler implements IHandler {
 			payload.viewportPoint.y,
 		);
 		const nextShape = this.shapeManager.getShapeByPoint(worldPoint);
+		const selectedShapes = this.selectService.getSelectedShapes();
 
 		// 点击已选中的图形，放行给 MoveHandler
-		if (nextShape && state.selectedShapes.some((s) => s.id === nextShape.id)) {
+		if (nextShape && selectedShapes.some((s) => s.id === nextShape.id)) {
 			return true;
 		}
 
@@ -54,17 +55,15 @@ export class SelectHandler implements IHandler {
 		}
 
 		// 取消所有选中
-		state.selectedShapes.forEach((s) => s.setState(ShapeStateEnum.Normal));
-		state.selectedShapes = [];
+		selectedShapes.forEach((s) => s.setState(ShapeStateEnum.Normal));
 		this.selectService.clearSelectedShapes();
 
 		if (nextShape) {
 			nextShape.setState(ShapeStateEnum.Selected);
-			state.selectedShapes = [nextShape];
 			this.selectService.setSelectedShape(nextShape);
 		}
 
-		this.selectService.updateMultiSelectOverlay(state.selectedShapes);
+		this.selectService.updateMultiSelectOverlay(this.selectService.getSelectedShapes());
 
 		return true;
 	}

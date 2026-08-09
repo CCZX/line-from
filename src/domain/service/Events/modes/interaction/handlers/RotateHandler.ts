@@ -11,6 +11,8 @@ import {
 } from '@/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
 import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
+import { ISelectService } from '@/domain/contract/SelectService';
+import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 
 const ROTATE_HANDLE_HIT_RADIUS = 12;
@@ -20,37 +22,41 @@ export class RotateHandler implements IHandler {
 	public type = HandlerEnum.Rotate;
 	public sort = 30;
 
+	@inject(ISelectService)
+	private selectService!: ISelectService;
+
 	private isRotating = false;
 	private rotatingShape: BaseShape | null = null;
 	private originRotation = 0;
 	private startPointerAngle = 0;
 
-	public enable(state: InteractionState): boolean {
+	public enable(_state: InteractionState): boolean {
+		const selectedShapes = this.selectService.getSelectedShapes();
 		// 线没有旋转手柄（LineSelectedBorder 不提供 getRotateHandleCenter）
-		return state.selectedShapes.length === 1 && state.selectedShapes[0].type !== ShapeTypeEnum.Line;
+		return selectedShapes.length === 1 && selectedShapes[0].type !== ShapeTypeEnum.Line;
 	}
 
-	public execute(e: PointerEvent, state: InteractionState, payload: EventPayload): boolean {
+	public execute(e: PointerEvent, _state: InteractionState, payload: EventPayload): boolean {
 		switch (e.type) {
 			case 'pointermove':
-				return this.handlePointerMove(state, payload);
+				return this.handlePointerMove(payload);
 			case 'pointerdown':
-				return this.handlePointerDown(state, payload);
+				return this.handlePointerDown(payload);
 			case 'pointerup':
-				return this.handlePointerUp(state);
+				return this.handlePointerUp();
 			default:
 				return true;
 		}
 	}
 
-	private handlePointerMove(state: InteractionState, payload: EventPayload): boolean {
+	private handlePointerMove(payload: EventPayload): boolean {
 		if (this.isRotating) {
 			document.body.style.cursor = 'grabbing';
 			this.applyRotate(payload.viewportPoint);
 			return false;
 		}
 
-		if (this.isOverRotateHandle(state.selectedShapes[0]!, payload.viewportPoint)) {
+		if (this.isOverRotateHandle(this.selectService.getSelectedShapes()[0], payload.viewportPoint)) {
 			document.body.style.cursor = 'grabbing';
 			return false;
 		}
@@ -58,8 +64,8 @@ export class RotateHandler implements IHandler {
 		return true;
 	}
 
-	private handlePointerDown(state: InteractionState, payload: EventPayload): boolean {
-		const shape = state.selectedShapes[0]!;
+	private handlePointerDown(payload: EventPayload): boolean {
+		const shape = this.selectService.getSelectedShapes()[0];
 		if (!this.isOverRotateHandle(shape, payload.viewportPoint)) {
 			return true;
 		}
@@ -75,15 +81,12 @@ export class RotateHandler implements IHandler {
 		return false;
 	}
 
-	private handlePointerUp(state: InteractionState): boolean {
+	private handlePointerUp(): boolean {
 		if (!this.isRotating) {
 			return true;
 		}
 
 		this.rotatingShape?.setState(ShapeStateEnum.Selected);
-		if (this.rotatingShape) {
-			state.selectedShapes[0] = this.rotatingShape;
-		}
 		this.reset();
 		document.body.style.cursor = 'default';
 		return false;

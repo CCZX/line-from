@@ -1,6 +1,11 @@
 import { ShapeStateEnum } from '@/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
-import { IHandlerWithInteraction, IHandler, IShapeManager } from '@/domain/contract';
+import {
+	IHandlerWithInteraction,
+	IHandler,
+	ISelectService,
+	IShapeManager,
+} from '@/domain/contract';
 import { IViewportService } from '@/domain/contract/ViewportService';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
@@ -27,18 +32,22 @@ export class TextEditHandler implements IHandler {
 	@inject(IViewportService)
 	private viewportService!: IViewportService;
 
+	@inject(ISelectService)
+	private selectService!: ISelectService;
+
 	private lastPointerDown: PointerDownSnapshot | null = null;
 
 	public enable(_state: InteractionState): boolean {
 		return true;
 	}
 
-	public execute(e: PointerEvent, state: InteractionState, payload: EventPayload): boolean {
+	public execute(e: PointerEvent, _state: InteractionState, payload: EventPayload): boolean {
 		if (e.type !== 'pointerdown') {
 			return true;
 		}
 
-		if (state.selectedShapes.length !== 1) {
+		const selectedShapes = this.selectService.getSelectedShapes();
+		if (selectedShapes.length !== 1) {
 			this.lastPointerDown = null;
 			return true;
 		}
@@ -53,7 +62,7 @@ export class TextEditHandler implements IHandler {
 			return true;
 		}
 
-		if (state.selectedShapes[0].id !== shapeUnderCursor.id) {
+		if (selectedShapes[0].id !== shapeUnderCursor.id) {
 			this.lastPointerDown = null;
 			return true;
 		}
@@ -86,7 +95,6 @@ export class TextEditHandler implements IHandler {
 		}
 
 		shapeUnderCursor.setState(ShapeStateEnum.Edit);
-		state.selectedShapes = [shapeUnderCursor];
 
 		return false;
 	}

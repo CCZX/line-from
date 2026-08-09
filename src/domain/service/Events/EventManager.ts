@@ -9,7 +9,6 @@ export class EventManager implements IEventManager, IDestroyable {
 	/** 跨 handler 共享的可变状态 */
 	private state: InteractionState = {
 		hoveredShape: null,
-		selectedShapes: [],
 	};
 
 	@multiInject(IEventMode)
@@ -88,8 +87,7 @@ export class EventManager implements IEventManager, IDestroyable {
 		document.removeEventListener('pointerup', this.onPointerup);
 	}
 
-	public clearSelection() {
-		this.state.selectedShapes = [];
+	public clearInteractionState(): void {
 		this.state.hoveredShape = null;
 	}
 }

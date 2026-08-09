@@ -66,7 +66,7 @@ export class SelectService implements ISelectService {
 	}
 
 	public getSelectedShapes() {
-		return this.selectedShapes;
+		return Array.from(this.selectedShapes.values());
 	}
 
 	public removeSelectedShapeById(id: string) {

@@ -13,6 +13,7 @@ import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAc
 import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
 import { IViewportService } from '@/domain/contract/ViewportService';
 import { IShapeManager } from '@/domain/contract';
+import { ISelectService } from '@/domain/contract/SelectService';
 import { getShapeAnchorPoint } from '@/shape/geometry';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
@@ -48,6 +49,9 @@ export class LineEditHandler implements IHandler {
 	@inject(IocContainerService)
 	private ioc!: IocContainerService;
 
+	@inject(ISelectService)
+	private selectService!: ISelectService;
+
 	private isDragging = false;
 	private draggingShape: BaseShape | null = null;
 	private dragTarget: DragTarget | null = null;
@@ -55,28 +59,29 @@ export class LineEditHandler implements IHandler {
 	private lastDownTime = 0;
 	private lastDownMidIndex: number | null = null;
 
-	public enable(state: InteractionState): boolean {
-		return state.selectedShapes.length === 1 && state.selectedShapes[0].type === ShapeTypeEnum.Line;
+	public enable(_state: InteractionState): boolean {
+		const selectedShapes = this.selectService.getSelectedShapes();
+		return selectedShapes.length === 1 && selectedShapes[0].type === ShapeTypeEnum.Line;
 	}
 
-	public execute(e: PointerEvent, state: InteractionState, payload: EventPayload): boolean {
+	public execute(e: PointerEvent, _state: InteractionState, payload: EventPayload): boolean {
 		switch (e.type) {
 			case 'pointerdown':
-				return this.handlePointerDown(state, payload);
+				return this.handlePointerDown(payload);
 			case 'pointermove':
 				if (e.buttons !== 1 && this.isDragging) {
-					this.finishDrag(state);
+					this.finishDrag();
 				}
-				return this.handlePointerMove(state, payload);
+				return this.handlePointerMove(payload);
 			case 'pointerup':
-				return this.handlePointerUp(state);
+				return this.handlePointerUp();
 			default:
 				return true;
 		}
 	}
 
-	private handlePointerDown(state: InteractionState, payload: EventPayload): boolean {
-		const shape = state.selectedShapes[0];
+	private handlePointerDown(payload: EventPayload): boolean {
+		const shape = this.selectService.getSelectedShapes()[0];
 		const line = shape.getProperty<LineProperty>(ShapePropertyEnum.Line);
 		const point = this.toWorldPoint(payload);
 		const threshold = HANDLE_HIT_RADIUS / payload.scale;
@@ -129,14 +134,14 @@ export class LineEditHandler implements IHandler {
 		return true;
 	}
 
-	private handlePointerMove(state: InteractionState, payload: EventPayload): boolean {
+	private handlePointerMove(payload: EventPayload): boolean {
 		if (this.isDragging) {
 			document.body.style.cursor = 'move';
 			this.applyDrag(payload);
 			return false;
 		}
 
-		const shape = state.selectedShapes[0];
+		const shape = this.selectService.getSelectedShapes()[0];
 		const line = shape.getProperty<LineProperty>(ShapePropertyEnum.Line);
 		const point = this.toWorldPoint(payload);
 		const threshold = HANDLE_HIT_RADIUS / payload.scale;
@@ -152,21 +157,18 @@ export class LineEditHandler implements IHandler {
 		return true;
 	}
 
-	private handlePointerUp(state: InteractionState): boolean {
+	private handlePointerUp(): boolean {
 		if (!this.isDragging) {
 			return true;
 		}
-		this.finishDrag(state);
+		this.finishDrag();
 		document.body.style.cursor = 'default';
 		return false;
 	}
 
-	private finishDrag(state: InteractionState) {
+	private finishDrag() {
 		this.actionLogManager.setStreamEnd();
 		this.draggingShape?.setState(ShapeStateEnum.Selected);
-		if (this.draggingShape) {
-			state.selectedShapes[0] = this.draggingShape;
-		}
 		this.reset();
 	}
 

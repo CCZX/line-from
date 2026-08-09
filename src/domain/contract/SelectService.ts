@@ -18,7 +18,7 @@ export interface ISelectService {
 	setMultipleSelectedShapes(shapes: BaseShape[]): void;
 	clearSelectedShapes(): void;
 	getSelectedShapeById(id: string): BaseShape | undefined;
-	getSelectedShapes(): Map<string, BaseShape>;
+	getSelectedShapes(): BaseShape[];
 	removeSelectedShapeById(id: string): void;
 
 	showMultiSelectOverlay(rect: Rectangle): void;

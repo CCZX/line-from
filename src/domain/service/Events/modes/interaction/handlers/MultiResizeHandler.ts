@@ -54,22 +54,24 @@ export class MultiResizeHandler implements IHandler {
 	private originAABB: Rectangle | null = null;
 	private originShapeProps: Map<string, BasePropertyValue> = new Map();
 
-	public enable(state: InteractionState): boolean {
-		return state.selectedShapes.length >= 2;
+	public enable(_state: InteractionState): boolean {
+		return this.selectService.getSelectedShapes().length >= 2;
 	}
 
-	public execute(e: PointerEvent, state: InteractionState, payload: EventPayload): boolean {
+	public execute(e: PointerEvent, _state: InteractionState, payload: EventPayload): boolean {
 		switch (e.type) {
 			case 'pointermove':
 				if (e.buttons !== 1 && this.isResizing) {
-					state.selectedShapes.forEach((s) => s.setState(ShapeStateEnum.MultiSelected));
+					this.selectService
+						.getSelectedShapes()
+						.forEach((s) => s.setState(ShapeStateEnum.MultiSelected));
 					this.reset();
 				}
-				return this.handlePointerMove(state, payload);
+				return this.handlePointerMove(payload);
 			case 'pointerdown':
-				return this.handlePointerDown(state, payload);
+				return this.handlePointerDown(payload);
 			case 'pointerup':
-				return this.handlePointerUp(state);
+				return this.handlePointerUp();
 			default:
 				return true;
 		}
@@ -96,10 +98,10 @@ export class MultiResizeHandler implements IHandler {
 		};
 	}
 
-	private handlePointerMove(state: InteractionState, payload: EventPayload): boolean {
+	private handlePointerMove(payload: EventPayload): boolean {
 		if (this.isResizing) {
 			document.body.style.cursor = CURSOR_MAP[this.direction!];
-			this.applyResize(state, payload);
+			this.applyResize(payload);
 			return false;
 		}
 
@@ -119,7 +121,7 @@ export class MultiResizeHandler implements IHandler {
 		return true;
 	}
 
-	private handlePointerDown(state: InteractionState, payload: EventPayload): boolean {
+	private handlePointerDown(payload: EventPayload): boolean {
 		const overlayRect = this.getExpandedOverlayRect();
 		if (!overlayRect) {
 			return true;
@@ -138,8 +140,9 @@ export class MultiResizeHandler implements IHandler {
 		this.startLocalPoint = local;
 		this.originAABB = { ...this.selectService.getMultiSelectOverlayRect()! };
 
+		const selectedShapes = this.selectService.getSelectedShapes();
 		this.originShapeProps.clear();
-		for (const shape of state.selectedShapes) {
+		for (const shape of selectedShapes) {
 			const p = shape.getProperty<BaseProperty>(ShapePropertyEnum.Base).get();
 			if (p) {
 				this.originShapeProps.set(shape.id, { ...p });
@@ -147,25 +150,25 @@ export class MultiResizeHandler implements IHandler {
 		}
 
 		this.isResizing = true;
-		state.selectedShapes.forEach((s) => s.setState(ShapeStateEnum.Resizing));
+		selectedShapes.forEach((s) => s.setState(ShapeStateEnum.Resizing));
 
 		return false;
 	}
 
-	private handlePointerUp(state: InteractionState): boolean {
+	private handlePointerUp(): boolean {
 		if (!this.isResizing) {
 			return true;
 		}
 
 		this.actionLogManager.setStreamEnd();
 
-		state.selectedShapes.forEach((s) => s.setState(ShapeStateEnum.MultiSelected));
+		this.selectService.getSelectedShapes().forEach((s) => s.setState(ShapeStateEnum.MultiSelected));
 		this.reset();
 		document.body.style.cursor = 'default';
 		return false;
 	}
 
-	private applyResize(state: InteractionState, payload: EventPayload) {
+	private applyResize(payload: EventPayload) {
 		if (!this.originAABB || !this.direction) {
 			return;
 		}
@@ -182,8 +185,9 @@ export class MultiResizeHandler implements IHandler {
 		const scaleX = newAABB.width / ow;
 		const scaleY = newAABB.height / oh;
 
+		const selectedShapes = this.selectService.getSelectedShapes();
 		const shapeDatas: ShapeData[] = [];
-		for (const shape of state.selectedShapes) {
+		for (const shape of selectedShapes) {
 			const origin = this.originShapeProps.get(shape.id);
 			if (!origin) {
 				continue;
@@ -207,7 +211,7 @@ export class MultiResizeHandler implements IHandler {
 		}
 		this.actionManager.push(new UpdatePropsAction(shapeDatas, this.ioc));
 
-		this.selectService.updateMultiSelectOverlay(state.selectedShapes);
+		this.selectService.updateMultiSelectOverlay(selectedShapes);
 	}
 
 	private computeNewAABB(local: Point): Rectangle {

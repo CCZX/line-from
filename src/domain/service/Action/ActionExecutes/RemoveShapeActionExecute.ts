@@ -22,7 +22,7 @@ export class RemoveShapeActionExecute extends AbsActionExecute {
 			this.shapeManager.removeShape(id);
 		}
 
-		const remaining = Array.from(this.selectService.getSelectedShapes().values());
+		const remaining = this.selectService.getSelectedShapes();
 		this.selectService.updateMultiSelectOverlay(remaining);
 	}
 }

@@ -35,7 +35,7 @@ export class DeleteShortcutKey implements IShortcutKey {
 	}
 
 	public onKeyDown(e: KeyboardEvent): void {
-		const shapes = Array.from(this.selectService.getSelectedShapes().values());
+		const shapes = this.selectService.getSelectedShapes();
 		if (shapes.length === 0) {
 			return;
 		}
@@ -46,8 +46,8 @@ export class DeleteShortcutKey implements IShortcutKey {
 		const data = shapes.map((shape) => shape.toData());
 		this.actionManager.push(new RemoveShapeAction(data, this.ioc));
 
-		// 同步清空跨 handler 共享的选中状态，避免残留已删除图形的引用
-		this.eventManager.clearSelection();
+		// 清除可能指向已删除图形的临时交互状态
+		this.eventManager.clearInteractionState();
 	}
 
 	public onKeyUp(_e: KeyboardEvent): void {}

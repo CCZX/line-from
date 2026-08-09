@@ -87,25 +87,25 @@ export class CreateHandler implements IHandler {
 		return tool === 'rect' || tool === 'circle' || tool === 'text' || tool === 'line';
 	}
 
-	public execute(e: PointerEvent, state: InteractionState, payload: EventPayload): boolean {
+	public execute(e: PointerEvent, _state: InteractionState, payload: EventPayload): boolean {
 		switch (e.type) {
 			case 'pointerdown':
-				return this.handlePointerDown(state, payload);
+				return this.handlePointerDown(payload);
 			case 'pointermove':
 				// 拖拽过程中丢失了 pointerup（如鼠标移出窗口松开），主动收尾
 				if (e.buttons !== 1 && this.isCreating) {
-					this.finish(state, payload);
+					this.finish(payload);
 					return false;
 				}
 				return this.handlePointerMove(payload);
 			case 'pointerup':
-				return this.handlePointerUp(state, payload);
+				return this.handlePointerUp(payload);
 			default:
 				return true;
 		}
 	}
 
-	private handlePointerDown(state: InteractionState, payload: EventPayload): boolean {
+	private handlePointerDown(payload: EventPayload): boolean {
 		const tool = this.toolService.store.getState().activeTool;
 		const localPoint = this.viewportService.clientToViewportLocal(
 			payload.viewportPoint.x,
@@ -171,7 +171,7 @@ export class CreateHandler implements IHandler {
 		}
 
 		// 文本：保持点击即创建
-		return this.createImmediate(tool, localPoint, state);
+		return this.createImmediate(tool, localPoint);
 	}
 
 	private handlePointerMove(payload: EventPayload): boolean {
@@ -192,16 +192,16 @@ export class CreateHandler implements IHandler {
 		return false;
 	}
 
-	private handlePointerUp(state: InteractionState, payload: EventPayload): boolean {
+	private handlePointerUp(payload: EventPayload): boolean {
 		if (!this.isCreating) {
 			return true;
 		}
-		this.finish(state, payload);
+		this.finish(payload);
 		return false;
 	}
 
 	/** 收尾：应用最终尺寸（拖拽太小则回退默认尺寸）、选中新图形、切回 Select 工具 */
-	private finish(state: InteractionState, payload: EventPayload) {
+	private finish(payload: EventPayload) {
 		const cur = this.viewportService.clientToViewportLocal(
 			payload.viewportPoint.x,
 			payload.viewportPoint.y,
@@ -232,7 +232,7 @@ export class CreateHandler implements IHandler {
 
 		this.actionLogManager.setStreamEnd();
 
-		this.selectCreatedShape(state);
+		this.selectCreatedShape();
 
 		this.toolService.store.getState().setActiveTool(ToolType.Select);
 		this.reset();
@@ -310,31 +310,26 @@ export class CreateHandler implements IHandler {
 		return { x: point.x, y: point.y };
 	}
 
-	private selectCreatedShape(state: InteractionState) {
-		this.selectShape(state, this.creatingId!);
+	private selectCreatedShape() {
+		this.selectShape(this.creatingId!);
 	}
 
-	private selectShape(state: InteractionState, shapeId: string) {
+	private selectShape(shapeId: string) {
 		const shape = this.shapeManager.getShapeById(shapeId);
 		if (!shape) {
 			return;
 		}
 
 		// 清理可能残留的旧选中
-		state.selectedShapes.forEach((s) => s.setState(ShapeStateEnum.Normal));
+		this.selectService.getSelectedShapes().forEach((s) => s.setState(ShapeStateEnum.Normal));
 		this.selectService.clearSelectedShapes();
 
 		shape.setState(ShapeStateEnum.Selected);
-		state.selectedShapes = [shape];
 		this.selectService.setSelectedShape(shape);
 		this.selectService.updateMultiSelectOverlay([shape]);
 	}
 
-	private createImmediate(
-		tool: ToolType,
-		localPoint: { x: number; y: number },
-		state: InteractionState,
-	): boolean {
+	private createImmediate(tool: ToolType, localPoint: { x: number; y: number }): boolean {
 		const id = nextId();
 		const shapeType = tool === 'text' ? ShapeTypeEnum.Text : ShapeTypeEnum.Line;
 		const isText = shapeType === ShapeTypeEnum.Text;
@@ -376,7 +371,7 @@ export class CreateHandler implements IHandler {
 		};
 
 		this.actionManager.push(new CreateShapeAction([shapeData], this.ioc));
-		this.selectShape(state, id);
+		this.selectShape(id);
 
 		// 新建文本后自动进入编辑态
 		if (isText) {

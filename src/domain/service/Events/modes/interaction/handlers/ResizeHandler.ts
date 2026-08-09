@@ -12,6 +12,7 @@ import { HandlerEnum, InteractionState, EventPayload } from '../../../../../cont
 import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
 import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
 import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
+import { ISelectService } from '@/domain/contract/SelectService';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 import { IocContainerService } from '@/common/contract';
@@ -56,18 +57,22 @@ export class ResizeHandler implements IHandler {
 	@inject(IocContainerService)
 	private ioc!: IocContainerService;
 
+	@inject(ISelectService)
+	private selectService!: ISelectService;
+
 	private isResizing = false;
 	private resizingShape: BaseShape | null = null;
 	private direction: Dir | null = null;
 	private startViewportPoint: Point | null = null;
 	private originBaseProps: BasePropertyValue | null = null;
 
-	public enable(state: InteractionState): boolean {
+	public enable(_state: InteractionState): boolean {
+		const selectedShapes = this.selectService.getSelectedShapes();
 		// 线由 LineEditHandler 负责端点/途经点编辑，不走 bbox resize
-		return state.selectedShapes.length === 1 && state.selectedShapes[0].type !== ShapeTypeEnum.Line;
+		return selectedShapes.length === 1 && selectedShapes[0].type !== ShapeTypeEnum.Line;
 	}
 
-	public execute(e: PointerEvent, state: InteractionState, payload: EventPayload): boolean {
+	public execute(e: PointerEvent, _state: InteractionState, payload: EventPayload): boolean {
 		switch (e.type) {
 			case 'pointermove':
 				// 没有按住主按键时不在 resize 中，清除残留状态
@@ -75,30 +80,27 @@ export class ResizeHandler implements IHandler {
 					this.resizingShape?.setState(ShapeStateEnum.Selected);
 					this.reset();
 				}
-				return this.handlePointerMove(state, payload);
+				return this.handlePointerMove(payload);
 			case 'pointerdown':
-				return this.handlePointerDown(state, payload);
+				return this.handlePointerDown(payload);
 			case 'pointerup':
-				return this.handlePointerUp(state);
+				return this.handlePointerUp();
 			default:
 				return true;
 		}
 	}
 
-	private handlePointerMove(state: InteractionState, payload: EventPayload): boolean {
+	private handlePointerMove(payload: EventPayload): boolean {
 		// 正在 resize 中，更新尺寸
 		if (this.isResizing) {
 			document.body.style.cursor = CURSOR_MAP[this.direction!];
-			this.applyResize(state, payload.viewportPoint);
+			this.applyResize(payload.viewportPoint);
 			return false;
 		}
 
 		// 悬停在 resize handle 上，改光标并打断后续 handler
-		const handle = this.detectHandle(
-			state.selectedShapes[0]!,
-			payload.viewportPoint,
-			payload.scale,
-		);
+		const shape = this.selectService.getSelectedShapes()[0];
+		const handle = this.detectHandle(shape, payload.viewportPoint, payload.scale);
 		if (handle) {
 			document.body.style.cursor = CURSOR_MAP[handle];
 			return false;
@@ -107,12 +109,9 @@ export class ResizeHandler implements IHandler {
 		return true;
 	}
 
-	private handlePointerDown(state: InteractionState, payload: EventPayload): boolean {
-		const handle = this.detectHandle(
-			state.selectedShapes[0]!,
-			payload.viewportPoint,
-			payload.scale,
-		);
+	private handlePointerDown(payload: EventPayload): boolean {
+		const shape = this.selectService.getSelectedShapes()[0];
+		const handle = this.detectHandle(shape, payload.viewportPoint, payload.scale);
 		if (!handle) {
 			return true;
 		}
@@ -122,18 +121,18 @@ export class ResizeHandler implements IHandler {
 		this.direction = handle;
 		this.startViewportPoint = payload.viewportPoint;
 
-		const p = state.selectedShapes[0]!.getProperty<BaseProperty>(ShapePropertyEnum.Base).get();
+		const p = shape.getProperty<BaseProperty>(ShapePropertyEnum.Base).get();
 		this.originBaseProps = { ...p };
 
 		this.isResizing = true;
-		this.resizingShape = state.selectedShapes[0]!;
+		this.resizingShape = shape;
 
 		this.resizingShape.setState(ShapeStateEnum.Resizing);
 
 		return false;
 	}
 
-	private handlePointerUp(state: InteractionState): boolean {
+	private handlePointerUp(): boolean {
 		if (!this.isResizing) {
 			return true;
 		}
@@ -141,16 +140,12 @@ export class ResizeHandler implements IHandler {
 		this.actionLogManager.setStreamEnd();
 
 		this.resizingShape?.setState(ShapeStateEnum.Selected);
-		if (this.resizingShape) {
-			state.selectedShapes[0] = this.resizingShape;
-		}
-
 		this.reset();
 		document.body.style.cursor = 'default';
 		return false;
 	}
 
-	private applyResize(state: InteractionState, viewportPoint: Point) {
+	private applyResize(viewportPoint: Point) {
 		if (!this.resizingShape || !this.originBaseProps || !this.direction) {
 			return;
 		}

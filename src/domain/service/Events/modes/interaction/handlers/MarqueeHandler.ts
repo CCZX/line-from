@@ -37,7 +37,7 @@ export class MarqueeHandler implements IHandler {
 		return true;
 	}
 
-	public execute(e: PointerEvent, state: InteractionState, payload: EventPayload): boolean {
+	public execute(e: PointerEvent, _state: InteractionState, payload: EventPayload): boolean {
 		switch (e.type) {
 			case 'pointerdown':
 				return this.handlePointerDown(payload);
@@ -49,9 +49,9 @@ export class MarqueeHandler implements IHandler {
 					}
 					return true;
 				}
-				return this.handlePointerMove(state, payload);
+				return this.handlePointerMove(payload);
 			case 'pointerup':
-				return this.handlePointerUp(state);
+				return this.handlePointerUp();
 			default:
 				return true;
 		}
@@ -74,7 +74,7 @@ export class MarqueeHandler implements IHandler {
 		return true;
 	}
 
-	private handlePointerMove(state: InteractionState, payload: EventPayload): boolean {
+	private handlePointerMove(payload: EventPayload): boolean {
 		if (!this.hasStart) {
 			return true;
 		}
@@ -97,11 +97,11 @@ export class MarqueeHandler implements IHandler {
 		this.lastViewportX = curLocal.x;
 		this.lastViewportY = curLocal.y;
 		this.updateMarquee();
-		this.selectShapesInMarquee(state);
+		this.selectShapesInMarquee();
 		return false;
 	}
 
-	private handlePointerUp(state: InteractionState): boolean {
+	private handlePointerUp(): boolean {
 		if (this.isDragging) {
 			this.removeMarquee();
 			this.reset();
@@ -130,7 +130,7 @@ export class MarqueeHandler implements IHandler {
 		this.marquee.endFill();
 	}
 
-	private selectShapesInMarquee(state: InteractionState) {
+	private selectShapesInMarquee() {
 		const marqueeRect = {
 			x: Math.min(this.startClientX, this.lastViewportX),
 			y: Math.min(this.startClientY, this.lastViewportY),
@@ -151,8 +151,6 @@ export class MarqueeHandler implements IHandler {
 		});
 
 		this.selectService.setMultipleSelectedShapes(intersectingShapes);
-
-		state.selectedShapes = intersectingShapes;
 
 		const targetState =
 			intersectingShapes.length > 1 ? ShapeStateEnum.MultiSelected : ShapeStateEnum.Selected;

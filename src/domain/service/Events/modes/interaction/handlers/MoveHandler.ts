@@ -53,14 +53,14 @@ export class MoveHandler implements IHandler {
 	private originBasePropsMap: Map<string, BasePropertyValue> = new Map();
 	private originLinePropsMap: Map<string, LinePropertyValue> = new Map();
 
-	public enable(state: InteractionState): boolean {
-		return state.selectedShapes.length > 0;
+	public enable(_state: InteractionState): boolean {
+		return this.selectService.getSelectedShapes().length > 0;
 	}
 
-	public execute(e: PointerEvent, state: InteractionState, payload: EventPayload): boolean {
+	public execute(e: PointerEvent, _state: InteractionState, payload: EventPayload): boolean {
 		switch (e.type) {
 			case 'pointerdown':
-				return this.handlePointerDown(state, payload);
+				return this.handlePointerDown(payload);
 			case 'pointermove':
 				if (e.buttons !== 1) {
 					if (this.isDragging) {
@@ -73,22 +73,23 @@ export class MoveHandler implements IHandler {
 					}
 					return true;
 				}
-				return this.handlePointerMove(state, payload);
+				return this.handlePointerMove(payload);
 			case 'pointerup':
-				return this.handlePointerUp(state);
+				return this.handlePointerUp();
 			default:
 				return true;
 		}
 	}
 
-	private handlePointerDown(state: InteractionState, payload: EventPayload): boolean {
+	private handlePointerDown(payload: EventPayload): boolean {
 		const worldPoint = this.viewportService.clientToViewportLocal(
 			payload.viewportPoint.x,
 			payload.viewportPoint.y,
 		);
 		const shapeUnderCursor = this.shapeManager.getShapeByPoint(worldPoint);
+		const selectedShapes = this.selectService.getSelectedShapes();
 		const isOnSelected =
-			shapeUnderCursor && state.selectedShapes.some((s) => s.id === shapeUnderCursor.id);
+			shapeUnderCursor && selectedShapes.some((s) => s.id === shapeUnderCursor.id);
 
 		const isOnOverlay = this.isPointOnOverlay(payload);
 
@@ -98,7 +99,7 @@ export class MoveHandler implements IHandler {
 
 		this.originBasePropsMap.clear();
 		this.originLinePropsMap.clear();
-		for (const shape of state.selectedShapes) {
+		for (const shape of selectedShapes) {
 			const p = shape.getProperty<BaseProperty>(ShapePropertyEnum.Base).get();
 			if (p) {
 				this.originBasePropsMap.set(shape.id, { ...p });
@@ -140,7 +141,7 @@ export class MoveHandler implements IHandler {
 		return isPointInRect({ x: local.x, y: local.y }, expanded);
 	}
 
-	private handlePointerMove(state: InteractionState, payload: EventPayload): boolean {
+	private handlePointerMove(payload: EventPayload): boolean {
 		if (this.isDragging) {
 			document.body.style.cursor = 'grabbing';
 			this.applyMove(payload.viewportPoint);
@@ -158,7 +159,7 @@ export class MoveHandler implements IHandler {
 			this.actionLogManager.setStreamStart();
 
 			this.isDragging = true;
-			this.movingShapes = [...state.selectedShapes];
+			this.movingShapes = this.selectService.getSelectedShapes();
 			this.movingShapes.forEach((s) => s.setState(ShapeStateEnum.Moving));
 			document.body.style.cursor = 'grabbing';
 			return false;
@@ -167,7 +168,7 @@ export class MoveHandler implements IHandler {
 		return true;
 	}
 
-	private handlePointerUp(_state: InteractionState): boolean {
+	private handlePointerUp(): boolean {
 		if (this.isDragging) {
 			this.actionLogManager.setStreamEnd();
 

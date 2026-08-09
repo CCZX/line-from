@@ -74,7 +74,7 @@ export class CanvasInitService implements ICanvasInitService {
 	public replace(data: ShapeData[]): void {
 		this.selectService.clearSelectedShapes();
 		this.selectService.hideMultiSelectOverlay();
-		this.eventManager.clearSelection();
+		this.eventManager.clearInteractionState();
 		this.actionLogManager.clear();
 		this.shapeManager.clearShapes();
 		this.init(data);

@@ -8,6 +8,7 @@ import {
 	InteractionState,
 } from '@/domain/contract/EventManager';
 import { IShapeManager } from '@/domain/contract/ShapeManager';
+import { ISelectService } from '@/domain/contract/SelectService';
 import { IViewportService } from '@/domain/contract/ViewportService';
 import { CreateShapeAction } from '@/domain/service/Action/Actions/CreateShapeAction';
 import { BaseShape } from '@/shape/BaseShape';
@@ -58,25 +59,30 @@ export class ConnectionCreateHandler implements IHandler {
 	@inject(IViewportService)
 	private viewportService!: IViewportService;
 
+	@inject(ISelectService)
+	private selectService!: ISelectService;
+
 	private sourceShape: BaseShape | null = null;
 	private sourceAnchor: ConnectionAnchor | null = null;
 	private startPoint: Point | null = null;
 	private creatingData: ShapeData | null = null;
 
-	public enable(state: InteractionState): boolean {
-		return state.selectedShapes.length === 1 && state.selectedShapes[0].type !== ShapeTypeEnum.Line;
+	public enable(_state: InteractionState): boolean {
+		const selectedShapes = this.selectService.getSelectedShapes();
+		return selectedShapes.length === 1 && selectedShapes[0].type !== ShapeTypeEnum.Line;
 	}
 
-	public execute(e: PointerEvent, state: InteractionState, payload: EventPayload): boolean {
+	public execute(e: PointerEvent, _state: InteractionState, payload: EventPayload): boolean {
+		const selectedShape = this.selectService.getSelectedShapes()[0];
 		switch (e.type) {
 			case 'pointerdown':
-				return this.handlePointerDown(state.selectedShapes[0], payload);
+				return this.handlePointerDown(selectedShape, payload);
 			case 'pointermove':
 				if (this.sourceShape && e.buttons !== 1) {
 					this.finish();
 					return false;
 				}
-				return this.handlePointerMove(state, payload);
+				return this.handlePointerMove(selectedShape, payload);
 			case 'pointerup':
 				return this.handlePointerUp(payload);
 			default:
@@ -97,13 +103,13 @@ export class ConnectionCreateHandler implements IHandler {
 		return false;
 	}
 
-	private handlePointerMove(state: InteractionState, payload: EventPayload): boolean {
+	private handlePointerMove(selectedShape: BaseShape, payload: EventPayload): boolean {
 		const shape = this.sourceShape;
 		const anchor = this.sourceAnchor;
 		const start = this.startPoint;
 
 		if (!shape || !anchor || !start) {
-			const hoveredAnchor = this.detectHandle(state.selectedShapes[0], payload);
+			const hoveredAnchor = this.detectHandle(selectedShape, payload);
 			if (hoveredAnchor) {
 				document.body.style.cursor = 'crosshair';
 				return false;
