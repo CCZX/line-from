@@ -84,7 +84,9 @@ export class CreateHandler implements IHandler {
 
 	public enable(_state: InteractionState): boolean {
 		const tool = this.toolService.store.getState().activeTool;
-		return tool === 'rect' || tool === 'circle' || tool === 'text' || tool === 'line';
+		return (
+			tool === 'rect' || tool === 'circle' || tool === 'text' || tool === 'line' || tool === 'arrow'
+		);
 	}
 
 	public execute(e: PointerEvent, _state: InteractionState, payload: EventPayload): boolean {
@@ -112,8 +114,8 @@ export class CreateHandler implements IHandler {
 			payload.viewportPoint.y,
 		);
 
-		// 矩形/圆/线：进入拖拽创建流程
-		if (tool === 'rect' || tool === 'circle' || tool === 'line') {
+		// 矩形/圆/直线/箭头：进入拖拽创建流程
+		if (tool === 'rect' || tool === 'circle' || tool === 'line' || tool === 'arrow') {
 			const type =
 				tool === 'rect'
 					? ShapeTypeEnum.Rectangle
@@ -137,6 +139,7 @@ export class CreateHandler implements IHandler {
 							start: startEndpoint,
 							end: { ...startEndpoint },
 							routing: 'straight' as const,
+							endArrow: tool === 'arrow',
 						},
 					},
 				};
