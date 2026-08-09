@@ -3,6 +3,8 @@ import rough from 'roughjs';
 import { colorToHex, SHAPE_COLORS } from '@/common/color';
 
 const generator = rough.generator();
+const SKETCHY_HACHURE_GAP = 9;
+const SKETCHY_FILL_ALPHA_FACTOR = 0.72;
 
 interface RoughOp {
 	op: string;
@@ -124,7 +126,7 @@ function drawHachureFill(
 	g.lineStyle({
 		width: 1,
 		color,
-		alpha,
+		alpha: Math.min(1, alpha * SKETCHY_FILL_ALPHA_FACTOR),
 		cap: LINE_CAP.ROUND,
 		join: LINE_JOIN.ROUND,
 	});
@@ -153,9 +155,9 @@ export function drawSketchyFillRect(
 		fill: colorToHex(SHAPE_COLORS.background.patternBase),
 		fillStyle: 'hachure',
 		hachureAngle: 45,
-		hachureGap: 6,
-		roughness: 1.2,
-		bowing: 0.8,
+		hachureGap: SKETCHY_HACHURE_GAP,
+		roughness: 1.05,
+		bowing: 0.65,
 	});
 	drawHachureFill(g, drawable, color, alpha);
 }
@@ -174,9 +176,9 @@ export function drawSketchyFillCircle(
 		fill: colorToHex(SHAPE_COLORS.background.patternBase),
 		fillStyle: 'hachure',
 		hachureAngle: 45,
-		hachureGap: 6,
-		roughness: 1.2,
-		bowing: 0.8,
+		hachureGap: SKETCHY_HACHURE_GAP,
+		roughness: 1.05,
+		bowing: 0.65,
 	});
 	drawHachureFill(g, drawable, color, alpha);
 }

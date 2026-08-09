@@ -222,10 +222,6 @@ export function Toolbar() {
 			aria-pressed={activeTool === tool}
 			onClick={() => handleToolClick(tool)}
 		>
-			<svg className='tb-button-frame' viewBox='0 0 40 40' aria-hidden='true'>
-				<path d='M7 3.5 C15 2.7 28 3 34 4.2 C37 9 36.8 29 34.8 35 C27 37 12 36.8 5 35 C3 28 3.2 10 5.2 5 Z' />
-				<path d='M6 4.6 C15 3.6 29 3.8 35 5 C36 13 36.2 28 34 34 C25 35.8 12 35.5 5.8 34 C4.2 25 4 12 6 4.6 Z' />
-			</svg>
 			{children}
 		</button>
 	);
@@ -249,10 +245,6 @@ export function Toolbar() {
 			disabled={disabled}
 			onClick={onClick}
 		>
-			<svg className='tb-button-frame' viewBox='0 0 40 40' aria-hidden='true'>
-				<path d='M7 3.5 C15 2.7 28 3 34 4.2 C37 9 36.8 29 34.8 35 C27 37 12 36.8 5 35 C3 28 3.2 10 5.2 5 Z' />
-				<path d='M6 4.6 C15 3.6 29 3.8 35 5 C36 13 36.2 28 34 34 C25 35.8 12 35.5 5.8 34 C4.2 25 4 12 6 4.6 Z' />
-			</svg>
 			{children}
 		</button>
 	);

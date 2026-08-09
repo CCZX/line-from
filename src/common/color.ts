@@ -52,12 +52,12 @@ export const SHAPE_COLORS = {
 } as const;
 
 export const CANVAS_COLORS = {
-	background: COLOR_PALETTE.white,
+	background: 0xfaf9f7,
 } as const;
 
 export const DECORATE_COLORS = {
-	selection: 0x4a90d9,
-	hoverBorder: 0xbacbfd,
+	selection: 0x615ba4,
+	hoverBorder: 0xa9a4d4,
 	handleSurface: COLOR_PALETTE.white,
 	controlSurface: 0xfffefa,
 	activeAccent: 0x615ba4,

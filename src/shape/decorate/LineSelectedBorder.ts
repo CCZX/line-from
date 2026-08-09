@@ -53,7 +53,7 @@ export class LineSelectedBorder extends AbsDecorate {
 		// 途经点（实心）
 		for (const p of midPoints) {
 			this.graphics.lineStyle(lineWidth, DECORATE_COLORS.handleSurface, 1);
-			this.graphics.beginFill(DECORATE_COLORS.hoverBorder, 1);
+			this.graphics.beginFill(DECORATE_COLORS.activeAccent, 1);
 			this.graphics.drawCircle(p.x, p.y, MID_POINT_RADIUS / scale);
 			this.graphics.endFill();
 		}
@@ -76,7 +76,7 @@ export class LineSelectedBorder extends AbsDecorate {
 			this.graphics.beginFill(DECORATE_COLORS.activeAccent, 1);
 			this.graphics.drawCircle(p.x, p.y, ANCHORED_ENDPOINT_INNER_RADIUS / scale);
 		} else {
-			this.graphics.lineStyle(1 / scale, DECORATE_COLORS.hoverBorder, 1);
+			this.graphics.lineStyle(1 / scale, DECORATE_COLORS.activeAccent, 1);
 			this.graphics.beginFill(DECORATE_COLORS.controlSurface, 1);
 			this.graphics.drawCircle(p.x, p.y, ENDPOINT_RADIUS / scale);
 		}
