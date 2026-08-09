@@ -11,7 +11,10 @@ import {
 } from '@/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
 import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
+import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
 import { ISelectService } from '@/domain/contract/SelectService';
+import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
+import { IocContainerService } from '@/common/contract';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 
@@ -24,6 +27,15 @@ export class RotateHandler implements IHandler {
 
 	@inject(ISelectService)
 	private selectService!: ISelectService;
+
+	@inject(IActionManager)
+	private actionManager!: IActionManager;
+
+	@inject(IActionLogManager)
+	private actionLogManager!: IActionLogManager;
+
+	@inject(IocContainerService)
+	private ioc!: IocContainerService;
 
 	private isRotating = false;
 	private rotatingShape: BaseShape | null = null;
@@ -39,6 +51,10 @@ export class RotateHandler implements IHandler {
 	public execute(e: PointerEvent, _state: InteractionState, payload: EventPayload): boolean {
 		switch (e.type) {
 			case 'pointermove':
+				// 鼠标在画布外松开时可能收不到 pointerup，主动结束本次流式操作。
+				if (e.buttons !== 1 && this.isRotating) {
+					return this.finishRotate();
+				}
 				return this.handlePointerMove(payload);
 			case 'pointerdown':
 				return this.handlePointerDown(payload);
@@ -73,6 +89,7 @@ export class RotateHandler implements IHandler {
 		const p = shape.getProperty<BaseProperty>(ShapePropertyEnum.Base).get() as BasePropertyValue;
 		this.originRotation = p.rotation || 0;
 		this.startPointerAngle = this.getPointerAngle(shape, payload.viewportPoint);
+		this.actionLogManager.setStreamStart();
 
 		this.isRotating = true;
 		this.rotatingShape = shape;
@@ -86,10 +103,7 @@ export class RotateHandler implements IHandler {
 			return true;
 		}
 
-		this.rotatingShape?.setState(ShapeStateEnum.Selected);
-		this.reset();
-		document.body.style.cursor = 'default';
-		return false;
+		return this.finishRotate();
 	}
 
 	private applyRotate(vp: Point) {
@@ -103,9 +117,35 @@ export class RotateHandler implements IHandler {
 		// 规范化角度为 0-360
 		const normalized = ((angle % 360) + 360) % 360;
 
-		this.rotatingShape.updateProperty(ShapePropertyEnum.Base, {
-			rotation: normalized,
-		});
+		const base = this.rotatingShape
+			.getProperty<BaseProperty>(ShapePropertyEnum.Base)
+			.get() as BasePropertyValue;
+		const currentRotation = base.rotation ?? 0;
+		const rotationDelta = Math.abs(normalized - currentRotation);
+		if (Math.min(rotationDelta, 360 - rotationDelta) < 0.01) {
+			return;
+		}
+
+		this.actionManager.push(
+			new UpdatePropsAction(
+				[
+					{
+						id: this.rotatingShape.id,
+						type: this.rotatingShape.type,
+						properties: { base: { ...base, rotation: normalized } },
+					},
+				],
+				this.ioc,
+			),
+		);
+	}
+
+	private finishRotate(): boolean {
+		this.actionLogManager.setStreamEnd();
+		this.rotatingShape?.setState(ShapeStateEnum.Selected);
+		this.reset();
+		document.body.style.cursor = 'default';
+		return false;
 	}
 
 	private isOverRotateHandle(shape: BaseShape, vp: Point): boolean {

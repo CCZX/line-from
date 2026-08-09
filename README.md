@@ -1,4 +1,4 @@
-# Bear Draw
+# 线构
 
 A high-performance 2D vector drawing editor built with React 18, PixiJS 7, and TypeScript.
 

@@ -27,7 +27,9 @@ export class UpdatePropsAction extends AbsAction<ShapeData[]> {
 				shape?.getProperty<BaseProperty>(ShapePropertyEnum.Base)?.value || item.properties.base;
 
 			const properties: ShapeData['properties'] = {
-				base: { ...base },
+				// BaseProperty 通过 merge 更新；旧数据没有 rotation 字段时，撤销旋转若仍省略
+				// rotation，会保留当前角度而不是恢复到默认值 0。
+				base: { ...base, rotation: base.rotation ?? 0 },
 			};
 
 			if (item.properties.fill) {

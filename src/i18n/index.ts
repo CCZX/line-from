@@ -34,14 +34,15 @@ void i18n.use(initReactI18next).init({
 	},
 });
 
-function applyDocumentLanguage(locale: string): void {
+function applyDocumentMetadata(locale: string): void {
 	document.documentElement.lang = locale;
+	document.title = i18n.t('app.name');
 }
 
-applyDocumentLanguage(i18n.language);
+applyDocumentMetadata(i18n.language);
 i18n.on('languageChanged', (locale) => {
 	localStorage.setItem(LOCALE_STORAGE_KEY, locale);
-	applyDocumentLanguage(locale);
+	applyDocumentMetadata(locale);
 });
 
 export default i18n;

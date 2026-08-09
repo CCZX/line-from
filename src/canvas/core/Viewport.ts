@@ -30,6 +30,10 @@ export function formatZoomScale(scale: number) {
  */
 export class Viewport extends Container {
 	private canvas: HTMLCanvasElement;
+	private isSpacePressed = false;
+	private activePanPointerId: number | null = null;
+	private lastPanPoint: Point | null = null;
+	private previousCanvasCursor: string | null = null;
 
 	public scaleChangeEvent$ = new Subject<{ scale: number }>();
 
@@ -51,7 +55,7 @@ export class Viewport extends Container {
 		e.preventDefault();
 		e.stopPropagation();
 
-		const { ctrlKey, deltaX, deltaY, offsetX, offsetY } = e;
+		const { ctrlKey, shiftKey, deltaX, deltaY, offsetX, offsetY } = e;
 
 		if (ctrlKey) {
 			const scale = this.scale.x - deltaY / 50; // ➗ 50 防止缩放速度过快
@@ -59,11 +63,138 @@ export class Viewport extends Container {
 			return;
 		}
 
+		if (shiftKey) {
+			// 鼠标滚轮通常只产生 deltaY，Shift 时将它转换为水平位移。
+			// 触控板可能已经提供 deltaX，此时优先使用原始水平位移。
+			const horizontalDelta = deltaX || deltaY;
+			this.setPosition(this.x - horizontalDelta, this.y);
+			return;
+		}
+
 		this.setPosition(this.x - deltaX, this.y - deltaY);
 	};
 
+	private onKeyDown = (e: KeyboardEvent) => {
+		if (e.code !== 'Space' || this.isEditableTarget(e.target)) {
+			return;
+		}
+
+		e.preventDefault();
+		if (this.isSpacePressed) {
+			return;
+		}
+
+		this.isSpacePressed = true;
+		this.previousCanvasCursor = this.canvas.style.cursor;
+		this.canvas.style.cursor = 'grab';
+	};
+
+	private onKeyUp = (e: KeyboardEvent) => {
+		if (e.code !== 'Space' || !this.isSpacePressed) {
+			return;
+		}
+
+		e.preventDefault();
+		this.isSpacePressed = false;
+		this.handleDragMoveEnd();
+		this.restoreCanvasCursor();
+	};
+
+	private onPointerDown = (e: PointerEvent) => {
+		if (!this.isSpacePressed || e.button !== 0 || this.activePanPointerId !== null) {
+			return;
+		}
+
+		e.preventDefault();
+		e.stopPropagation();
+
+		this.activePanPointerId = e.pointerId;
+		this.lastPanPoint = new Point(e.clientX, e.clientY);
+		this.canvas.setPointerCapture?.(e.pointerId);
+		this.canvas.style.cursor = 'grabbing';
+	};
+
+	private onPointerMove = (e: PointerEvent) => {
+		if (e.pointerId !== this.activePanPointerId || !this.lastPanPoint) {
+			return;
+		}
+
+		e.preventDefault();
+		e.stopPropagation();
+
+		const deltaX = e.clientX - this.lastPanPoint.x;
+		const deltaY = e.clientY - this.lastPanPoint.y;
+		this.lastPanPoint.set(e.clientX, e.clientY);
+		this.setPosition(this.x + deltaX, this.y + deltaY);
+	};
+
+	private onPointerUp = (e: PointerEvent) => {
+		if (e.pointerId !== this.activePanPointerId) {
+			return;
+		}
+
+		e.preventDefault();
+		e.stopPropagation();
+		this.handleDragMoveEnd();
+	};
+
+	private onWindowBlur = () => {
+		if (!this.isSpacePressed && this.activePanPointerId === null) {
+			return;
+		}
+
+		this.isSpacePressed = false;
+		this.handleDragMoveEnd();
+		this.restoreCanvasCursor();
+	};
+
+	private isEditableTarget(target: EventTarget | null): boolean {
+		const element = target as HTMLElement | null;
+		return Boolean(
+			element &&
+				(element.tagName === 'INPUT' ||
+					element.tagName === 'TEXTAREA' ||
+					element.tagName === 'SELECT' ||
+					element.isContentEditable),
+		);
+	}
+
+	private handleDragMoveEnd(): void {
+		if (this.activePanPointerId !== null) {
+			const canRelease =
+				!this.canvas.hasPointerCapture || this.canvas.hasPointerCapture(this.activePanPointerId);
+			if (canRelease) {
+				this.canvas.releasePointerCapture?.(this.activePanPointerId);
+			}
+		}
+
+		this.activePanPointerId = null;
+		this.lastPanPoint = null;
+		if (this.isSpacePressed) {
+			this.canvas.style.cursor = 'grab';
+		}
+	}
+
+	private restoreCanvasCursor(): void {
+		if (this.previousCanvasCursor === null) {
+			return;
+		}
+
+		this.canvas.style.cursor = this.previousCanvasCursor;
+		this.previousCanvasCursor = null;
+	}
+
 	private initEvent() {
 		this.canvas.addEventListener('wheel', this.onWheel);
+		this.canvas.addEventListener('pointerdown', this.onPointerDown);
+		this.canvas.addEventListener('pointermove', this.onPointerMove);
+		this.canvas.addEventListener('pointerup', this.onPointerUp);
+		this.canvas.addEventListener('pointercancel', this.onPointerUp);
+		if (typeof window !== 'undefined') {
+			window.addEventListener('keydown', this.onKeyDown);
+			window.addEventListener('keyup', this.onKeyUp);
+			window.addEventListener('blur', this.onWindowBlur);
+		}
 	}
 
 	public setScale(scale: number, point?: Point) {
@@ -114,8 +245,20 @@ export class Viewport extends Container {
 	}
 
 	public destroy(options?: boolean | IDestroyOptions | undefined): void {
-		super.destroy(options);
-
 		this.canvas.removeEventListener('wheel', this.onWheel);
+		this.canvas.removeEventListener('pointerdown', this.onPointerDown);
+		this.canvas.removeEventListener('pointermove', this.onPointerMove);
+		this.canvas.removeEventListener('pointerup', this.onPointerUp);
+		this.canvas.removeEventListener('pointercancel', this.onPointerUp);
+		if (typeof window !== 'undefined') {
+			window.removeEventListener('keydown', this.onKeyDown);
+			window.removeEventListener('keyup', this.onKeyUp);
+			window.removeEventListener('blur', this.onWindowBlur);
+		}
+		this.isSpacePressed = false;
+		this.handleDragMoveEnd();
+		this.restoreCanvasCursor();
+
+		super.destroy(options);
 	}
 }

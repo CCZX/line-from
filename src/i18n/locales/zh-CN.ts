@@ -1,4 +1,7 @@
 export default {
+	app: {
+		name: '线构',
+	},
 	language: {
 		label: '切换语言',
 		zhCN: '中文',

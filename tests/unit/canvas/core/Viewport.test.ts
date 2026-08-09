@@ -2,14 +2,49 @@ import { Point } from 'pixi.js';
 import { describe, expect, it, vi } from 'vitest';
 import { MAX_ZOOM_SCALE, MIN_ZOOM_SCALE, Viewport } from '@/canvas/core/Viewport';
 
-function createViewport(): Viewport {
-	const canvas = {
+interface CanvasMock {
+	style: { cursor: string };
+	addEventListener: ReturnType<typeof vi.fn>;
+	removeEventListener: ReturnType<typeof vi.fn>;
+	getBoundingClientRect: ReturnType<typeof vi.fn>;
+	setPointerCapture: ReturnType<typeof vi.fn>;
+	hasPointerCapture: ReturnType<typeof vi.fn>;
+	releasePointerCapture: ReturnType<typeof vi.fn>;
+}
+
+function createCanvas(): CanvasMock {
+	return {
+		style: { cursor: '' },
 		addEventListener: vi.fn(),
 		removeEventListener: vi.fn(),
 		getBoundingClientRect: vi.fn(() => ({ width: 1000, height: 800 })),
+		setPointerCapture: vi.fn(),
+		hasPointerCapture: vi.fn(() => true),
+		releasePointerCapture: vi.fn(),
 	};
+}
 
+function createViewport(canvas = createCanvas()): Viewport {
 	return new Viewport(canvas as unknown as HTMLCanvasElement);
+}
+
+function callWheelHandler(viewport: Viewport, event: WheelEvent): void {
+	(viewport as unknown as { onWheel: (event: WheelEvent) => void }).onWheel(event);
+}
+
+function callViewportHandler<
+	T extends 'onKeyDown' | 'onKeyUp' | 'onPointerDown' | 'onPointerMove' | 'onPointerUp',
+>(
+	viewport: Viewport,
+	handler: T,
+	event: T extends 'onKeyDown' | 'onKeyUp' ? KeyboardEvent : PointerEvent,
+): void {
+	(
+		viewport as unknown as Record<
+			T,
+			(event: T extends 'onKeyDown' | 'onKeyUp' ? KeyboardEvent : PointerEvent) => void
+		>
+	)[handler](event);
 }
 
 describe('Viewport zoom', () => {
@@ -51,5 +86,111 @@ describe('Viewport zoom', () => {
 
 		viewport.setScale(10);
 		expect(viewport.scale.x).toBe(MAX_ZOOM_SCALE);
+	});
+});
+
+describe('Viewport pan', () => {
+	it('普通滚轮竖向平移，Shift + 滚轮水平平移', () => {
+		const viewport = createViewport();
+		const preventDefault = vi.fn();
+		const stopPropagation = vi.fn();
+
+		callWheelHandler(viewport, {
+			ctrlKey: false,
+			shiftKey: false,
+			deltaX: 0,
+			deltaY: 20,
+			preventDefault,
+			stopPropagation,
+		} as unknown as WheelEvent);
+		expect({ x: viewport.x, y: viewport.y }).toEqual({ x: 0, y: -20 });
+
+		callWheelHandler(viewport, {
+			ctrlKey: false,
+			shiftKey: true,
+			deltaX: 0,
+			deltaY: 30,
+			preventDefault,
+			stopPropagation,
+		} as unknown as WheelEvent);
+		expect({ x: viewport.x, y: viewport.y }).toEqual({ x: -30, y: -20 });
+		expect(preventDefault).toHaveBeenCalledTimes(2);
+		expect(stopPropagation).toHaveBeenCalledTimes(2);
+	});
+
+	it('按住空格拖拽时按屏幕位移平移画布', () => {
+		const canvas = createCanvas();
+		canvas.style.cursor = 'crosshair';
+		const viewport = createViewport(canvas);
+		const positionChanges: Array<{ x: number; y: number }> = [];
+		viewport.positionChangeEvent$.subscribe((position) => positionChanges.push(position));
+		const preventDefault = vi.fn();
+		const stopPropagation = vi.fn();
+
+		callViewportHandler(viewport, 'onKeyDown', {
+			code: 'Space',
+			target: null,
+			preventDefault,
+		} as unknown as KeyboardEvent);
+		expect(canvas.style.cursor).toBe('grab');
+
+		callViewportHandler(viewport, 'onPointerDown', {
+			button: 0,
+			pointerId: 7,
+			clientX: 100,
+			clientY: 80,
+			preventDefault,
+			stopPropagation,
+		} as unknown as PointerEvent);
+		expect(canvas.setPointerCapture).toHaveBeenCalledWith(7);
+		expect(canvas.style.cursor).toBe('grabbing');
+
+		callViewportHandler(viewport, 'onPointerMove', {
+			pointerId: 7,
+			clientX: 130,
+			clientY: 60,
+			preventDefault,
+			stopPropagation,
+		} as unknown as PointerEvent);
+		expect({ x: viewport.x, y: viewport.y }).toEqual({ x: 30, y: -20 });
+		expect(positionChanges).toEqual([{ x: 30, y: -20 }]);
+
+		callViewportHandler(viewport, 'onPointerUp', {
+			pointerId: 7,
+			preventDefault,
+			stopPropagation,
+		} as unknown as PointerEvent);
+		expect(canvas.releasePointerCapture).toHaveBeenCalledWith(7);
+		expect(canvas.style.cursor).toBe('grab');
+
+		callViewportHandler(viewport, 'onKeyUp', {
+			code: 'Space',
+			preventDefault,
+		} as unknown as KeyboardEvent);
+		expect(canvas.style.cursor).toBe('crosshair');
+	});
+
+	it('在可编辑元素中按空格时不进入画布平移状态', () => {
+		const canvas = createCanvas();
+		const viewport = createViewport(canvas);
+		const preventDefault = vi.fn();
+
+		callViewportHandler(viewport, 'onKeyDown', {
+			code: 'Space',
+			target: { tagName: 'TEXTAREA', isContentEditable: false },
+			preventDefault,
+		} as unknown as KeyboardEvent);
+		callViewportHandler(viewport, 'onPointerDown', {
+			button: 0,
+			pointerId: 1,
+			clientX: 0,
+			clientY: 0,
+			preventDefault: vi.fn(),
+			stopPropagation: vi.fn(),
+		} as unknown as PointerEvent);
+
+		expect(preventDefault).not.toHaveBeenCalled();
+		expect(canvas.setPointerCapture).not.toHaveBeenCalled();
+		expect(canvas.style.cursor).toBe('');
 	});
 });

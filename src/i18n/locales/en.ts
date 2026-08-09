@@ -1,4 +1,7 @@
 export default {
+	app: {
+		name: 'Lineform',
+	},
 	language: {
 		label: 'Change language',
 		zhCN: '中文',
