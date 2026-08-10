@@ -44,6 +44,8 @@ export class UpdatePropsActionExecute extends AbsActionExecute {
 				shape.updateProperty(ShapePropertyEnum.Line, properties.line);
 			}
 
+			this.shapeManager.refreshShapeIndex(id);
+
 			shapes.push(shape);
 		}
 

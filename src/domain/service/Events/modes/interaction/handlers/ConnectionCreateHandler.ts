@@ -1,6 +1,6 @@
 import { Point as PixiPoint } from '@pixi/core';
 import { IocContainerService } from '@/common/contract';
-import { IActionManager } from '@/domain/contract/Action';
+import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
 import {
 	EventPayload,
 	HandlerEnum,
@@ -11,13 +11,13 @@ import { IShapeManager } from '@/domain/contract/ShapeManager';
 import { ISelectService } from '@/domain/contract/SelectService';
 import { IViewportService } from '@/domain/contract/ViewportService';
 import { CreateShapeAction } from '@/domain/service/Action/Actions/CreateShapeAction';
+import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
 import { BaseShape } from '@/shape/BaseShape';
 import {
 	LineEndpointValue,
 	LinePropertyValue,
 	ShapeData,
 	ShapeDecorateTypeEnum,
-	ShapePropertyEnum,
 	ShapeTypeEnum,
 } from '@/shape/contract';
 import { ConnectionAnchor, SelectedBorder } from '@/shape/decorate/SelectedBorder';
@@ -53,6 +53,9 @@ export class ConnectionCreateHandler implements IHandler {
 	@inject(IActionManager)
 	private actionManager!: IActionManager;
 
+	@inject(IActionLogManager)
+	private actionLogManager!: IActionLogManager;
+
 	@inject(IShapeManager)
 	private shapeManager!: IShapeManager;
 
@@ -66,6 +69,7 @@ export class ConnectionCreateHandler implements IHandler {
 	private sourceAnchor: ConnectionAnchor | null = null;
 	private startPoint: Point | null = null;
 	private creatingData: ShapeData | null = null;
+	private isStreaming = false;
 
 	public enable(_state: InteractionState): boolean {
 		const selectedShapes = this.selectService.getSelectedShapes();
@@ -191,6 +195,8 @@ export class ConnectionCreateHandler implements IHandler {
 		};
 
 		this.creatingData = data;
+		this.actionLogManager.setStreamStart();
+		this.isStreaming = true;
 		this.actionManager.push(new CreateShapeAction([data], this.ioc));
 	}
 
@@ -204,10 +210,21 @@ export class ConnectionCreateHandler implements IHandler {
 
 		// CreateShapeAction 的数据与撤销动作共享；同步最终值可确保撤销后重做恢复完整连线。
 		this.creatingData.properties.line = nextLine;
-		this.creatingData.properties.base = this.getLineBounds(nextLine.start, nextLine.end);
+		const base = this.getLineBounds(nextLine.start, nextLine.end);
+		this.creatingData.properties.base = base;
 
-		const shape = this.shapeManager.getShapeById(this.creatingData.id);
-		shape?.updateProperty(ShapePropertyEnum.Line, nextLine);
+		this.actionManager.push(
+			new UpdatePropsAction(
+				[
+					{
+						id: this.creatingData.id,
+						type: ShapeTypeEnum.Line,
+						properties: { base, line: nextLine },
+					},
+				],
+				this.ioc,
+			),
+		);
 	}
 
 	private detectHandle(shape: BaseShape, payload: EventPayload): ConnectionAnchor | null {
@@ -271,6 +288,10 @@ export class ConnectionCreateHandler implements IHandler {
 	}
 
 	private finish() {
+		if (this.isStreaming) {
+			this.actionLogManager.setStreamEnd();
+			this.isStreaming = false;
+		}
 		this.sourceShape = null;
 		this.sourceAnchor = null;
 		this.startPoint = null;

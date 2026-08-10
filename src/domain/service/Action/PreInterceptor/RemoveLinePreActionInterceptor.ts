@@ -49,6 +49,7 @@ export class RemoveLinePreActionInterceptor implements IPreActionInterceptor {
 
 			if (changed) {
 				shape.setProperty(ShapePropertyEnum.Line, { ...value, start, end });
+				this.shapeManager.refreshShapeIndex(shape.id);
 			}
 		}
 	}

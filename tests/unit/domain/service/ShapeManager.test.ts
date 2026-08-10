@@ -2,23 +2,34 @@ import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import type { BaseShape } from '@/shape/BaseShape';
 import type { IViewportService } from '@/domain/contract';
 import { ShapeManager } from '@/domain/service/ShapeManager';
+import { ShapeTypeEnum } from '@/shape/contract';
 
 interface ShapeMock {
 	id: string;
+	type: ShapeTypeEnum;
 	container: {
+		x: number;
+		y: number;
+		angle: number;
 		toLocal: Mock;
 		destroy: Mock;
 	};
+	getBounds: Mock;
 	containsPoint: Mock;
 }
 
-function createShape(id: string, containsPoint = false): ShapeMock {
+function createShape(id: string, containsPoint = false, x = 0, y = 0): ShapeMock {
 	return {
 		id,
+		type: ShapeTypeEnum.Rectangle,
 		container: {
+			x,
+			y,
+			angle: 0,
 			toLocal: vi.fn(() => ({ x: 0, y: 0 })),
 			destroy: vi.fn(),
 		},
+		getBounds: vi.fn(() => ({ x: 0, y: 0, width: 100, height: 100 })),
 		containsPoint: vi.fn(() => containsPoint),
 	};
 }
@@ -104,6 +115,45 @@ describe('ShapeManager', () => {
 			manager.setShape(shape as unknown as BaseShape, false);
 
 			expect(manager.getShapeByPoint({ x: 20, y: 30 })).toBeUndefined();
+		});
+
+		it('只对四叉树返回的候选图形执行精确命中检测', () => {
+			const farShape = createShape('far', true, 1000, 1000);
+			const nearShape = createShape('near', true);
+			manager.setShape(farShape as unknown as BaseShape, false);
+			manager.setShape(nearShape as unknown as BaseShape, false);
+
+			expect(manager.getShapeByPoint({ x: 0, y: 0 })).toBe(nearShape);
+			expect(farShape.container.toLocal).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('空间区域索引', () => {
+		it('图形更新后从旧区域移动到新区域', () => {
+			const shape = createShape('shape-1');
+			manager.setShape(shape as unknown as BaseShape, false);
+
+			expect(manager.getShapesByRect({ x: -10, y: -10, width: 20, height: 20 })).toEqual([shape]);
+
+			shape.container.x = 500;
+			shape.container.y = 500;
+			manager.refreshShapeIndex(shape.id);
+
+			expect(manager.getShapesByRect({ x: -10, y: -10, width: 20, height: 20 })).toEqual([]);
+			expect(manager.getShapesByRect({ x: 490, y: 490, width: 20, height: 20 })).toEqual([shape]);
+		});
+
+		it('删除和清空图形时同步清理空间索引', () => {
+			const firstShape = createShape('shape-1');
+			const secondShape = createShape('shape-2', false, 300, 300);
+			manager.setShape(firstShape as unknown as BaseShape, false);
+			manager.setShape(secondShape as unknown as BaseShape, false);
+
+			manager.removeShape(firstShape.id);
+			expect(manager.getShapesByRect({ x: -50, y: -50, width: 100, height: 100 })).toEqual([]);
+
+			manager.clearShapes();
+			expect(manager.getShapesByRect({ x: 250, y: 250, width: 100, height: 100 })).toEqual([]);
 		});
 	});
 

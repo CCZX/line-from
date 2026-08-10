@@ -3,7 +3,6 @@ import { HandlerEnum, InteractionState, EventPayload } from '../../../../../cont
 import { IHandler, IHandlerWithInteraction, IShapeManager } from '@/domain/contract';
 import { ISelectService } from '@/domain/contract/SelectService';
 import { IViewportService } from '@/domain/contract/ViewportService';
-import { isRectIntersect } from '@/shape/geometry';
 import { ShapeStateEnum } from '@/shape/contract';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
@@ -138,17 +137,9 @@ export class MarqueeHandler implements IHandler {
 			height: Math.abs(this.lastViewportY - this.startClientY),
 		};
 
-		const allShapes = this.shapeManager.getAllShapes();
-		const intersectingShapes = allShapes.filter((shape) => {
-			const bounds = shape.getBounds();
-			const shapeRect = {
-				x: shape.container.x - bounds.width / 2,
-				y: shape.container.y - bounds.height / 2,
-				width: bounds.width,
-				height: bounds.height,
-			};
-			return isRectIntersect(marqueeRect, shapeRect);
-		});
+		const previouslySelected = this.selectService.getSelectedShapes();
+		const intersectingShapes = this.shapeManager.getShapesByRect(marqueeRect);
+		const intersectingIds = new Set(intersectingShapes.map(({ id }) => id));
 
 		this.selectService.setMultipleSelectedShapes(intersectingShapes);
 
@@ -159,8 +150,8 @@ export class MarqueeHandler implements IHandler {
 			shape.setState(targetState);
 		});
 
-		allShapes
-			.filter((shape) => !intersectingShapes.includes(shape))
+		previouslySelected
+			.filter((shape) => !intersectingIds.has(shape.id))
 			.forEach((shape) => {
 				const s = shape.getState();
 				if (s === ShapeStateEnum.Selected || s === ShapeStateEnum.MultiSelected) {

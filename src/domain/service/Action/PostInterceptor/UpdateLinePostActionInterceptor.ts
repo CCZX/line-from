@@ -52,6 +52,7 @@ export class UpdateLinePostActionInterceptor implements IPostActionInterceptor {
 			}
 
 			shape.updateProperty(ShapePropertyEnum.Line, { ...value, start, end });
+			this.shapeManager.refreshShapeIndex(shape.id);
 		}
 	}
 }
