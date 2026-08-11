@@ -71,12 +71,17 @@ export class EventManager implements IEventManager, IDestroyable {
 		this.dispatch(e);
 	};
 
+	private onPointercancel = (e: PointerEvent) => {
+		this.dispatch(e);
+	};
+
 	public start(canvasEl: HTMLElement) {
 		this.canvasEl = canvasEl;
 
 		document.addEventListener('pointermove', this.onPointermove);
 		document.addEventListener('pointerdown', this.onPointerdown);
 		document.addEventListener('pointerup', this.onPointerup);
+		document.addEventListener('pointercancel', this.onPointercancel);
 	}
 
 	public destroy() {
@@ -85,6 +90,7 @@ export class EventManager implements IEventManager, IDestroyable {
 		document.removeEventListener('pointermove', this.onPointermove);
 		document.removeEventListener('pointerdown', this.onPointerdown);
 		document.removeEventListener('pointerup', this.onPointerup);
+		document.removeEventListener('pointercancel', this.onPointercancel);
 	}
 
 	public clearInteractionState(): void {

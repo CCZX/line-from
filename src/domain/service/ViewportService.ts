@@ -73,6 +73,20 @@ export class ViewportService implements IViewportService, IDestroyable {
 		return viewport.toLocal(new PixiPoint(stageX, stageY));
 	}
 
+	public getVisibleWorldRect(): Rectangle {
+		const viewport = this.stage.getViewport();
+		const { width, height } = viewport.canvasEl.getBoundingClientRect();
+		const topLeft = viewport.toLocal(new PixiPoint(0, 0));
+		const bottomRight = viewport.toLocal(new PixiPoint(width, height));
+
+		return {
+			x: Math.min(topLeft.x, bottomRight.x),
+			y: Math.min(topLeft.y, bottomRight.y),
+			width: Math.abs(bottomRight.x - topLeft.x),
+			height: Math.abs(bottomRight.y - topLeft.y),
+		};
+	}
+
 	public destroy(): void {
 		this.clearViewportSubscriptions();
 	}

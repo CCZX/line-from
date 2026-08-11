@@ -2,6 +2,7 @@ export * from './Events';
 export * from './CanvasInitService';
 export * from './ShapeManager';
 export * from './Action';
+export * from './AlignmentSnap';
 export * from './ShortcutKey';
 export * from './Select/SelectService';
 export * from './ViewportService';

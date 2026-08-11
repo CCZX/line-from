@@ -10,7 +10,7 @@ import {
 	ShapeTypeEnum,
 } from '@/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
-import { IShapeManager } from '@/domain/contract';
+import { IAlignmentSnapService, IShapeManager } from '@/domain/contract';
 import { ISelectService } from '@/domain/contract/SelectService';
 import { IViewportService } from '@/domain/contract/ViewportService';
 import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
@@ -20,6 +20,7 @@ import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 import { IocContainerService } from '@/common/contract';
+import { getShapesWorldBounds } from '@/domain/service/ShapeManager/ShapeBounds';
 
 const DRAG_THRESHOLD = 3;
 
@@ -43,6 +44,9 @@ export class MoveHandler implements IHandler {
 	@inject(IActionLogManager)
 	private actionLogManager!: IActionLogManager;
 
+	@inject(IAlignmentSnapService)
+	private alignmentSnapService!: IAlignmentSnapService;
+
 	@inject(IocContainerService)
 	private ioc!: IocContainerService;
 
@@ -50,6 +54,7 @@ export class MoveHandler implements IHandler {
 	private movingShapes: BaseShape[] = [];
 	private startScreenPoint: Point | null = null;
 	private startViewportPoint: Point | null = null;
+	private originMovingBounds: Rectangle | null = null;
 	private originBasePropsMap: Map<string, BasePropertyValue> = new Map();
 	private originLinePropsMap: Map<string, LinePropertyValue> = new Map();
 
@@ -73,8 +78,10 @@ export class MoveHandler implements IHandler {
 					}
 					return true;
 				}
-				return this.handlePointerMove(payload);
+				return this.handlePointerMove(e, payload);
 			case 'pointerup':
+				return this.handlePointerUp();
+			case 'pointercancel':
 				return this.handlePointerUp();
 			default:
 				return true;
@@ -141,10 +148,10 @@ export class MoveHandler implements IHandler {
 		return isPointInRect({ x: local.x, y: local.y }, expanded);
 	}
 
-	private handlePointerMove(payload: EventPayload): boolean {
+	private handlePointerMove(e: PointerEvent, payload: EventPayload): boolean {
 		if (this.isDragging) {
 			document.body.style.cursor = 'grabbing';
-			this.applyMove(payload.viewportPoint);
+			this.applyMove(payload.viewportPoint, payload.scale, e.altKey);
 			return false;
 		}
 
@@ -160,6 +167,11 @@ export class MoveHandler implements IHandler {
 
 			this.isDragging = true;
 			this.movingShapes = this.selectService.getSelectedShapes();
+			const alignableShapes = this.movingShapes.filter(
+				(shape) => shape.type !== ShapeTypeEnum.Line,
+			);
+			this.originMovingBounds = getShapesWorldBounds(alignableShapes);
+			this.alignmentSnapService.begin(this.movingShapes);
 			this.movingShapes.forEach((s) => s.setState(ShapeStateEnum.Moving));
 			document.body.style.cursor = 'grabbing';
 			return false;
@@ -185,7 +197,7 @@ export class MoveHandler implements IHandler {
 		return true;
 	}
 
-	private applyMove(viewportPoint: Point) {
+	private applyMove(viewportPoint: Point, scale: number, snapDisabled: boolean) {
 		if (!this.startViewportPoint) {
 			return;
 		}
@@ -194,8 +206,19 @@ export class MoveHandler implements IHandler {
 			viewportPoint.x,
 			viewportPoint.y,
 		);
-		const dx = currentViewportPoint.x - this.startViewportPoint.x;
-		const dy = currentViewportPoint.y - this.startViewportPoint.y;
+		const rawDelta = {
+			x: currentViewportPoint.x - this.startViewportPoint.x,
+			y: currentViewportPoint.y - this.startViewportPoint.y,
+		};
+		const snapped = this.originMovingBounds
+			? this.alignmentSnapService.resolveMove({
+					originBounds: this.originMovingBounds,
+					rawDelta,
+					scale,
+					disabled: snapDisabled,
+			  })
+			: { delta: rawDelta, guides: [] };
+		const { x: dx, y: dy } = snapped.delta;
 
 		const shapeDatas: ShapeData[] = [];
 		for (const shape of this.movingShapes) {
@@ -231,7 +254,9 @@ export class MoveHandler implements IHandler {
 		this.movingShapes = [];
 		this.startScreenPoint = null;
 		this.startViewportPoint = null;
+		this.originMovingBounds = null;
 		this.originBasePropsMap.clear();
 		this.originLinePropsMap.clear();
+		this.alignmentSnapService.end();
 	}
 }

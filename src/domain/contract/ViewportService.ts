@@ -22,5 +22,6 @@ export interface IViewportService {
 	resetZoom(): void;
 
 	clientToViewportLocal(clientX: number, clientY: number): PixiPoint;
+	getVisibleWorldRect(): Rectangle;
 }
 export const IViewportService = Symbol('IViewportService');

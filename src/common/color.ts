@@ -61,6 +61,7 @@ export const DECORATE_COLORS = {
 	handleSurface: COLOR_PALETTE.white,
 	controlSurface: 0xfffefa,
 	activeAccent: 0x615ba4,
+	snapGuide: 0x615ba4,
 } as const;
 
 export const WIDGET_COLORS = {

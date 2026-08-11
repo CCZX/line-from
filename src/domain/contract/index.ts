@@ -9,3 +9,4 @@ export * from './TextEditorService';
 export * from './ShortcutKey';
 export * from './ToolService';
 export * from './Action';
+export * from './AlignmentSnapService';
