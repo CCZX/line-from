@@ -58,6 +58,17 @@ function toRoughOptions(seed: number) {
 	};
 }
 
+/**
+ * Rough.js 默认会分别随机扰动椭圆的横、纵半径，圆越大越容易显得被压扁。
+ * curveFitting 设为 1 后仍保留路径抖动，但不再改变圆的基础长宽比。
+ */
+function toRoughCircleOptions(seed: number) {
+	return {
+		...toRoughOptions(seed),
+		curveFitting: 1,
+	};
+}
+
 export function drawSketchyRect(
 	g: Graphics,
 	x: number,
@@ -79,7 +90,7 @@ export function drawSketchyCircle(
 	r: number,
 	seed: number,
 ): void {
-	const drawable = generator.circle(cx, cy, r * 2, toRoughOptions(seed));
+	const drawable = generator.circle(cx, cy, r * 2, toRoughCircleOptions(seed));
 	for (const set of drawable.sets) {
 		drawOpSet(g, set);
 	}
@@ -179,6 +190,7 @@ export function drawSketchyFillCircle(
 		hachureGap: SKETCHY_HACHURE_GAP,
 		roughness: 1.05,
 		bowing: 0.65,
+		curveFitting: 1,
 	});
 	drawHachureFill(g, drawable, color, alpha);
 }
