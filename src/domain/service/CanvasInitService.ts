@@ -2,6 +2,8 @@ import { ShapeData, ShapePropertyEnum, ShapeTypeEnum } from '@/shape/contract';
 import { BaseShape } from '@/shape/BaseShape';
 import { Circle } from '@/shape/Circle';
 import { Rectangle } from '@/shape/Rectangle';
+import { RoundedRectangle } from '@/shape/RoundedRectangle';
+import { Diamond } from '@/shape/Diamond';
 import { Line } from '@/shape/Line';
 import { Text } from '@/shape/Text';
 import {
@@ -46,6 +48,10 @@ export class CanvasInitService implements ICanvasInitService {
 				shape = new Circle(shapeDataItem.id, { ioc: this.iocContainerService });
 			} else if (shapeDataItem.type === ShapeTypeEnum.Rectangle) {
 				shape = new Rectangle(shapeDataItem.id, { ioc: this.iocContainerService });
+			} else if (shapeDataItem.type === ShapeTypeEnum.RoundedRectangle) {
+				shape = new RoundedRectangle(shapeDataItem.id, { ioc: this.iocContainerService });
+			} else if (shapeDataItem.type === ShapeTypeEnum.Diamond) {
+				shape = new Diamond(shapeDataItem.id, { ioc: this.iocContainerService });
 			} else if (shapeDataItem.type === ShapeTypeEnum.Text) {
 				shape = new Text(shapeDataItem.id, { ioc: this.iocContainerService });
 			} else if (shapeDataItem.type === ShapeTypeEnum.Line) {

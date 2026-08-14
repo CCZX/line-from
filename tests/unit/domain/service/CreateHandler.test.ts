@@ -38,13 +38,31 @@ const payload: EventPayload = {
 };
 
 describe('CreateHandler', () => {
+	it.each([
+		[ToolType.RoundedRect, ShapeTypeEnum.RoundedRectangle],
+		[ToolType.Diamond, ShapeTypeEnum.Diamond],
+	])('%s 工具进入拖拽创建流程并创建对应图形', (tool, shapeType) => {
+		const { handler, push, setStreamStart } = createHandler(tool);
+
+		expect(handler.enable(state)).toBe(true);
+		expect(handler.execute({ type: 'pointerdown' } as PointerEvent, state, payload)).toBe(false);
+
+		expect(setStreamStart).toHaveBeenCalledOnce();
+		const action = push.mock.calls[0][0] as CreateShapeAction;
+		expect(action.data[0]).toMatchObject({
+			type: shapeType,
+			properties: {
+				base: { x: 20, y: 30, width: 0, height: 0 },
+				text: { text: '' },
+			},
+		});
+	});
+
 	it('箭头工具进入创建流程，并创建带终点箭头的连线', () => {
 		const { handler, push, setStreamStart } = createHandler(ToolType.Arrow);
 
 		expect(handler.enable(state)).toBe(true);
-		expect(
-			handler.execute({ type: 'pointerdown' } as PointerEvent, state, payload),
-		).toBe(false);
+		expect(handler.execute({ type: 'pointerdown' } as PointerEvent, state, payload)).toBe(false);
 
 		expect(setStreamStart).toHaveBeenCalledOnce();
 		expect(push).toHaveBeenCalledOnce();

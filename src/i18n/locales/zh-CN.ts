@@ -14,6 +14,8 @@ export default {
 		select: '选择 (V)',
 		pen: '画笔 (P)',
 		rect: '矩形 (R)',
+		roundedRect: '圆角矩形 (U)',
+		diamond: '菱形 (D)',
 		circle: '圆形 (C)',
 		line: '直线 (L)',
 		arrow: '箭头 (A)',

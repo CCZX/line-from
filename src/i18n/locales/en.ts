@@ -14,6 +14,8 @@ export default {
 		select: 'Select (V)',
 		pen: 'Pen (P)',
 		rect: 'Rectangle (R)',
+		roundedRect: 'Rounded rectangle (U)',
+		diamond: 'Diamond (D)',
 		circle: 'Circle (C)',
 		line: 'Line (L)',
 		arrow: 'Arrow (A)',

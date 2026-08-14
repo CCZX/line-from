@@ -4,6 +4,8 @@ import { CreateShapeAction } from '../Actions/CreateShapeAction';
 import { ShapePropertyEnum, ShapeTypeEnum } from '@/shape/contract';
 import { Circle } from '@/shape/Circle';
 import { Rectangle } from '@/shape/Rectangle';
+import { RoundedRectangle } from '@/shape/RoundedRectangle';
+import { Diamond } from '@/shape/Diamond';
 import { Line } from '@/shape/Line';
 import { Text } from '@/shape/Text';
 import { ActionTypeEnum, IActionExecute } from '../../../contract/Action';
@@ -29,6 +31,10 @@ export class CreateShapeActionExecute extends AbsActionExecute {
 			let shape: BaseShape;
 			if (type === ShapeTypeEnum.Rectangle) {
 				shape = new Rectangle(id, { ioc: this.iocContainerService });
+			} else if (type === ShapeTypeEnum.RoundedRectangle) {
+				shape = new RoundedRectangle(id, { ioc: this.iocContainerService });
+			} else if (type === ShapeTypeEnum.Diamond) {
+				shape = new Diamond(id, { ioc: this.iocContainerService });
 			} else if (type === ShapeTypeEnum.Circle) {
 				shape = new Circle(id, { ioc: this.iocContainerService });
 			} else if (type === ShapeTypeEnum.Text) {

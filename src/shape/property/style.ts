@@ -1,5 +1,6 @@
 import { Graphics, LINE_CAP, LINE_JOIN } from '@pixi/graphics';
 import rough from 'roughjs';
+import { getDiamondPoints } from '../geometry';
 import { colorToHex, SHAPE_COLORS } from '@/common/color';
 
 const generator = rough.generator();
@@ -78,6 +79,54 @@ export function drawSketchyRect(
 	seed: number,
 ): void {
 	const drawable = generator.rectangle(x, y, w, h, toRoughOptions(seed));
+	for (const set of drawable.sets) {
+		drawOpSet(g, set);
+	}
+}
+
+function getRoundedRectPath(x: number, y: number, w: number, h: number, radius: number): string {
+	const r = Math.max(0, Math.min(radius, w / 2, h / 2));
+	return [
+		`M ${x + r} ${y}`,
+		`L ${x + w - r} ${y}`,
+		`Q ${x + w} ${y} ${x + w} ${y + r}`,
+		`L ${x + w} ${y + h - r}`,
+		`Q ${x + w} ${y + h} ${x + w - r} ${y + h}`,
+		`L ${x + r} ${y + h}`,
+		`Q ${x} ${y + h} ${x} ${y + h - r}`,
+		`L ${x} ${y + r}`,
+		`Q ${x} ${y} ${x + r} ${y}`,
+		'Z',
+	].join(' ');
+}
+
+export function drawSketchyRoundedRect(
+	g: Graphics,
+	x: number,
+	y: number,
+	w: number,
+	h: number,
+	radius: number,
+	seed: number,
+): void {
+	const drawable = generator.path(getRoundedRectPath(x, y, w, h, radius), toRoughOptions(seed));
+	for (const set of drawable.sets) {
+		drawOpSet(g, set);
+	}
+}
+
+export function drawSketchyDiamond(
+	g: Graphics,
+	x: number,
+	y: number,
+	w: number,
+	h: number,
+	seed: number,
+): void {
+	const points = getDiamondPoints(w, h).map(
+		(point) => [point.x + x, point.y + y] as [number, number],
+	);
+	const drawable = generator.polygon(points, toRoughOptions(seed));
 	for (const set of drawable.sets) {
 		drawOpSet(g, set);
 	}
@@ -162,6 +211,54 @@ export function drawSketchyFillRect(
 	seed: number,
 ): void {
 	const drawable = generator.rectangle(x, y, w, h, {
+		seed,
+		fill: colorToHex(SHAPE_COLORS.background.patternBase),
+		fillStyle: 'hachure',
+		hachureAngle: 45,
+		hachureGap: SKETCHY_HACHURE_GAP,
+		roughness: 1.05,
+		bowing: 0.65,
+	});
+	drawHachureFill(g, drawable, color, alpha);
+}
+
+export function drawSketchyFillRoundedRect(
+	g: Graphics,
+	x: number,
+	y: number,
+	w: number,
+	h: number,
+	radius: number,
+	color: number,
+	alpha: number,
+	seed: number,
+): void {
+	const drawable = generator.path(getRoundedRectPath(x, y, w, h, radius), {
+		seed,
+		fill: colorToHex(SHAPE_COLORS.background.patternBase),
+		fillStyle: 'hachure',
+		hachureAngle: 45,
+		hachureGap: SKETCHY_HACHURE_GAP,
+		roughness: 1.05,
+		bowing: 0.65,
+	});
+	drawHachureFill(g, drawable, color, alpha);
+}
+
+export function drawSketchyFillDiamond(
+	g: Graphics,
+	x: number,
+	y: number,
+	w: number,
+	h: number,
+	color: number,
+	alpha: number,
+	seed: number,
+): void {
+	const points = getDiamondPoints(w, h).map(
+		(point) => [point.x + x, point.y + y] as [number, number],
+	);
+	const drawable = generator.polygon(points, {
 		seed,
 		fill: colorToHex(SHAPE_COLORS.background.patternBase),
 		fillStyle: 'hachure',

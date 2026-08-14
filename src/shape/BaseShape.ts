@@ -15,7 +15,7 @@ import {
 } from './contract';
 import { AbsDecorate, createDecorateViewport, type DecorateViewport } from './decorate/AbsDecorate';
 import { HoverBorder } from './decorate/HoverBorder';
-import { isPointInRect } from './geometry';
+import { getDiamondPoints, getRoundedRectRadius, isPointInRect } from './geometry';
 import { AbsState } from './state/AbsState';
 import { StateFactory } from './state/StateFactory';
 import { StateMachine } from './state/StateMachine';
@@ -114,11 +114,21 @@ export abstract class BaseShape<T extends Container = Container> {
 		const graphics = this.graphics as unknown as Graphics;
 		graphics.clear();
 
-		if (this.type === ShapeTypeEnum.Rectangle) {
+		if (
+			this.type === ShapeTypeEnum.Rectangle ||
+			this.type === ShapeTypeEnum.RoundedRectangle ||
+			this.type === ShapeTypeEnum.Diamond
+		) {
 			graphics.position.set(0, 0);
-			// 保留完整矩形几何，手绘填充的空隙也能正常命中。
+			// 保留完整透明几何，手绘填充的空隙也能正常命中。
 			graphics.beginFill(0, 0);
-			graphics.drawRect(0, 0, width, height);
+			if (this.type === ShapeTypeEnum.Rectangle) {
+				graphics.drawRect(0, 0, width, height);
+			} else if (this.type === ShapeTypeEnum.RoundedRectangle) {
+				graphics.drawRoundedRect(0, 0, width, height, getRoundedRectRadius(width, height));
+			} else {
+				graphics.drawPolygon(getDiamondPoints(width, height).flatMap(({ x, y }) => [x, y]));
+			}
 			graphics.endFill();
 		}
 

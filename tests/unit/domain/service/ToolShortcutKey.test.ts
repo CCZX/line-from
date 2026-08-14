@@ -23,6 +23,8 @@ describe('ToolShortcutKey', () => {
 	it.each([
 		['v', ToolType.Select],
 		['r', ToolType.Rect],
+		['u', ToolType.RoundedRect],
+		['d', ToolType.Diamond],
 		['c', ToolType.Circle],
 		['l', ToolType.Line],
 		['a', ToolType.Arrow],

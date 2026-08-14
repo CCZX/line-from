@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import type { Graphics } from '@pixi/graphics';
-import { drawSketchyCircle } from '@/shape/property/style';
+import {
+	drawSketchyCircle,
+	drawSketchyDiamond,
+	drawSketchyRoundedRect,
+} from '@/shape/property/style';
 
 class RecordingGraphics {
 	public points: Point[] = [];
@@ -46,5 +50,23 @@ describe('drawSketchyCircle', () => {
 		const aspectRatio = Math.max(width, height) / Math.min(width, height);
 
 		expect(aspectRatio).toBeLessThan(1.02);
+	});
+});
+
+describe('new shape sketch styles', () => {
+	it('生成圆角矩形手绘路径', () => {
+		const graphics = new RecordingGraphics();
+
+		drawSketchyRoundedRect(graphics as unknown as Graphics, 0, 0, 120, 80, 16, 7);
+
+		expect(graphics.points.length).toBeGreaterThan(8);
+	});
+
+	it('生成菱形手绘路径', () => {
+		const graphics = new RecordingGraphics();
+
+		drawSketchyDiamond(graphics as unknown as Graphics, 0, 0, 120, 80, 11);
+
+		expect(graphics.points.length).toBeGreaterThan(4);
 	});
 });

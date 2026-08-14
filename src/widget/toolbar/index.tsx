@@ -21,6 +21,8 @@ type SketchIconName =
 	| 'select'
 	| 'pen'
 	| 'rect'
+	| 'roundedRect'
+	| 'diamond'
 	| 'circle'
 	| 'line'
 	| 'arrow'
@@ -38,6 +40,9 @@ const ICON_PATHS: Record<SketchIconName, string> = {
 	select: 'M5 3.5 L10.5 20 L13 13.5 L19.5 11 Z M13 13.5 L20 20.5',
 	pen: 'M5 19 L7 14.5 L16.8 4.7 C17.7 3.8 19.1 3.8 20 4.7 C20.9 5.6 20.9 7 20 7.9 L10.2 17.7 Z M7 14.5 L10.2 17.7 M4 20 L13 20',
 	rect: 'M4 5 C8 4.5 15.5 4.8 20 5.2 L19.7 19 C15 19.5 8.5 19.2 4.2 18.8 Z',
+	roundedRect:
+		'M7 5 L17 5 C19 5 20 6 20 8 L20 16 C20 18 19 19 17 19 L7 19 C5 19 4 18 4 16 L4 8 C4 6 5 5 7 5 Z',
+	diamond: 'M12 3.5 L20.5 12 L12 20.5 L3.5 12 Z',
 	circle:
 		'M20 12 C20 16.7 16.5 20 12 20 C7.3 20 4 16.5 4 12 C4 7.4 7.5 4 12 4 C16.7 4 20 7.5 20 12 Z',
 	line: 'M5 19 C9 15 14.8 9.2 19 5',
@@ -61,6 +66,8 @@ const ICON_SEEDS: Record<SketchIconName, number> = {
 	select: 23,
 	pen: 29,
 	rect: 31,
+	roundedRect: 33,
+	diamond: 35,
 	circle: 37,
 	line: 41,
 	arrow: 43,
@@ -270,6 +277,12 @@ export function Toolbar() {
 				</ToolButton>
 				<ToolButton tool={ToolType.Rect} title={t('toolbar.rect')}>
 					<SketchIcon name='rect' />
+				</ToolButton>
+				<ToolButton tool={ToolType.RoundedRect} title={t('toolbar.roundedRect')}>
+					<SketchIcon name='roundedRect' />
+				</ToolButton>
+				<ToolButton tool={ToolType.Diamond} title={t('toolbar.diamond')}>
+					<SketchIcon name='diamond' />
 				</ToolButton>
 				<ToolButton tool={ToolType.Circle} title={t('toolbar.circle')}>
 					<SketchIcon name='circle' />

@@ -51,6 +51,15 @@ const DEFAULT_PROPS = {
 /** 拖拽位移小于该阈值视为单击，回退为默认尺寸 */
 const DRAG_THRESHOLD = 3;
 
+const SHAPE_TYPE_BY_DRAG_TOOL: Partial<Record<ToolType, ShapeTypeEnum>> = {
+	[ToolType.Rect]: ShapeTypeEnum.Rectangle,
+	[ToolType.RoundedRect]: ShapeTypeEnum.RoundedRectangle,
+	[ToolType.Diamond]: ShapeTypeEnum.Diamond,
+	[ToolType.Circle]: ShapeTypeEnum.Circle,
+	[ToolType.Line]: ShapeTypeEnum.Line,
+	[ToolType.Arrow]: ShapeTypeEnum.Line,
+};
+
 @provide(IHandlerWithCreator)
 export class CreateHandler implements IHandler {
 	public type: HandlerEnum = HandlerEnum.Select;
@@ -84,9 +93,7 @@ export class CreateHandler implements IHandler {
 
 	public enable(_state: InteractionState): boolean {
 		const tool = this.toolService.store.getState().activeTool;
-		return (
-			tool === 'rect' || tool === 'circle' || tool === 'text' || tool === 'line' || tool === 'arrow'
-		);
+		return tool === ToolType.Text || SHAPE_TYPE_BY_DRAG_TOOL[tool] !== undefined;
 	}
 
 	public execute(e: PointerEvent, _state: InteractionState, payload: EventPayload): boolean {
@@ -114,15 +121,9 @@ export class CreateHandler implements IHandler {
 			payload.viewportPoint.y,
 		);
 
-		// 矩形/圆/直线/箭头：进入拖拽创建流程
-		if (tool === 'rect' || tool === 'circle' || tool === 'line' || tool === 'arrow') {
-			const type =
-				tool === 'rect'
-					? ShapeTypeEnum.Rectangle
-					: tool === 'circle'
-					? ShapeTypeEnum.Circle
-					: ShapeTypeEnum.Line;
-
+		// 图形与连线工具进入拖拽创建流程
+		const type = SHAPE_TYPE_BY_DRAG_TOOL[tool];
+		if (type !== undefined) {
 			this.actionLogManager.setStreamStart();
 
 			if (type === ShapeTypeEnum.Line) {

@@ -3,7 +3,13 @@ import { AbsProperty } from './AbsProperty';
 import { FillPropertyValue, ShapeTypeEnum } from '../contract';
 import { BaseShape } from '../BaseShape';
 import { getHatchTexture } from './hatch';
-import { drawSketchyFillCircle, drawSketchyFillRect } from './style';
+import {
+	drawSketchyFillCircle,
+	drawSketchyFillDiamond,
+	drawSketchyFillRect,
+	drawSketchyFillRoundedRect,
+} from './style';
+import { getDiamondPoints, getRoundedRectRadius } from '../geometry';
 import { SHAPE_COLORS } from '@/common/color';
 
 const DEFAULT_VALUE: FillPropertyValue = {
@@ -96,6 +102,64 @@ export class FillProperty extends AbsProperty<FillPropertyValue> {
 				g.beginFill(this.value.color, this.value.alpha);
 			}
 			g.drawRect(0, 0, width, height);
+			g.endFill();
+		}
+
+		if (this.shape.type === ShapeTypeEnum.RoundedRectangle) {
+			const radius = getRoundedRectRadius(width, height);
+			if (style === 'sketchy' && this.value.seed != null) {
+				drawSketchyFillRoundedRect(
+					g,
+					0,
+					0,
+					width,
+					height,
+					radius,
+					this.value.color,
+					this.value.alpha,
+					this.value.seed,
+				);
+				return;
+			}
+
+			if (style === 'hatch') {
+				g.beginTextureFill({
+					texture: getHatchTexture(),
+					color: this.value.color,
+					alpha: this.value.alpha,
+				});
+			} else {
+				g.beginFill(this.value.color, this.value.alpha);
+			}
+			g.drawRoundedRect(0, 0, width, height, radius);
+			g.endFill();
+		}
+
+		if (this.shape.type === ShapeTypeEnum.Diamond) {
+			if (style === 'sketchy' && this.value.seed != null) {
+				drawSketchyFillDiamond(
+					g,
+					0,
+					0,
+					width,
+					height,
+					this.value.color,
+					this.value.alpha,
+					this.value.seed,
+				);
+				return;
+			}
+
+			if (style === 'hatch') {
+				g.beginTextureFill({
+					texture: getHatchTexture(),
+					color: this.value.color,
+					alpha: this.value.alpha,
+				});
+			} else {
+				g.beginFill(this.value.color, this.value.alpha);
+			}
+			g.drawPolygon(getDiamondPoints(width, height).flatMap(({ x, y }) => [x, y]));
 			g.endFill();
 		}
 	}

@@ -5,6 +5,8 @@ export enum ToolType {
 	Pen = 'pen',
 	Eraser = 'eraser',
 	Rect = 'rect',
+	RoundedRect = 'roundedRect',
+	Diamond = 'diamond',
 	Circle = 'circle',
 	Line = 'line',
 	Arrow = 'arrow',

@@ -5,6 +5,8 @@ import { provide } from 'inversify-binding-decorators';
 const TOOL_BY_KEY: Record<string, ToolType> = {
 	v: ToolType.Select,
 	r: ToolType.Rect,
+	u: ToolType.RoundedRect,
+	d: ToolType.Diamond,
 	c: ToolType.Circle,
 	l: ToolType.Line,
 	a: ToolType.Arrow,

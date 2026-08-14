@@ -29,6 +29,53 @@ export function isPointInRect(point: Point, rect: Rectangle) {
 	return true;
 }
 
+export function getRoundedRectRadius(width: number, height: number): number {
+	return Math.max(0, Math.min(16, width / 4, height / 4));
+}
+
+export function isPointInRoundedRect(
+	point: Point,
+	width: number,
+	height: number,
+	radius = getRoundedRectRadius(width, height),
+): boolean {
+	if (!isPointInRect(point, { x: 0, y: 0, width, height })) {
+		return false;
+	}
+
+	const r = Math.max(0, Math.min(radius, width / 2, height / 2));
+	if (
+		r === 0 ||
+		(point.x >= r && point.x <= width - r) ||
+		(point.y >= r && point.y <= height - r)
+	) {
+		return true;
+	}
+
+	const centerX = point.x < r ? r : width - r;
+	const centerY = point.y < r ? r : height - r;
+	return Math.hypot(point.x - centerX, point.y - centerY) <= r;
+}
+
+export function getDiamondPoints(width: number, height: number): Point[] {
+	return [
+		{ x: width / 2, y: 0 },
+		{ x: width, y: height / 2 },
+		{ x: width / 2, y: height },
+		{ x: 0, y: height / 2 },
+	];
+}
+
+export function isPointInDiamond(point: Point, width: number, height: number): boolean {
+	if (width <= 0 || height <= 0) {
+		return false;
+	}
+
+	return (
+		Math.abs(point.x - width / 2) / (width / 2) + Math.abs(point.y - height / 2) / (height / 2) <= 1
+	);
+}
+
 /**
  * 两个矩形是否相交
  */

@@ -56,6 +56,15 @@ export abstract class TextEditableShape<T extends Container = Container> extends
 			};
 		}
 
+		if (this.type === ShapeTypeEnum.Diamond) {
+			return {
+				x: width / 4 + padding,
+				y: height / 4 + padding,
+				width: Math.max(0, width / 2 - padding * 2),
+				height: Math.max(0, height / 2 - padding * 2),
+			};
+		}
+
 		return {
 			x: padding,
 			y: padding,

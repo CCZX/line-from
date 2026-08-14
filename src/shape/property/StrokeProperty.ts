@@ -2,7 +2,14 @@ import { Graphics } from '@pixi/graphics';
 import { AbsProperty } from './AbsProperty';
 import { StrokePropertyValue, ShapeTypeEnum } from '../contract';
 import { BaseShape } from '../BaseShape';
-import { applyLineStyle, drawSketchyCircle, drawSketchyRect } from './style';
+import {
+	applyLineStyle,
+	drawSketchyCircle,
+	drawSketchyDiamond,
+	drawSketchyRect,
+	drawSketchyRoundedRect,
+} from './style';
+import { getDiamondPoints, getRoundedRectRadius } from '../geometry';
 import { SHAPE_COLORS } from '@/common/color';
 
 const DEFAULT_VALUE: StrokePropertyValue = {
@@ -59,6 +66,23 @@ export class StrokeProperty extends AbsProperty<StrokePropertyValue> {
 				drawSketchyRect(g, 0, 0, width, height, this.value.seed);
 			} else {
 				g.drawRect(0, 0, width, height);
+			}
+		}
+
+		if (this.shape.type === ShapeTypeEnum.RoundedRectangle) {
+			const radius = getRoundedRectRadius(width, height);
+			if (style === 'sketchy' && this.value.seed != null) {
+				drawSketchyRoundedRect(g, 0, 0, width, height, radius, this.value.seed);
+			} else {
+				g.drawRoundedRect(0, 0, width, height, radius);
+			}
+		}
+
+		if (this.shape.type === ShapeTypeEnum.Diamond) {
+			if (style === 'sketchy' && this.value.seed != null) {
+				drawSketchyDiamond(g, 0, 0, width, height, this.value.seed);
+			} else {
+				g.drawPolygon(getDiamondPoints(width, height).flatMap(({ x, y }) => [x, y]));
 			}
 		}
 

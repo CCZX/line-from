@@ -4,6 +4,8 @@
 export enum ShapeTypeEnum {
 	Circle = 'circle',
 	Rectangle = 'rectangle',
+	RoundedRectangle = 'roundedRectangle',
+	Diamond = 'diamond',
 	Text = 'text',
 	Line = 'line',
 }
