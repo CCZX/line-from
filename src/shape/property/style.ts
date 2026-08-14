@@ -1,9 +1,10 @@
 import { Graphics, LINE_CAP, LINE_JOIN } from '@pixi/graphics';
-import rough from 'roughjs';
+import { RoughGenerator } from 'roughjs/bin/generator';
 import { getDiamondPoints } from '../geometry';
 import { colorToHex, SHAPE_COLORS } from '@/common/color';
 
-const generator = rough.generator();
+// 直接引用生成器，避免 roughjs 默认入口把 Canvas/SVG 渲染器重复打进首屏 bundle。
+const generator = new RoughGenerator();
 const SKETCHY_HACHURE_GAP = 9;
 const SKETCHY_FILL_ALPHA_FACTOR = 0.72;
 
