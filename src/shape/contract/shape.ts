@@ -75,6 +75,26 @@ export interface BasePropertyValue {
 	rotation?: number;
 }
 
+export enum ResizeDirection {
+	TL = 'TL',
+	TR = 'TR',
+	BR = 'BR',
+	BL = 'BL',
+	T = 'T',
+	R = 'R',
+	B = 'B',
+	L = 'L',
+}
+
+export interface ShapeResizeRequest {
+	origin: BasePropertyValue;
+	proposed: BasePropertyValue;
+	direction: ResizeDirection;
+	deltaX: number;
+	deltaY: number;
+	minSize: number;
+}
+
 export type FillStyle = 'solid' | 'hatch' | 'sketchy';
 
 export interface FillPropertyValue {

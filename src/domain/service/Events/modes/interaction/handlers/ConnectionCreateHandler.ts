@@ -73,7 +73,7 @@ export class ConnectionCreateHandler implements IHandler {
 
 	public enable(_state: InteractionState): boolean {
 		const selectedShapes = this.selectService.getSelectedShapes();
-		return selectedShapes.length === 1 && selectedShapes[0].type !== ShapeTypeEnum.Line;
+		return selectedShapes.length === 1 && selectedShapes[0].acceptsConnections;
 	}
 
 	public execute(e: PointerEvent, _state: InteractionState, payload: EventPayload): boolean {
@@ -252,7 +252,7 @@ export class ConnectionCreateHandler implements IHandler {
 		refEndpoint: LineEndpointValue,
 	): LineEndpointValue {
 		const target = this.shapeManager.getShapeByPoint(point);
-		if (!target || target.id === sourceId || target.type === ShapeTypeEnum.Line) {
+		if (!target || target.id === sourceId || !target.acceptsConnections) {
 			return { x: point.x, y: point.y };
 		}
 

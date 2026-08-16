@@ -3,10 +3,10 @@ import { BaseShape } from '@/shape/BaseShape';
 import { BaseProperty } from '@/shape/property/BaseProperty';
 import {
 	BasePropertyValue,
+	ResizeDirection,
 	ShapeDecorateTypeEnum,
 	ShapePropertyEnum,
 	ShapeStateEnum,
-	ShapeTypeEnum,
 } from '@/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
 import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
@@ -21,26 +21,15 @@ import { SelectedBorder } from '@/shape/decorate/SelectedBorder';
 const MIN_SIZE = 10;
 const HANDLE_HIT_RADIUS = 8;
 
-enum Dir {
-	TL = 'TL',
-	TR = 'TR',
-	BR = 'BR',
-	BL = 'BL',
-	T = 'T',
-	R = 'R',
-	B = 'B',
-	L = 'L',
-}
-
-const CURSOR_MAP: Record<Dir, string> = {
-	[Dir.TL]: 'nwse-resize',
-	[Dir.TR]: 'nesw-resize',
-	[Dir.BR]: 'nwse-resize',
-	[Dir.BL]: 'nesw-resize',
-	[Dir.T]: 'ns-resize',
-	[Dir.B]: 'ns-resize',
-	[Dir.L]: 'ew-resize',
-	[Dir.R]: 'ew-resize',
+const CURSOR_MAP: Record<ResizeDirection, string> = {
+	[ResizeDirection.TL]: 'nwse-resize',
+	[ResizeDirection.TR]: 'nesw-resize',
+	[ResizeDirection.BR]: 'nwse-resize',
+	[ResizeDirection.BL]: 'nesw-resize',
+	[ResizeDirection.T]: 'ns-resize',
+	[ResizeDirection.B]: 'ns-resize',
+	[ResizeDirection.L]: 'ew-resize',
+	[ResizeDirection.R]: 'ew-resize',
 };
 
 @provide(IHandlerWithInteraction)
@@ -62,14 +51,14 @@ export class ResizeHandler implements IHandler {
 
 	private isResizing = false;
 	private resizingShape: BaseShape | null = null;
-	private direction: Dir | null = null;
+	private direction: ResizeDirection | null = null;
 	private startViewportPoint: Point | null = null;
 	private originBaseProps: BasePropertyValue | null = null;
 
 	public enable(_state: InteractionState): boolean {
 		const selectedShapes = this.selectService.getSelectedShapes();
 		// 线由 LineEditHandler 负责端点/途经点编辑，不走 bbox resize
-		return selectedShapes.length === 1 && selectedShapes[0].type !== ShapeTypeEnum.Line;
+		return selectedShapes.length === 1 && selectedShapes[0].supportsBoxResize;
 	}
 
 	public execute(e: PointerEvent, _state: InteractionState, payload: EventPayload): boolean {
@@ -165,89 +154,51 @@ export class ResizeHandler implements IHandler {
 		let newWidth = width;
 		let newHeight = height;
 
-		const isCircle = this.resizingShape.type === ShapeTypeEnum.Circle;
-
-		if (isCircle) {
-			const d = width;
-			let newD: number;
-
-			switch (this.direction) {
-				case Dir.T:
-					newD = Math.max(MIN_SIZE, d - dy);
-					newX = x + (d - newD) / 2;
-					newY = y + d - newD;
-					break;
-				case Dir.B:
-					newD = Math.max(MIN_SIZE, d + dy);
-					newX = x + (d - newD) / 2;
-					break;
-				case Dir.L:
-					newD = Math.max(MIN_SIZE, d - dx);
-					newX = x + d - newD;
-					newY = y + (d - newD) / 2;
-					break;
-				case Dir.R:
-					newD = Math.max(MIN_SIZE, d + dx);
-					newY = y + (d - newD) / 2;
-					break;
-				case Dir.BR:
-					newD = Math.max(MIN_SIZE, Math.max(d + dx, d + dy));
-					break;
-				case Dir.TL:
-					newD = Math.max(MIN_SIZE, Math.max(d - dx, d - dy));
-					newX = x + d - newD;
-					newY = y + d - newD;
-					break;
-				case Dir.TR:
-					newD = Math.max(MIN_SIZE, Math.max(d + dx, d - dy));
-					newY = y + d - newD;
-					break;
-				case Dir.BL:
-					newD = Math.max(MIN_SIZE, Math.max(d - dx, d + dy));
-					newX = x + d - newD;
-					break;
-			}
-
-			newWidth = newD;
-			newHeight = newD;
-		} else {
-			switch (this.direction) {
-				case Dir.BR:
-					newWidth = Math.max(MIN_SIZE, width + dx);
-					newHeight = Math.max(MIN_SIZE, height + dy);
-					break;
-				case Dir.TL:
-					newWidth = Math.max(MIN_SIZE, width - dx);
-					newHeight = Math.max(MIN_SIZE, height - dy);
-					newX = x + (width - newWidth);
-					newY = y + (height - newHeight);
-					break;
-				case Dir.TR:
-					newWidth = Math.max(MIN_SIZE, width + dx);
-					newHeight = Math.max(MIN_SIZE, height - dy);
-					newY = y + (height - newHeight);
-					break;
-				case Dir.BL:
-					newWidth = Math.max(MIN_SIZE, width - dx);
-					newHeight = Math.max(MIN_SIZE, height + dy);
-					newX = x + (width - newWidth);
-					break;
-				case Dir.T:
-					newHeight = Math.max(MIN_SIZE, height - dy);
-					newY = y + (height - newHeight);
-					break;
-				case Dir.B:
-					newHeight = Math.max(MIN_SIZE, height + dy);
-					break;
-				case Dir.L:
-					newWidth = Math.max(MIN_SIZE, width - dx);
-					newX = x + (width - newWidth);
-					break;
-				case Dir.R:
-					newWidth = Math.max(MIN_SIZE, width + dx);
-					break;
-			}
+		switch (this.direction) {
+			case ResizeDirection.BR:
+				newWidth = Math.max(MIN_SIZE, width + dx);
+				newHeight = Math.max(MIN_SIZE, height + dy);
+				break;
+			case ResizeDirection.TL:
+				newWidth = Math.max(MIN_SIZE, width - dx);
+				newHeight = Math.max(MIN_SIZE, height - dy);
+				newX = x + (width - newWidth);
+				newY = y + (height - newHeight);
+				break;
+			case ResizeDirection.TR:
+				newWidth = Math.max(MIN_SIZE, width + dx);
+				newHeight = Math.max(MIN_SIZE, height - dy);
+				newY = y + (height - newHeight);
+				break;
+			case ResizeDirection.BL:
+				newWidth = Math.max(MIN_SIZE, width - dx);
+				newHeight = Math.max(MIN_SIZE, height + dy);
+				newX = x + (width - newWidth);
+				break;
+			case ResizeDirection.T:
+				newHeight = Math.max(MIN_SIZE, height - dy);
+				newY = y + (height - newHeight);
+				break;
+			case ResizeDirection.B:
+				newHeight = Math.max(MIN_SIZE, height + dy);
+				break;
+			case ResizeDirection.L:
+				newWidth = Math.max(MIN_SIZE, width - dx);
+				newX = x + (width - newWidth);
+				break;
+			case ResizeDirection.R:
+				newWidth = Math.max(MIN_SIZE, width + dx);
+				break;
 		}
+
+		const nextBase = this.resizingShape.resolveResize({
+			origin: this.originBaseProps,
+			proposed: { x: newX, y: newY, width: newWidth, height: newHeight },
+			direction: this.direction,
+			deltaX: dx,
+			deltaY: dy,
+			minSize: MIN_SIZE,
+		});
 
 		this.actionManager.push(
 			new UpdatePropsAction(
@@ -256,7 +207,7 @@ export class ResizeHandler implements IHandler {
 						id: this.resizingShape.id,
 						type: this.resizingShape.type,
 						properties: {
-							base: { x: newX, y: newY, width: newWidth, height: newHeight },
+							base: nextBase,
 						},
 					},
 				],
@@ -265,7 +216,7 @@ export class ResizeHandler implements IHandler {
 		);
 	}
 
-	private detectHandle(shape: BaseShape, vp: Point, scale: number): Dir | null {
+	private detectHandle(shape: BaseShape, vp: Point, scale: number): ResizeDirection | null {
 		const threshold = HANDLE_HIT_RADIUS / scale;
 		const border = shape.getDecorate(ShapeDecorateTypeEnum.SelectedBorder) as SelectedBorder;
 		const { left, top, right, bottom } = border.getHandleBounds();
@@ -273,11 +224,11 @@ export class ResizeHandler implements IHandler {
 		// 转换到容器本地坐标，适配旋转后的 resize 热区检测
 		const local = shape.container.toLocal(new PixiPoint(vp.x, vp.y));
 
-		const corners: { px: number; py: number; dir: Dir }[] = [
-			{ px: left, py: top, dir: Dir.TL },
-			{ px: right, py: top, dir: Dir.TR },
-			{ px: right, py: bottom, dir: Dir.BR },
-			{ px: left, py: bottom, dir: Dir.BL },
+		const corners: { px: number; py: number; dir: ResizeDirection }[] = [
+			{ px: left, py: top, dir: ResizeDirection.TL },
+			{ px: right, py: top, dir: ResizeDirection.TR },
+			{ px: right, py: bottom, dir: ResizeDirection.BR },
+			{ px: left, py: bottom, dir: ResizeDirection.BL },
 		];
 
 		for (const c of corners) {
@@ -290,35 +241,35 @@ export class ResizeHandler implements IHandler {
 		const cornerExclude = threshold * 2;
 		const edges: {
 			check: () => boolean;
-			dir: Dir;
+			dir: ResizeDirection;
 		}[] = [
 			{
 				check: () =>
 					Math.abs(local.y - top) < threshold &&
 					local.x > left + cornerExclude &&
 					local.x < right - cornerExclude,
-				dir: Dir.T,
+				dir: ResizeDirection.T,
 			},
 			{
 				check: () =>
 					Math.abs(local.x - right) < threshold &&
 					local.y > top + cornerExclude &&
 					local.y < bottom - cornerExclude,
-				dir: Dir.R,
+				dir: ResizeDirection.R,
 			},
 			{
 				check: () =>
 					Math.abs(local.y - bottom) < threshold &&
 					local.x > left + cornerExclude &&
 					local.x < right - cornerExclude,
-				dir: Dir.B,
+				dir: ResizeDirection.B,
 			},
 			{
 				check: () =>
 					Math.abs(local.x - left) < threshold &&
 					local.y > top + cornerExclude &&
 					local.y < bottom - cornerExclude,
-				dir: Dir.L,
+				dir: ResizeDirection.L,
 			},
 		];
 

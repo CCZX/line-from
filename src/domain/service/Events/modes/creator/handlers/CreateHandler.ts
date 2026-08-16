@@ -306,7 +306,7 @@ export class CreateHandler implements IHandler {
 	/** 检测点是否在某图形上，返回带 shapeId/anchor 的端点，否则返回自由坐标端点 */
 	private trySnapEndpoint(point: Point, refEndpoint: LineEndpointValue | null): LineEndpointValue {
 		const snapShape = this.shapeManager.getShapeByPoint(point);
-		if (snapShape && snapShape.type !== ShapeTypeEnum.Line && snapShape.id !== this.creatingId) {
+		if (snapShape?.acceptsConnections && snapShape.id !== this.creatingId) {
 			const ref = refEndpoint ?? point;
 			const anchorPt = getShapeAnchorPoint(snapShape, 'auto', ref);
 			return { x: anchorPt.x, y: anchorPt.y, shapeId: snapShape.id, anchor: 'auto' };

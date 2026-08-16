@@ -1,6 +1,6 @@
 import { IShapeManager } from '@/domain/contract';
 import { ActionTypeEnum, IAction, IPostActionInterceptor } from '@/domain/contract/Action';
-import { ShapeData, ShapePropertyEnum, ShapeTypeEnum } from '@/shape/contract';
+import { ShapeData, ShapePropertyEnum } from '@/shape/contract';
 import { LineProperty } from '@/shape/property/LineProperty';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
@@ -22,10 +22,6 @@ export class UpdateLinePostActionInterceptor implements IPostActionInterceptor {
 		const changedShapeIds = new Set(shapeData.map(({ id }) => id));
 
 		for (const shape of this.shapeManager.getAllShapes()) {
-			if (shape.type !== ShapeTypeEnum.Line) {
-				continue;
-			}
-
 			const lineProp = shape.getProperty<LineProperty>(ShapePropertyEnum.Line);
 			if (!lineProp) {
 				continue;

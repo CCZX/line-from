@@ -5,7 +5,6 @@ import {
 	LinePropertyValue,
 	ShapePropertyEnum,
 	ShapeStateEnum,
-	ShapeTypeEnum,
 } from '@/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
 import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
@@ -61,7 +60,7 @@ export class LineEditHandler implements IHandler {
 
 	public enable(_state: InteractionState): boolean {
 		const selectedShapes = this.selectService.getSelectedShapes();
-		return selectedShapes.length === 1 && selectedShapes[0].type === ShapeTypeEnum.Line;
+		return selectedShapes.length === 1 && selectedShapes[0].hasProperty(ShapePropertyEnum.Line);
 	}
 
 	public execute(e: PointerEvent, _state: InteractionState, payload: EventPayload): boolean {
@@ -297,7 +296,7 @@ export class LineEditHandler implements IHandler {
 		refEndpoint: LineEndpointValue,
 	): LineEndpointValue | null {
 		const snapShape = this.shapeManager.getShapeByPoint(point);
-		if (!snapShape || snapShape.id === excludeId || snapShape.type === ShapeTypeEnum.Line) {
+		if (!snapShape || snapShape.id === excludeId || !snapShape.acceptsConnections) {
 			return null;
 		}
 		const anchorPt = getShapeAnchorPoint(snapShape, 'auto', refEndpoint);

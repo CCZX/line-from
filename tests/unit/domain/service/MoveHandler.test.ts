@@ -3,6 +3,7 @@ import type { IocContainerService } from '@/common/contract';
 import type { EventPayload, InteractionState } from '@/domain/contract/EventManager';
 import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
 import { MoveHandler } from '@/domain/service/Events/modes/interaction/handlers/MoveHandler';
+import { BaseShape } from '@/shape/BaseShape';
 import {
 	ShapePropertyEnum,
 	ShapeStateEnum,
@@ -36,6 +37,10 @@ function createShape(
 			angle: base.rotation ?? 0,
 		},
 		getBounds: () => ({ x: 0, y: 0, width: base.width, height: base.height }),
+		getWorldBounds: BaseShape.prototype.getWorldBounds,
+		supportsAlignmentSnap: type !== ShapeTypeEnum.Line,
+		hasProperty: (property: ShapePropertyEnum) =>
+			property === ShapePropertyEnum.Line && line !== undefined,
 		getProperty: vi.fn((property: ShapePropertyEnum) => {
 			if (property === ShapePropertyEnum.Base) {
 				return { get: () => ({ ...base }) };

@@ -7,7 +7,6 @@ import {
 	ShapeDecorateTypeEnum,
 	ShapePropertyEnum,
 	ShapeStateEnum,
-	ShapeTypeEnum,
 } from '@/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
 import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
@@ -45,7 +44,7 @@ export class RotateHandler implements IHandler {
 	public enable(_state: InteractionState): boolean {
 		const selectedShapes = this.selectService.getSelectedShapes();
 		// 线没有旋转手柄（LineSelectedBorder 不提供 getRotateHandleCenter）
-		return selectedShapes.length === 1 && selectedShapes[0].type !== ShapeTypeEnum.Line;
+		return selectedShapes.length === 1 && selectedShapes[0].supportsRotation;
 	}
 
 	public execute(e: PointerEvent, _state: InteractionState, payload: EventPayload): boolean {

@@ -1,9 +1,11 @@
 import { Graphics } from '@pixi/graphics';
-import { ShapeContext, ShapeTypeEnum } from './contract';
-import { isPointInDiamond } from './geometry';
-import { TextEditableShape } from './TextEditableShape';
+import { FillPropertyValue, ShapeContext, ShapeTypeEnum, StrokePropertyValue } from './contract';
+import { getDiamondPoints, isPointInDiamond } from './geometry';
+import { ClosedShape } from './ClosedShape';
+import { drawSketchyDiamond, drawSketchyFillDiamond } from './property/style';
+import type { TextLayoutBounds } from './TextEditableShape';
 
-export class Diamond extends TextEditableShape<Graphics> {
+export class Diamond extends ClosedShape {
 	public get type(): ShapeTypeEnum {
 		return ShapeTypeEnum.Diamond;
 	}
@@ -15,5 +17,38 @@ export class Diamond extends TextEditableShape<Graphics> {
 	public containsPoint(localPoint: Point): boolean {
 		const { width, height } = this.getWH();
 		return isPointInDiamond(localPoint, width, height);
+	}
+
+	public getTextLayoutBounds(): TextLayoutBounds {
+		const { width, height } = this.getWH();
+		const padding = this.getTextPadding();
+		return {
+			x: width / 4 + padding,
+			y: height / 4 + padding,
+			width: Math.max(0, width / 2 - padding * 2),
+			height: Math.max(0, height / 2 - padding * 2),
+		};
+	}
+
+	protected drawPath(graphics: Graphics, width: number, height: number): void {
+		graphics.drawPolygon(getDiamondPoints(width, height).flatMap(({ x, y }) => [x, y]));
+	}
+
+	protected drawSketchyFill(
+		graphics: Graphics,
+		width: number,
+		height: number,
+		value: FillPropertyValue,
+	): void {
+		drawSketchyFillDiamond(graphics, 0, 0, width, height, value.color, value.alpha, value.seed!);
+	}
+
+	protected drawSketchyStroke(
+		graphics: Graphics,
+		width: number,
+		height: number,
+		value: StrokePropertyValue,
+	): void {
+		drawSketchyDiamond(graphics, 0, 0, width, height, value.seed!);
 	}
 }

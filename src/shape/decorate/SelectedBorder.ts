@@ -1,6 +1,6 @@
 import { Graphics } from '@pixi/graphics';
 import { DECORATE_COLORS } from '@/common/color';
-import { ShapeDecorateTypeEnum, ShapePropertyEnum, ShapeTypeEnum } from '../contract';
+import { ShapeDecorateTypeEnum, ShapePropertyEnum } from '../contract';
 import type { StrokePropertyValue } from '../contract';
 import { BaseShape } from '../BaseShape';
 import { AbsDecorate, type DecorateViewport } from './AbsDecorate';
@@ -8,7 +8,6 @@ import { StrokeProperty } from '../property/StrokeProperty';
 
 const HANDLE_RADIUS = 5;
 const BORDER_PADDING = 2;
-const CIRCLE_BORDER_INSET = 3;
 const ROTATE_HANDLE_RADIUS = 4;
 const ROTATE_HANDLE_DISTANCE = 16;
 const CONNECTION_HANDLE_RADIUS = 4;
@@ -34,7 +33,7 @@ export class SelectedBorder extends AbsDecorate {
 		const { width, height } = this.shape.getBounds();
 		const scale = this.getViewportScale();
 		const offset = this.getStrokeWidth() / 2 + BORDER_PADDING / scale;
-		const inset = this.shape.type === ShapeTypeEnum.Circle ? CIRCLE_BORDER_INSET / scale : 0;
+		const inset = this.shape.getSelectionBorderInset(scale);
 
 		return {
 			left: 0 - offset + inset,

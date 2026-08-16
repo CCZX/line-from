@@ -9,7 +9,6 @@ import {
 import { IShapeManager } from '@/domain/contract/ShapeManager';
 import { IViewportService } from '@/domain/contract/ViewportService';
 import { getShapeWorldBounds } from '@/domain/service/ShapeManager/ShapeBounds';
-import { ShapeTypeEnum } from '@/shape/contract';
 import type { BaseShape } from '@/shape/BaseShape';
 import { SnapGuideRenderer } from './SnapGuideRenderer';
 import type { SnapAnchorKind, SnapMatch, SourceAnchor, TargetAnchor } from './types';
@@ -44,7 +43,7 @@ export class AlignmentSnapService implements IAlignmentSnapService {
 	public begin(movingShapes: BaseShape[]): void {
 		this.end();
 
-		this.enabled = movingShapes.some((shape) => shape.type !== ShapeTypeEnum.Line);
+		this.enabled = movingShapes.some((shape) => shape.supportsAlignmentSnap);
 		if (!this.enabled) {
 			return;
 		}
@@ -62,7 +61,7 @@ export class AlignmentSnapService implements IAlignmentSnapService {
 
 		const candidates = this.shapeManager.getShapesByRect(searchBounds);
 		candidates.forEach((shape, order) => {
-			if (movingIds.has(shape.id) || shape.type === ShapeTypeEnum.Line) {
+			if (movingIds.has(shape.id) || !shape.supportsAlignmentSnap) {
 				return;
 			}
 

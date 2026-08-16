@@ -6,12 +6,7 @@ import { IActionManager, ITextEditorService, IViewportService } from '@/domain/c
 import { UpdatePropsAction } from './Action/Actions/UpdatePropsAction';
 import { BaseProperty } from '@/shape/property/BaseProperty';
 import { TextProperty } from '@/shape/property/TextProperty';
-import {
-	ShapePropertyEnum,
-	ShapeStateEnum,
-	ShapeTypeEnum,
-	TextPropertyValue,
-} from '@/shape/contract';
+import { ShapePropertyEnum, ShapeStateEnum, TextPropertyValue } from '@/shape/contract';
 import type { TextEditableShape } from '@/shape/TextEditableShape';
 import { provide } from 'inversify-binding-decorators';
 import i18n from '@/i18n';
@@ -158,8 +153,7 @@ export class TextEditorService implements ITextEditorService {
 		}
 
 		const value = shape.getTextValue();
-		const isStandaloneText = shape.type === ShapeTypeEnum.Text;
-		const horizontalAlign = value.horizontalAlign ?? (isStandaloneText ? 'left' : 'center');
+		const horizontalAlign = shape.getTextHorizontalAlign();
 
 		this.textarea.style.color = colorToHex(value.color ?? SHAPE_COLORS.text.default);
 		this.textarea.style.caretColor = colorToHex(value.color ?? SHAPE_COLORS.text.default);
@@ -183,9 +177,7 @@ export class TextEditorService implements ITextEditorService {
 
 		const shape = this.activeShape;
 		const bounds = shape.getTextLayoutBounds();
-		const value = shape.getTextValue();
-		const isStandaloneText = shape.type === ShapeTypeEnum.Text;
-		const verticalAlign = value.verticalAlign ?? (isStandaloneText ? 'top' : 'middle');
+		const verticalAlign = shape.getTextVerticalAlign();
 		const metrics = TextMetrics.measureText(
 			this.textarea.value || ' ',
 			shape.textView.style,

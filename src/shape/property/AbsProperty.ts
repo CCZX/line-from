@@ -8,7 +8,6 @@ export abstract class AbsProperty<T extends Record<string, any> = {}> {
 	constructor(shape: BaseShape, value: T) {
 		this.shape = shape;
 		this.value = value;
-		this.draw();
 	}
 
 	public abstract draw(): void;

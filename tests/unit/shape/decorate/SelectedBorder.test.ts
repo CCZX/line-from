@@ -80,6 +80,7 @@ describe('SelectedBorder', () => {
 			type: ShapeTypeEnum.Rectangle,
 			container: { addChild, removeChild },
 			getBounds: vi.fn(() => ({ x: 0, y: 0, width: 100, height: 80 })),
+			getSelectionBorderInset: vi.fn(() => 0),
 			getProperty: vi.fn((type: ShapePropertyEnum) => {
 				if (type === ShapePropertyEnum.Stroke) {
 					return { value: { width: 2 } };

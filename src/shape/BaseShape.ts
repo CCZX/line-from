@@ -1,5 +1,4 @@
 import { Container } from '@pixi/display';
-import { Graphics } from '@pixi/graphics';
 import {
 	BasePropertyValue,
 	FillPropertyValue,
@@ -8,6 +7,7 @@ import {
 	ShapeData,
 	ShapeDecorateTypeEnum,
 	ShapePropertyEnum,
+	ShapeResizeRequest,
 	ShapeStateEnum,
 	ShapeTypeEnum,
 	StrokePropertyValue,
@@ -15,7 +15,7 @@ import {
 } from './contract';
 import { AbsDecorate, createDecorateViewport, type DecorateViewport } from './decorate/AbsDecorate';
 import { HoverBorder } from './decorate/HoverBorder';
-import { getDiamondPoints, getRoundedRectRadius, isPointInRect } from './geometry';
+import { isPointInRect } from './geometry';
 import { AbsState } from './state/AbsState';
 import { StateFactory } from './state/StateFactory';
 import { StateMachine } from './state/StateMachine';
@@ -23,7 +23,6 @@ import { AbsProperty } from './property/AbsProperty';
 import { BaseProperty } from './property/BaseProperty';
 import { FillProperty } from './property/FillProperty';
 import { StrokeProperty } from './property/StrokeProperty';
-import { LineProperty } from './property/LineProperty';
 import { SelectedBorder } from './decorate/SelectedBorder';
 import { ISelectService } from '@/domain/contract/SelectService';
 import { IViewportService } from '@/domain/contract/ViewportService';
@@ -90,56 +89,14 @@ export abstract class BaseShape<T extends Container = Container> {
 		}
 	}
 
-	/**
-	 * 图形级统一重绘入口。
-	 * 属性只维护自身数据和绘制细节，由 Shape 负责清理画布并编排完整绘制顺序。
-	 */
+	/** 图形级统一重绘入口，具体绘制行为由子类实现。 */
 	public redraw(): void {
-		if (this.type === ShapeTypeEnum.Text) {
-			this.layoutText();
-			return;
-		}
-
-		if (this.type === ShapeTypeEnum.Line) {
-			this.getProperty<LineProperty>(ShapePropertyEnum.Line)?.draw();
-			return;
-		}
-
-		const base = this.propertyMap.get(ShapePropertyEnum.Base) as BaseProperty | undefined;
-		if (!base) {
-			return;
-		}
-
-		const { width, height } = base.get();
-		const graphics = this.graphics as unknown as Graphics;
-		graphics.clear();
-
-		if (
-			this.type === ShapeTypeEnum.Rectangle ||
-			this.type === ShapeTypeEnum.RoundedRectangle ||
-			this.type === ShapeTypeEnum.Diamond
-		) {
-			graphics.position.set(0, 0);
-			// 保留完整透明几何，手绘填充的空隙也能正常命中。
-			graphics.beginFill(0, 0);
-			if (this.type === ShapeTypeEnum.Rectangle) {
-				graphics.drawRect(0, 0, width, height);
-			} else if (this.type === ShapeTypeEnum.RoundedRectangle) {
-				graphics.drawRoundedRect(0, 0, width, height, getRoundedRectRadius(width, height));
-			} else {
-				graphics.drawPolygon(getDiamondPoints(width, height).flatMap(({ x, y }) => [x, y]));
-			}
-			graphics.endFill();
-		}
-
-		if (this.type === ShapeTypeEnum.Circle) {
-			graphics.position.set(width / 2, height / 2);
-		}
-
-		this.getProperty<FillProperty>(ShapePropertyEnum.Fill)?.draw();
-		this.getProperty<StrokeProperty>(ShapePropertyEnum.Stroke)?.draw();
+		this.drawShape();
 		this.layoutText();
 	}
+
+	/** 子类绘制自身内容；基类不感知具体图形类型。 */
+	protected drawShape(): void {}
 
 	private refreshDecorates() {
 		this.decorateMap.forEach((decorate) => decorate.refresh());
@@ -147,6 +104,59 @@ export abstract class BaseShape<T extends Container = Container> {
 
 	public getProperty<T>(type: ShapePropertyEnum) {
 		return this.propertyMap.get(type) as T;
+	}
+
+	public hasProperty(type: ShapePropertyEnum): boolean {
+		return this.propertyMap.has(type);
+	}
+
+	/** 是否支持通过包围盒手柄调整尺寸。 */
+	public get supportsBoxResize(): boolean {
+		return true;
+	}
+
+	/** 是否支持旋转。 */
+	public get supportsRotation(): boolean {
+		return true;
+	}
+
+	/** 是否参与对齐吸附。 */
+	public get supportsAlignmentSnap(): boolean {
+		return true;
+	}
+
+	/** 是否可作为连线目标。 */
+	public get acceptsConnections(): boolean {
+		return true;
+	}
+
+	/** 选中框相对图形包围盒的内缩量。 */
+	public getSelectionBorderInset(_viewportScale: number): number {
+		return 0;
+	}
+
+	/** 应用图形自身的缩放约束，默认接受交互层计算出的矩形。 */
+	public resolveResize(request: ShapeResizeRequest): BasePropertyValue {
+		return request.proposed;
+	}
+
+	/** 图形在世界坐标系中的轴对齐包围盒。 */
+	public getWorldBounds(): Rectangle {
+		const { width, height } = this.getBounds();
+		const centerX = this.container.x;
+		const centerY = this.container.y;
+		const radians = (this.container.angle * Math.PI) / 180;
+		const absCos = Math.abs(Math.cos(radians));
+		const absSin = Math.abs(Math.sin(radians));
+		const worldWidth = width * absCos + height * absSin;
+		const worldHeight = width * absSin + height * absCos;
+
+		return {
+			x: centerX - worldWidth / 2,
+			y: centerY - worldHeight / 2,
+			width: worldWidth,
+			height: worldHeight,
+		};
 	}
 
 	/** 序列化为 ShapeData，用于删除后可撤销地重建图形 */

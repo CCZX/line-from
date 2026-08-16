@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { BaseShape } from '@/shape/BaseShape';
+import { BaseShape } from '@/shape/BaseShape';
 import { ShapeTypeEnum } from '@/shape/contract';
 import { AlignmentSnapService } from '@/domain/service/AlignmentSnap';
 
@@ -20,6 +20,8 @@ function createShape(
 			angle: 0,
 		},
 		getBounds: () => ({ x: 0, y: 0, width, height }),
+		getWorldBounds: BaseShape.prototype.getWorldBounds,
+		supportsAlignmentSnap: type !== ShapeTypeEnum.Line,
 	} as unknown as BaseShape;
 }
 

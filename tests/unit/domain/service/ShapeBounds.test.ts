@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { BaseShape } from '@/shape/BaseShape';
+import { BaseShape } from '@/shape/BaseShape';
+import { Line } from '@/shape/Line';
 import { ShapePropertyEnum, ShapeTypeEnum } from '@/shape/contract';
 import { getShapeWorldBounds } from '@/domain/service/ShapeManager';
 
@@ -9,6 +10,7 @@ describe('getShapeWorldBounds', () => {
 			type: ShapeTypeEnum.Rectangle,
 			container: { x: 100, y: 200, angle: 90 },
 			getBounds: vi.fn(() => ({ x: 0, y: 0, width: 80, height: 40 })),
+			getWorldBounds: BaseShape.prototype.getWorldBounds,
 		} as unknown as BaseShape;
 
 		const bounds = getShapeWorldBounds(shape);
@@ -29,6 +31,7 @@ describe('getShapeWorldBounds', () => {
 		const strokeProperty = { value: { width: 2 } };
 		const shape = {
 			type: ShapeTypeEnum.Line,
+			getWorldBounds: Line.prototype.getWorldBounds,
 			getProperty: vi.fn((type: ShapePropertyEnum) => {
 				if (type === ShapePropertyEnum.Line) {
 					return lineProperty;

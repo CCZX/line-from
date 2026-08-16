@@ -7,7 +7,6 @@ import {
 	ShapeData,
 	ShapePropertyEnum,
 	ShapeStateEnum,
-	ShapeTypeEnum,
 } from '@/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
 import { IAlignmentSnapService, IShapeManager } from '@/domain/contract';
@@ -112,7 +111,7 @@ export class MoveHandler implements IHandler {
 				this.originBasePropsMap.set(shape.id, { ...p });
 			}
 			// 线的 start/end/途经点是世界坐标，移动时需要一并平移，否则数据与容器位置脱节
-			if (shape.type === ShapeTypeEnum.Line) {
+			if (shape.hasProperty(ShapePropertyEnum.Line)) {
 				const line = shape.getProperty<LineProperty>(ShapePropertyEnum.Line)?.get();
 				if (line) {
 					this.originLinePropsMap.set(shape.id, {
@@ -167,9 +166,7 @@ export class MoveHandler implements IHandler {
 
 			this.isDragging = true;
 			this.movingShapes = this.selectService.getSelectedShapes();
-			const alignableShapes = this.movingShapes.filter(
-				(shape) => shape.type !== ShapeTypeEnum.Line,
-			);
+			const alignableShapes = this.movingShapes.filter((shape) => shape.supportsAlignmentSnap);
 			this.originMovingBounds = getShapesWorldBounds(alignableShapes);
 			this.alignmentSnapService.begin(this.movingShapes);
 			this.movingShapes.forEach((s) => s.setState(ShapeStateEnum.Moving));

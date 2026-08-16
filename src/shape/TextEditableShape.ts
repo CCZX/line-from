@@ -1,9 +1,9 @@
 import { Container } from '@pixi/display';
 import { Graphics } from '@pixi/graphics';
-import { Text as PixiText } from '@pixi/text';
+import { Text as PixiText, TextStyle } from '@pixi/text';
 import { ITextEditorService } from '@/domain/contract';
 import { BaseShape } from './BaseShape';
-import { ShapeContext, ShapePropertyEnum, ShapeTypeEnum, TextPropertyValue } from './contract';
+import { ShapeContext, ShapePropertyEnum, TextPropertyValue } from './contract';
 import { FillProperty } from './property/FillProperty';
 import { TextProperty } from './property/TextProperty';
 import { SHAPE_COLORS } from '@/common/color';
@@ -39,31 +39,7 @@ export abstract class TextEditableShape<T extends Container = Container> extends
 
 	public getTextLayoutBounds(): TextLayoutBounds {
 		const { width, height } = this.getWH();
-		const value = this.getProperty<TextProperty>(ShapePropertyEnum.Text)?.value;
-		const padding = Math.max(0, value?.padding ?? DEFAULT_PADDING);
-
-		if (this.type === ShapeTypeEnum.Text) {
-			return { x: 0, y: 0, width, height };
-		}
-
-		if (this.type === ShapeTypeEnum.Circle) {
-			const side = Math.max(0, Math.min(width, height) / Math.sqrt(2) - padding * 2);
-			return {
-				x: (width - side) / 2,
-				y: (height - side) / 2,
-				width: side,
-				height: side,
-			};
-		}
-
-		if (this.type === ShapeTypeEnum.Diamond) {
-			return {
-				x: width / 4 + padding,
-				y: height / 4 + padding,
-				width: Math.max(0, width / 2 - padding * 2),
-				height: Math.max(0, height / 2 - padding * 2),
-			};
-		}
+		const padding = this.getTextPadding();
 
 		return {
 			x: padding,
@@ -73,6 +49,55 @@ export abstract class TextEditableShape<T extends Container = Container> extends
 		};
 	}
 
+	protected getTextPadding(): number {
+		const value = this.getProperty<TextProperty>(ShapePropertyEnum.Text)?.value;
+		return Math.max(0, value?.padding ?? DEFAULT_PADDING);
+	}
+
+	protected getDefaultHorizontalAlign(): NonNullable<TextPropertyValue['horizontalAlign']> {
+		return 'center';
+	}
+
+	protected getDefaultVerticalAlign(): NonNullable<TextPropertyValue['verticalAlign']> {
+		return 'middle';
+	}
+
+	public getTextHorizontalAlign(): NonNullable<TextPropertyValue['horizontalAlign']> {
+		return this.getTextValue().horizontalAlign ?? this.getDefaultHorizontalAlign();
+	}
+
+	public getTextVerticalAlign(): NonNullable<TextPropertyValue['verticalAlign']> {
+		return this.getTextValue().verticalAlign ?? this.getDefaultVerticalAlign();
+	}
+
+	protected shouldDrawTextBackground(): boolean {
+		return true;
+	}
+
+	protected drawShape(): void {
+		if (!this.textView) {
+			return;
+		}
+
+		const value = this.getProperty<TextProperty>(ShapePropertyEnum.Text)?.value;
+		if (!value) {
+			return;
+		}
+
+		const horizontalAlign = this.getTextHorizontalAlign();
+		this.textView.text = value.text;
+		this.textView.style = new TextStyle({
+			fill: value.color ?? SHAPE_COLORS.text.default,
+			fontSize: value.fontSize ?? 16,
+			fontFamily:
+				value.fontFamily ?? "-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif",
+			fontWeight: value.fontWeight ?? 'normal',
+			lineHeight: value.lineHeight,
+			align: horizontalAlign,
+			wordWrap: true,
+		});
+	}
+
 	public layoutText(): void {
 		if (!this.textView) {
 			return;
@@ -80,9 +105,8 @@ export abstract class TextEditableShape<T extends Container = Container> extends
 
 		const value = this.getProperty<TextProperty>(ShapePropertyEnum.Text)?.value;
 		const bounds = this.getTextLayoutBounds();
-		const isStandaloneText = this.type === ShapeTypeEnum.Text;
-		const horizontalAlign = value?.horizontalAlign ?? (isStandaloneText ? 'left' : 'center');
-		const verticalAlign = value?.verticalAlign ?? (isStandaloneText ? 'top' : 'middle');
+		const horizontalAlign = this.getTextHorizontalAlign();
+		const verticalAlign = this.getTextVerticalAlign();
 
 		const anchorX = horizontalAlign === 'left' ? 0 : horizontalAlign === 'right' ? 1 : 0.5;
 		const anchorY = verticalAlign === 'top' ? 0 : verticalAlign === 'bottom' ? 1 : 0.5;
@@ -112,7 +136,7 @@ export abstract class TextEditableShape<T extends Container = Container> extends
 		const background = this.textBackgroundView;
 		background.clear();
 
-		if (this.type === ShapeTypeEnum.Text || !this.textView.text) {
+		if (!this.shouldDrawTextBackground() || !this.textView.text) {
 			return;
 		}
 

@@ -15,23 +15,32 @@ interface ShapeMock {
 		destroy: Mock;
 	};
 	getBounds: Mock;
+	getWorldBounds: Mock;
 	containsPoint: Mock;
 }
 
 function createShape(id: string, containsPoint = false, x = 0, y = 0): ShapeMock {
-	return {
+	const container = {
+		x,
+		y,
+		angle: 0,
+		toLocal: vi.fn(() => ({ x: 0, y: 0 })),
+		destroy: vi.fn(),
+	};
+	const shape: ShapeMock = {
 		id,
 		type: ShapeTypeEnum.Rectangle,
-		container: {
-			x,
-			y,
-			angle: 0,
-			toLocal: vi.fn(() => ({ x: 0, y: 0 })),
-			destroy: vi.fn(),
-		},
+		container,
 		getBounds: vi.fn(() => ({ x: 0, y: 0, width: 100, height: 100 })),
+		getWorldBounds: vi.fn(() => ({
+			x: container.x - 50,
+			y: container.y - 50,
+			width: 100,
+			height: 100,
+		})),
 		containsPoint: vi.fn(() => containsPoint),
 	};
+	return shape;
 }
 
 describe('ShapeManager', () => {

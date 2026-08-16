@@ -19,6 +19,22 @@ export class Line extends BaseShape<Graphics> {
 		super(id, new Graphics(), context);
 	}
 
+	public get supportsBoxResize(): boolean {
+		return false;
+	}
+
+	public get supportsRotation(): boolean {
+		return false;
+	}
+
+	public get supportsAlignmentSnap(): boolean {
+		return false;
+	}
+
+	public get acceptsConnections(): boolean {
+		return false;
+	}
+
 	protected initProperty() {
 		super.initProperty();
 		this.propertyMap.set(ShapePropertyEnum.Line, new LineProperty(this));
@@ -30,6 +46,10 @@ export class Line extends BaseShape<Graphics> {
 			ShapeDecorateTypeEnum.SelectedBorder,
 			new LineSelectedBorder(this, viewport),
 		);
+	}
+
+	protected drawShape(): void {
+		this.getProperty<LineProperty>(ShapePropertyEnum.Line)?.draw();
 	}
 
 	/** 线的包围盒可能高/宽为 0，改用点到路径距离判断命中 */
@@ -50,5 +70,49 @@ export class Line extends BaseShape<Graphics> {
 			}
 		}
 		return false;
+	}
+
+	public getWorldBounds(): Rectangle {
+		const line = this.getProperty<LineProperty>(ShapePropertyEnum.Line);
+		if (!line) {
+			return this.getFallbackWorldBounds();
+		}
+
+		const points = sampleCurvePoints(line.getPoints());
+		if (points.length === 0) {
+			return this.getFallbackWorldBounds();
+		}
+
+		let minX = Infinity;
+		let minY = Infinity;
+		let maxX = -Infinity;
+		let maxY = -Infinity;
+		for (const point of points) {
+			minX = Math.min(minX, point.x);
+			minY = Math.min(minY, point.y);
+			maxX = Math.max(maxX, point.x);
+			maxY = Math.max(maxY, point.y);
+		}
+
+		const strokeWidth =
+			this.getProperty<StrokeProperty>(ShapePropertyEnum.Stroke)?.value?.width ?? 1;
+		const padding = Math.max(strokeWidth / 2 + 4, MIN_HIT_DISTANCE);
+
+		return {
+			x: minX - padding,
+			y: minY - padding,
+			width: maxX - minX + padding * 2,
+			height: maxY - minY + padding * 2,
+		};
+	}
+
+	private getFallbackWorldBounds(): Rectangle {
+		const { width, height } = this.getBounds();
+		return {
+			x: this.container.x - width / 2 - MIN_HIT_DISTANCE,
+			y: this.container.y - height / 2 - MIN_HIT_DISTANCE,
+			width: width + MIN_HIT_DISTANCE * 2,
+			height: height + MIN_HIT_DISTANCE * 2,
+		};
 	}
 }
