@@ -51,7 +51,6 @@ export default {
 		regular: '规正',
 		sketchy: '手绘',
 		solid: '纯色',
-		hatch: '斜线',
 		width: {
 			none: '无 (0)',
 			small: '小 (1)',

@@ -51,7 +51,6 @@ export default {
 		regular: 'Regular',
 		sketchy: 'Sketchy',
 		solid: 'Solid',
-		hatch: 'Hatch',
 		width: {
 			none: 'None (0)',
 			small: 'Small (1)',

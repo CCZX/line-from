@@ -4,7 +4,6 @@ import { TextEditableShape } from './TextEditableShape';
 import { BaseProperty } from './property/BaseProperty';
 import { FillProperty } from './property/FillProperty';
 import { StrokeProperty } from './property/StrokeProperty';
-import { getHatchTexture } from './property/hatch';
 import { applyLineStyle } from './property/style';
 
 /**
@@ -73,15 +72,7 @@ export abstract class ClosedShape extends TextEditableShape<Graphics> {
 			return;
 		}
 
-		if (value.style === 'hatch') {
-			graphics.beginTextureFill({
-				texture: getHatchTexture(),
-				color: value.color,
-				alpha: value.alpha,
-			});
-		} else {
-			graphics.beginFill(value.color, value.alpha);
-		}
+		graphics.beginFill(value.color, value.alpha);
 		this.drawPath(graphics, width, height);
 		graphics.endFill();
 	}

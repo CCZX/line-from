@@ -340,7 +340,7 @@ export function Property() {
 							<div className='ctx-field'>
 								<span className='ctx-label'>{t('property.pattern')}</span>
 								<div className='ctx-segmented'>
-									{(['solid', 'hatch', 'sketchy'] as const).map((style) => (
+									{(['solid', 'sketchy'] as const).map((style) => (
 										<button
 											type='button'
 											key={style}

@@ -3,7 +3,7 @@ import { ShapeTypeEnum, type ShapeData } from '@/shape/contract';
 type UnknownRecord = Record<string, unknown>;
 
 const SHAPE_TYPES = new Set<string>(Object.values(ShapeTypeEnum));
-const FILL_STYLES = new Set(['solid', 'hatch', 'sketchy']);
+const FILL_STYLES = new Set(['solid', 'sketchy']);
 const STROKE_STYLES = new Set(['regular', 'sketchy']);
 const LINE_ROUTING_TYPES = new Set(['straight', 'orthogonal', 'curved']);
 const LINE_ANCHORS = new Set(['auto', 'top', 'right', 'bottom', 'left', 'center']);

@@ -95,7 +95,7 @@ export interface ShapeResizeRequest {
 	minSize: number;
 }
 
-export type FillStyle = 'solid' | 'hatch' | 'sketchy';
+export type FillStyle = 'solid' | 'sketchy';
 
 export interface FillPropertyValue {
 	color: number;
