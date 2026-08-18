@@ -3,20 +3,25 @@ import type { IocContainerService } from '@/common/contract';
 import { ToolType } from '@/domain/contract';
 import type { EventPayload, InteractionState } from '@/domain/contract/EventManager';
 import { CreateShapeAction } from '@/domain/service/Action/Actions/CreateShapeAction';
+import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
 import { CreateHandler } from '@/domain/service/Events/modes/creator/handlers/CreateHandler';
 import { ShapeTypeEnum } from '@/shape/contract';
 
 function createHandler(activeTool: ToolType) {
 	const push = vi.fn();
 	const setStreamStart = vi.fn();
+	const setStreamEnd = vi.fn();
 	const setActiveTool = vi.fn();
 	const handler = new CreateHandler();
 
 	Object.assign(handler, {
 		ioc: {} as IocContainerService,
 		actionManager: { push },
-		actionLogManager: { setStreamStart },
-		shapeManager: { getShapeByPoint: vi.fn(() => undefined) },
+		actionLogManager: { setStreamStart, setStreamEnd },
+		shapeManager: {
+			getShapeByPoint: vi.fn(() => undefined),
+			getShapeById: vi.fn(() => undefined),
+		},
 		viewportService: {
 			clientToViewportLocal: vi.fn((x: number, y: number) => ({ x, y })),
 		},
@@ -27,7 +32,7 @@ function createHandler(activeTool: ToolType) {
 		},
 	});
 
-	return { handler, push, setStreamStart };
+	return { handler, push, setStreamStart, setStreamEnd };
 }
 
 const state: InteractionState = { hoveredShape: null };
@@ -89,5 +94,22 @@ describe('CreateHandler', () => {
 
 		const action = push.mock.calls[0][0] as CreateShapeAction;
 		expect(action.data[0].properties.line?.endArrow).toBe(false);
+	});
+
+	it.each([
+		[ToolType.RoundedRect, { x: -40, y: -10, width: 120, height: 80 }],
+		[ToolType.Rect, { x: -40, y: -30, width: 120, height: 120 }],
+		[ToolType.Diamond, { x: -40, y: -30, width: 120, height: 120 }],
+		[ToolType.Circle, { x: -20, y: -10, width: 80, height: 80 }],
+	])('%s 工具单击创建时使用对应的默认尺寸', (tool, expectedBase) => {
+		const { handler, push, setStreamEnd } = createHandler(tool);
+
+		handler.execute({ type: 'pointerdown' } as PointerEvent, state, payload);
+		handler.execute({ type: 'pointerup' } as PointerEvent, state, payload);
+
+		const action = push.mock.calls[1][0] as UpdatePropsAction;
+		expect(action).toBeInstanceOf(UpdatePropsAction);
+		expect(action.data[0].properties.base).toEqual(expectedBase);
+		expect(setStreamEnd).toHaveBeenCalledOnce();
 	});
 });

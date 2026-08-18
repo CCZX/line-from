@@ -34,8 +34,6 @@ function nextId(): string {
 }
 
 const DEFAULT_PROPS = {
-	width: 100,
-	height: 100,
 	stroke: { color: SHAPE_COLORS.border.default, width: 1, alpha: 1, style: 'sketchy' as const },
 	fill: { color: SHAPE_COLORS.background.default, alpha: 1, style: 'sketchy' as const },
 	text: {
@@ -46,6 +44,17 @@ const DEFAULT_PROPS = {
 		verticalAlign: 'middle' as const,
 		padding: 8,
 	},
+};
+
+const DEFAULT_SIZE = { width: 100, height: 100 };
+
+const DEFAULT_SIZE_BY_SHAPE_TYPE: Partial<
+	Record<ShapeTypeEnum, { width: number; height: number }>
+> = {
+	[ShapeTypeEnum.Rectangle]: { width: 120, height: 120 },
+	[ShapeTypeEnum.RoundedRectangle]: { width: 120, height: 80 },
+	[ShapeTypeEnum.Diamond]: { width: 120, height: 120 },
+	[ShapeTypeEnum.Circle]: { width: 80, height: 80 },
 };
 
 /** 拖拽位移小于该阈值视为单击，回退为默认尺寸 */
@@ -223,12 +232,13 @@ export class CreateHandler implements IHandler {
 			}
 		} else {
 			const isClick = Math.abs(dx) < DRAG_THRESHOLD && Math.abs(dy) < DRAG_THRESHOLD;
+			const defaultSize = DEFAULT_SIZE_BY_SHAPE_TYPE[this.creatingType!] ?? DEFAULT_SIZE;
 			const base: BasePropertyValue = isClick
 				? {
-						x: start.x - DEFAULT_PROPS.width / 2,
-						y: start.y - DEFAULT_PROPS.height / 2,
-						width: DEFAULT_PROPS.width,
-						height: DEFAULT_PROPS.height,
+						x: start.x - defaultSize.width / 2,
+						y: start.y - defaultSize.height / 2,
+						width: defaultSize.width,
+						height: defaultSize.height,
 				  }
 				: this.computeBase(cur);
 			this.pushBase(base);
@@ -343,10 +353,10 @@ export class CreateHandler implements IHandler {
 			type: shapeType,
 			properties: {
 				base: {
-					x: localPoint.x - DEFAULT_PROPS.width / 2,
-					y: localPoint.y - DEFAULT_PROPS.height / 2,
-					width: DEFAULT_PROPS.width,
-					height: DEFAULT_PROPS.height,
+					x: localPoint.x - DEFAULT_SIZE.width / 2,
+					y: localPoint.y - DEFAULT_SIZE.height / 2,
+					width: DEFAULT_SIZE.width,
+					height: DEFAULT_SIZE.height,
 				},
 				fill: isText ? { ...DEFAULT_PROPS.fill, alpha: 0 } : { ...DEFAULT_PROPS.fill },
 				stroke: isText
