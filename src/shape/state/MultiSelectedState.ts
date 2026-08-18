@@ -4,7 +4,7 @@ import { AbsState } from './AbsState';
 export class MultiSelectedState extends AbsState {
 	public type: ShapeStateEnum = ShapeStateEnum.MultiSelected;
 
-	public allowNextStateTypes: ShapeStateEnum[] = [
+	public override allowNextStateTypes: ShapeStateEnum[] = [
 		ShapeStateEnum.Normal,
 		ShapeStateEnum.Moving,
 		ShapeStateEnum.Resizing,

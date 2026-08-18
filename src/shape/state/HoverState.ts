@@ -4,7 +4,7 @@ import { AbsState } from './AbsState';
 export class HoverState extends AbsState {
 	public type: ShapeStateEnum = ShapeStateEnum.Hover;
 
-	public allowNextStateTypes = [
+	public override allowNextStateTypes = [
 		ShapeStateEnum.Normal,
 		ShapeStateEnum.Selected,
 		ShapeStateEnum.MultiSelected,

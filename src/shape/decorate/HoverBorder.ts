@@ -37,7 +37,7 @@ export class HoverBorder extends AbsDecorate {
 		this.startViewportScaleSync();
 	}
 
-	public refresh(): void {
+	public override refresh(): void {
 		this.draw();
 	}
 

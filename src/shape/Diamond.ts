@@ -14,12 +14,12 @@ export class Diamond extends ClosedShape {
 		super(id, new Graphics(), context);
 	}
 
-	public containsPoint(localPoint: Point): boolean {
+	public override containsPoint(localPoint: Point): boolean {
 		const { width, height } = this.getWH();
 		return isPointInDiamond(localPoint, width, height);
 	}
 
-	public getTextLayoutBounds(): TextLayoutBounds {
+	public override getTextLayoutBounds(): TextLayoutBounds {
 		const { width, height } = this.getWH();
 		const padding = this.getTextPadding();
 		return {

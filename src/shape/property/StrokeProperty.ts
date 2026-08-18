@@ -22,12 +22,12 @@ export class StrokeProperty extends AbsProperty<StrokePropertyValue> {
 		super(shape, withSketchySeed(value || DEFAULT_VALUE));
 	}
 
-	public set(value: StrokePropertyValue): void {
+	public override set(value: StrokePropertyValue): void {
 		this.value = withSketchySeed(value);
 		this.shape.redraw();
 	}
 
-	public update(value: Partial<StrokePropertyValue>): void {
+	public override update(value: Partial<StrokePropertyValue>): void {
 		const merged = { ...this.value, ...value };
 		if (merged.style === 'sketchy' && merged.seed == null) {
 			merged.seed = Math.floor(Math.random() * 1_000_000_000);

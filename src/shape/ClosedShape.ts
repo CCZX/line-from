@@ -11,7 +11,7 @@ import { applyLineStyle } from './property/style';
  * 具体几何路径及手绘实现由各图形类自行提供。
  */
 export abstract class ClosedShape extends TextEditableShape<Graphics> {
-	protected drawShape(): void {
+	protected override drawShape(): void {
 		const base = this.getProperty<BaseProperty>(ShapePropertyEnum.Base);
 		if (!base) {
 			super.drawShape();

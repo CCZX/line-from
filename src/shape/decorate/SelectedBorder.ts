@@ -93,7 +93,7 @@ export class SelectedBorder extends AbsDecorate {
 		this.startViewportScaleSync();
 	}
 
-	public refresh() {
+	public override refresh() {
 		this.draw();
 	}
 

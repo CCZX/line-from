@@ -74,7 +74,7 @@ export abstract class TextEditableShape<T extends Container = Container> extends
 		return true;
 	}
 
-	protected drawShape(): void {
+	protected override drawShape(): void {
 		if (!this.textView) {
 			return;
 		}
@@ -98,7 +98,7 @@ export abstract class TextEditableShape<T extends Container = Container> extends
 		});
 	}
 
-	public layoutText(): void {
+	public override layoutText(): void {
 		if (!this.textView) {
 			return;
 		}
@@ -164,15 +164,15 @@ export abstract class TextEditableShape<T extends Container = Container> extends
 		background.endFill();
 	}
 
-	public showTextInput(): void {
+	public override showTextInput(): void {
 		this.context.ioc.get<ITextEditorService>(ITextEditorService).begin(this);
 	}
 
-	public hideTextInput(): void {
+	public override hideTextInput(): void {
 		this.context.ioc.get<ITextEditorService>(ITextEditorService).close(this);
 	}
 
-	public commitTextInput(): void {
+	public override commitTextInput(): void {
 		this.context.ioc.get<ITextEditorService>(ITextEditorService).commit(this);
 	}
 

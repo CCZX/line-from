@@ -21,12 +21,12 @@ export class FillProperty extends AbsProperty<FillPropertyValue> {
 		super(shape, withSketchySeed(value || DEFAULT_VALUE));
 	}
 
-	public set(value: FillPropertyValue): void {
+	public override set(value: FillPropertyValue): void {
 		this.value = withSketchySeed(value);
 		this.shape.redraw();
 	}
 
-	public update(value: Partial<FillPropertyValue>): void {
+	public override update(value: Partial<FillPropertyValue>): void {
 		const merged = { ...this.value, ...value };
 		if (merged.style === 'sketchy' && merged.seed == null) {
 			merged.seed = Math.floor(Math.random() * 1_000_000_000);

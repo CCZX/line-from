@@ -247,7 +247,7 @@ export class Viewport extends Container {
 		this.positionChangeEvent$.next({ x, y });
 	}
 
-	public destroy(options?: boolean | IDestroyOptions | undefined): void {
+	public override destroy(options?: boolean | IDestroyOptions | undefined): void {
 		this.canvas.removeEventListener('wheel', this.onWheel);
 		this.canvas.removeEventListener('pointerdown', this.onPointerDown);
 		this.canvas.removeEventListener('pointermove', this.onPointerMove);

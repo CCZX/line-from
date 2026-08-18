@@ -22,7 +22,7 @@ export class Circle extends ClosedShape {
 		super(id, new Graphics(), context);
 	}
 
-	public getTextLayoutBounds(): TextLayoutBounds {
+	public override getTextLayoutBounds(): TextLayoutBounds {
 		const { width, height } = this.getWH();
 		const padding = this.getTextPadding();
 		const side = Math.max(0, Math.min(width, height) / Math.sqrt(2) - padding * 2);
@@ -34,11 +34,11 @@ export class Circle extends ClosedShape {
 		};
 	}
 
-	public getSelectionBorderInset(viewportScale: number): number {
+	public override getSelectionBorderInset(viewportScale: number): number {
 		return SELECTION_BORDER_INSET / viewportScale;
 	}
 
-	public resolveResize(request: ShapeResizeRequest) {
+	public override resolveResize(request: ShapeResizeRequest) {
 		const { x, y, width } = request.origin;
 		const { deltaX, deltaY, minSize, direction } = request;
 		const diameter = width;
@@ -92,7 +92,7 @@ export class Circle extends ClosedShape {
 		};
 	}
 
-	protected prepareGraphics(width: number, height: number): void {
+	protected override prepareGraphics(width: number, height: number): void {
 		this.graphics.position.set(width / 2, height / 2);
 	}
 

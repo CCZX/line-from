@@ -12,20 +12,20 @@ export class Text extends TextEditableShape<PixiText> {
 		super(id, textView, context, textView);
 	}
 
-	public getTextLayoutBounds(): TextLayoutBounds {
+	public override getTextLayoutBounds(): TextLayoutBounds {
 		const { width, height } = this.getWH();
 		return { x: 0, y: 0, width, height };
 	}
 
-	protected getDefaultHorizontalAlign(): 'left' {
+	protected override getDefaultHorizontalAlign(): 'left' {
 		return 'left';
 	}
 
-	protected getDefaultVerticalAlign(): 'top' {
+	protected override getDefaultVerticalAlign(): 'top' {
 		return 'top';
 	}
 
-	protected shouldDrawTextBackground(): boolean {
+	protected override shouldDrawTextBackground(): boolean {
 		return false;
 	}
 }

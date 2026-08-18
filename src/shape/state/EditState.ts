@@ -4,7 +4,7 @@ import { AbsState } from './AbsState';
 export class EditState extends AbsState {
 	public type: ShapeStateEnum = ShapeStateEnum.Edit;
 
-	public allowNextStateTypes = [ShapeStateEnum.Normal, ShapeStateEnum.Selected];
+	public override allowNextStateTypes = [ShapeStateEnum.Normal, ShapeStateEnum.Selected];
 
 	public onActivate() {
 		this.shape.showTextInput();

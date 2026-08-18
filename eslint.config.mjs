@@ -1,10 +1,20 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
+import tsconfig from 'eslint-plugin-tsconfig';
 
 export default tseslint.config(
 	js.configs.recommended,
 	prettier,
+	{
+		name: 'tsconfig/require-no-implicit-override',
+		files: ['tsconfig.json'],
+		languageOptions: tsconfig.configs.all.languageOptions,
+		plugins: tsconfig.configs.all.plugins,
+		rules: {
+			'tsconfig/require-no-implicit-override': 'error',
+		},
+	},
 	{
 		files: ['src/**/*.{ts,tsx}', 'tests/**/*.ts', 'vitest.config.ts'],
 		languageOptions: {

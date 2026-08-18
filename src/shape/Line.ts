@@ -19,28 +19,28 @@ export class Line extends BaseShape<Graphics> {
 		super(id, new Graphics(), context);
 	}
 
-	public get supportsBoxResize(): boolean {
+	public override get supportsBoxResize(): boolean {
 		return false;
 	}
 
-	public get supportsRotation(): boolean {
+	public override get supportsRotation(): boolean {
 		return false;
 	}
 
-	public get supportsAlignmentSnap(): boolean {
+	public override get supportsAlignmentSnap(): boolean {
 		return false;
 	}
 
-	public get acceptsConnections(): boolean {
+	public override get acceptsConnections(): boolean {
 		return false;
 	}
 
-	protected initProperty() {
+	protected override initProperty() {
 		super.initProperty();
 		this.propertyMap.set(ShapePropertyEnum.Line, new LineProperty(this));
 	}
 
-	protected initDecorate(viewport: DecorateViewport) {
+	protected override initDecorate(viewport: DecorateViewport) {
 		this.decorateMap.set(ShapeDecorateTypeEnum.HoverBorder, new HoverBorder(this, viewport));
 		this.decorateMap.set(
 			ShapeDecorateTypeEnum.SelectedBorder,
@@ -48,12 +48,12 @@ export class Line extends BaseShape<Graphics> {
 		);
 	}
 
-	protected drawShape(): void {
+	protected override drawShape(): void {
 		this.getProperty<LineProperty>(ShapePropertyEnum.Line)?.draw();
 	}
 
 	/** 线的包围盒可能高/宽为 0，改用点到路径距离判断命中 */
-	public containsPoint(localPoint: Point): boolean {
+	public override containsPoint(localPoint: Point): boolean {
 		const line = this.getProperty<LineProperty>(ShapePropertyEnum.Line);
 		if (!line) {
 			return false;
@@ -72,7 +72,7 @@ export class Line extends BaseShape<Graphics> {
 		return false;
 	}
 
-	public getWorldBounds(): Rectangle {
+	public override getWorldBounds(): Rectangle {
 		const line = this.getProperty<LineProperty>(ShapePropertyEnum.Line);
 		if (!line) {
 			return this.getFallbackWorldBounds();

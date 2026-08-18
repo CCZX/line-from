@@ -13,7 +13,7 @@ export class RoundedRectangle extends ClosedShape {
 		super(id, new Graphics(), context);
 	}
 
-	public containsPoint(localPoint: Point): boolean {
+	public override containsPoint(localPoint: Point): boolean {
 		const { width, height } = this.getWH();
 		return isPointInRoundedRect(localPoint, width, height, getRoundedRectRadius(width, height));
 	}
