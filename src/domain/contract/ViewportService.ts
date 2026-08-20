@@ -20,6 +20,7 @@ export interface IViewportService {
 	zoomIn(): void;
 	zoomOut(): void;
 	resetZoom(): void;
+	zoomToFit(bounds: Rectangle, padding?: number): void;
 
 	clientToViewportLocal(clientX: number, clientY: number): PixiPoint;
 	getVisibleWorldRect(): Rectangle;

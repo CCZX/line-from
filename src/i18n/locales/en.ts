@@ -24,6 +24,7 @@ export default {
 		zoomOut: 'Zoom out',
 		zoomIn: 'Zoom in',
 		zoomReset: 'Reset zoom',
+		zoomToFit: 'Zoom to fit',
 		clear: 'Clear canvas',
 		importJson: 'Import ShapeData JSON',
 		importError: 'Import failed. Choose a valid ShapeData JSON file.',

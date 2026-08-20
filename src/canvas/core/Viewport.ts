@@ -6,6 +6,7 @@ export const ZOOM_SCALE_LIST = [0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4];
 
 export const MIN_ZOOM_SCALE = ZOOM_SCALE_LIST[0];
 export const MAX_ZOOM_SCALE = ZOOM_SCALE_LIST[ZOOM_SCALE_LIST.length - 1];
+export const FIT_VIEW_PADDING = 48;
 
 function floorToTwoDecimals(value: number): number {
 	return Math.floor(value * 100) / 100;
@@ -237,6 +238,39 @@ export class Viewport extends Container {
 
 	public resetZoom(point?: Point): void {
 		this.setScale(1, point);
+	}
+
+	/** 调整缩放和位移，使世界坐标包围盒完整显示并居中。 */
+	public zoomToFit(bounds: Rectangle, padding = FIT_VIEW_PADDING): void {
+		if (
+			![bounds.x, bounds.y, bounds.width, bounds.height].every(Number.isFinite) ||
+			bounds.width < 0 ||
+			bounds.height < 0
+		) {
+			return;
+		}
+
+		const { width: canvasWidth, height: canvasHeight } = this.canvas.getBoundingClientRect();
+		if (canvasWidth <= 0 || canvasHeight <= 0) {
+			return;
+		}
+
+		const safePadding = Number.isFinite(padding) ? Math.max(0, padding) : FIT_VIEW_PADDING;
+		const availableWidth = Math.max(0, canvasWidth - safePadding * 2);
+		const availableHeight = Math.max(0, canvasHeight - safePadding * 2);
+		const widthScale = bounds.width > 0 ? availableWidth / bounds.width : Infinity;
+		const heightScale = bounds.height > 0 ? availableHeight / bounds.height : Infinity;
+		const fittedScale = Math.min(widthScale, heightScale);
+		const scale = formatZoomScale(Number.isFinite(fittedScale) ? fittedScale : MAX_ZOOM_SCALE);
+
+		if (scale !== this.scale.x) {
+			this.scale.set(scale, scale);
+			this.scaleChangeEvent$.next({ scale });
+		}
+
+		const centerX = bounds.x + bounds.width / 2;
+		const centerY = bounds.y + bounds.height / 2;
+		this.setPosition(canvasWidth / 2 - centerX * scale, canvasHeight / 2 - centerY * scale);
 	}
 
 	private setPosition(x: number, y: number) {

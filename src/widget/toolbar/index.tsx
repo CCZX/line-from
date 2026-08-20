@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import type { Locale } from '@/i18n';
 import { parseShapeDataJson } from './shapeDataJson';
 import { MAX_ZOOM_SCALE, MIN_ZOOM_SCALE } from '@/canvas/core/Viewport';
+import { getShapesWorldBounds } from '@/domain/service/ShapeManager';
 import './index.less';
 
 type SketchIconName =
@@ -30,6 +31,7 @@ type SketchIconName =
 	| 'eraser'
 	| 'zoomOut'
 	| 'zoomIn'
+	| 'zoomToFit'
 	| 'upload'
 	| 'download'
 	| 'trash';
@@ -54,6 +56,8 @@ const ICON_PATHS: Record<SketchIconName, string> = {
 		'M18 18 L21 21 M11 18 C7.1 18 4 14.9 4 11 C4 7.1 7.1 4 11 4 C14.9 4 18 7.1 18 11 C18 14.9 14.9 18 11 18 Z M8 11 L14 11',
 	zoomIn:
 		'M18 18 L21 21 M11 18 C7.1 18 4 14.9 4 11 C4 7.1 7.1 4 11 4 C14.9 4 18 7.1 18 11 C18 14.9 14.9 18 11 18 Z M8 11 L14 11 M11 8 L11 14',
+	zoomToFit:
+		'M9 4 L4 4 L4 9 M15 4 L20 4 L20 9 M4 15 L4 20 L9 20 M20 15 L20 20 L15 20 M8 8 L16 8 L16 16 L8 16 Z',
 	upload: 'M12 15 L12 4 M8 8 L12 4 L16 8 M5 17 L5 20 L19 20 L19 17',
 	download: 'M12 4 L12 15 M8 11 L12 15 L16 11 M5 17 L5 20 L19 20 L19 17',
 	trash:
@@ -75,6 +79,7 @@ const ICON_SEEDS: Record<SketchIconName, number> = {
 	eraser: 53,
 	zoomOut: 59,
 	zoomIn: 61,
+	zoomToFit: 63,
 	upload: 73,
 	download: 71,
 	trash: 67,
@@ -162,6 +167,13 @@ export function Toolbar() {
 	const handleZoomReset = useCallback(() => {
 		viewportService.resetZoom();
 	}, [viewportService]);
+
+	const handleZoomToFit = useCallback(() => {
+		const bounds = getShapesWorldBounds(shapeManager.getAllShapes());
+		if (bounds) {
+			viewportService.zoomToFit(bounds);
+		}
+	}, [shapeManager, viewportService]);
 
 	const handleUndo = useCallback(() => {
 		actionLogManager.undo();
@@ -305,15 +317,31 @@ export function Toolbar() {
 				<ActionButton title={t('toolbar.zoomOut')} onClick={handleZoomOut} disabled={!canZoomOut}>
 					<SketchIcon name='zoomOut' />
 				</ActionButton>
-				<button
-					type='button'
-					className='zoom-label'
-					title={t('toolbar.zoomReset')}
-					aria-label={`${t('toolbar.zoomReset')}，${zoom}%`}
-					onClick={handleZoomReset}
-				>
-					{zoom}%
-				</button>
+				<div className='zoom-menu'>
+					<button
+						type='button'
+						className='zoom-label'
+						title={t('toolbar.zoomReset')}
+						aria-label={`${t('toolbar.zoomReset')}，${zoom}%`}
+						aria-haspopup='menu'
+						onClick={handleZoomReset}
+					>
+						{zoom}%
+					</button>
+					<div className='zoom-menu__popover'>
+						<div className='zoom-menu__surface' role='menu'>
+							<button
+								type='button'
+								className='zoom-menu__item'
+								role='menuitem'
+								onClick={handleZoomToFit}
+							>
+								<SketchIcon name='zoomToFit' />
+								<span>{t('toolbar.zoomToFit')}</span>
+							</button>
+						</div>
+					</div>
+				</div>
 				<ActionButton title={t('toolbar.zoomIn')} onClick={handleZoomIn} disabled={!canZoomIn}>
 					<SketchIcon name='zoomIn' />
 				</ActionButton>

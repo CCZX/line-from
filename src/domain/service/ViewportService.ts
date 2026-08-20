@@ -65,6 +65,10 @@ export class ViewportService implements IViewportService, IDestroyable {
 		this.stage.getViewport().resetZoom();
 	}
 
+	public zoomToFit(bounds: Rectangle, padding?: number): void {
+		this.stage.getViewport().zoomToFit(bounds, padding);
+	}
+
 	public clientToViewportLocal(clientX: number, clientY: number): PixiPoint {
 		const viewport = this.stage.getViewport();
 		const canvasRect = viewport.canvasEl.getBoundingClientRect();

@@ -125,6 +125,84 @@
 	}
 }
 
+.zoom-menu {
+	position: relative;
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+
+	&:hover,
+	&:focus-within {
+		.zoom-menu__popover {
+			visibility: visible;
+			opacity: 1;
+			pointer-events: auto;
+			transform: translate(-50%, 0);
+		}
+	}
+}
+
+.zoom-menu__popover {
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	z-index: 110;
+	box-sizing: border-box;
+	min-width: 138px;
+	padding-top: 8px;
+	visibility: hidden;
+	opacity: 0;
+	pointer-events: none;
+	transform: translate(-50%, -4px);
+	transition: visibility 120ms ease, opacity 120ms ease, transform 120ms ease;
+}
+
+.zoom-menu__surface {
+	padding: 4px;
+	background: #fffefa;
+	border: 1px solid rgba(73, 67, 57, 0.22);
+	border-radius: 9px;
+	box-shadow: 0 1px 2px rgba(70, 61, 48, 0.06), 0 8px 24px rgba(70, 61, 48, 0.12);
+}
+
+.zoom-menu__item {
+	display: flex;
+	align-items: center;
+	box-sizing: border-box;
+	width: 100%;
+	height: 34px;
+	gap: 8px;
+	padding: 0 9px;
+	appearance: none;
+	color: #403b35;
+	font: 550 12px/1 -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+	white-space: nowrap;
+	background: transparent;
+	border: 0;
+	border-radius: 6px;
+	outline: none;
+	cursor: pointer;
+	transition: color 120ms ease, background-color 120ms ease;
+
+	.tb-icon {
+		width: 18px;
+		height: 18px;
+		flex: 0 0 18px;
+		overflow: visible;
+		pointer-events: none;
+	}
+
+	&:hover,
+	&:focus-visible {
+		color: #292621;
+		background: #f4f1ed;
+	}
+
+	&:focus-visible {
+		box-shadow: 0 0 0 2px rgba(97, 91, 164, 0.18);
+	}
+}
+
 .language-select {
 	box-sizing: border-box;
 	height: 36px;

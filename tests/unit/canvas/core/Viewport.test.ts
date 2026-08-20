@@ -87,6 +87,36 @@ describe('Viewport zoom', () => {
 		viewport.setScale(10);
 		expect(viewport.scale.x).toBe(MAX_ZOOM_SCALE);
 	});
+
+	it('缩放全览时完整容纳内容并居中', () => {
+		const viewport = createViewport();
+		const scaleChanges: number[] = [];
+		const positionChanges: Array<{ x: number; y: number }> = [];
+		viewport.scaleChangeEvent$.subscribe(({ scale }) => scaleChanges.push(scale));
+		viewport.positionChangeEvent$.subscribe((position) => positionChanges.push(position));
+
+		viewport.zoomToFit({ x: 100, y: 200, width: 400, height: 200 }, 50);
+
+		expect(viewport.scale.x).toBe(2.25);
+		expect({ x: viewport.x, y: viewport.y }).toEqual({ x: -175, y: -275 });
+		expect(scaleChanges).toEqual([2.25]);
+		expect(positionChanges).toEqual([{ x: -175, y: -275 }]);
+	});
+
+	it('缩放全览遵守缩放上下限，并支持零尺寸内容', () => {
+		const viewport = createViewport();
+
+		viewport.zoomToFit({ x: 100, y: 200, width: 10, height: 10 });
+		expect(viewport.scale.x).toBe(MAX_ZOOM_SCALE);
+		expect(viewport.toLocal(new Point(500, 400))).toMatchObject({ x: 105, y: 205 });
+
+		viewport.zoomToFit({ x: -5000, y: -4000, width: 10000, height: 8000 });
+		expect(viewport.scale.x).toBe(MIN_ZOOM_SCALE);
+
+		viewport.zoomToFit({ x: 20, y: 30, width: 0, height: 0 });
+		expect(viewport.scale.x).toBe(MAX_ZOOM_SCALE);
+		expect(viewport.toLocal(new Point(500, 400))).toMatchObject({ x: 20, y: 30 });
+	});
 });
 
 describe('Viewport pan', () => {

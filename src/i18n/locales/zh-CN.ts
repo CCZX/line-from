@@ -24,6 +24,7 @@ export default {
 		zoomOut: '缩小',
 		zoomIn: '放大',
 		zoomReset: '重置缩放',
+		zoomToFit: '缩放全览',
 		clear: '清空画布',
 		importJson: '导入 ShapeData JSON',
 		importError: '导入失败：请选择有效的 ShapeData JSON 文件。',
