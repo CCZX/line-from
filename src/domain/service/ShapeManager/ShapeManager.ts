@@ -49,7 +49,8 @@ export class ShapeManager implements IShapeManager {
 	public getShapeByPoint(point: Point) {
 		const viewport = this.viewportService.getStage().getViewport();
 		const candidates = this.getShapesByRect({ x: point.x, y: point.y, width: 0, height: 0 });
-		for (const shape of candidates) {
+		for (let index = candidates.length - 1; index >= 0; index -= 1) {
+			const shape = candidates[index];
 			// 将 viewport 点转换为 shape 容器坐标系
 			const local = shape.container.toLocal(new PixiPoint(point.x, point.y), viewport);
 			if (shape.containsPoint({ x: local.x, y: local.y })) {

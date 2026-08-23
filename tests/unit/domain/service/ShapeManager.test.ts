@@ -96,15 +96,15 @@ describe('ShapeManager', () => {
 	});
 
 	describe('getShapeByPoint', () => {
-		it('将 viewport 坐标转换为图形本地坐标并返回首个命中图形', () => {
-			const missedShape = createShape('missed');
-			const matchedShape = createShape('matched', true);
+		it('按从上到下的顺序转换本地坐标并返回首个命中图形', () => {
 			const uncheckedShape = createShape('unchecked', true);
+			const matchedShape = createShape('matched', true);
+			const missedShape = createShape('missed');
 			missedShape.container.toLocal.mockReturnValue({ x: 1, y: 2 });
 			matchedShape.container.toLocal.mockReturnValue({ x: 3, y: 4 });
-			manager.setShape(missedShape as unknown as BaseShape, false);
-			manager.setShape(matchedShape as unknown as BaseShape, false);
 			manager.setShape(uncheckedShape as unknown as BaseShape, false);
+			manager.setShape(matchedShape as unknown as BaseShape, false);
+			manager.setShape(missedShape as unknown as BaseShape, false);
 
 			const result = manager.getShapeByPoint({ x: 20, y: 30 });
 
@@ -117,6 +117,20 @@ describe('ShapeManager', () => {
 			expect(matchedShape.containsPoint).toHaveBeenCalledWith({ x: 3, y: 4 });
 			expect(uncheckedShape.container.toLocal).not.toHaveBeenCalled();
 			expect(result).toBe(matchedShape);
+		});
+
+		it('重叠图形命中时返回最后加入舞台的最上层图形', () => {
+			const bottomShape = createShape('bottom', true);
+			const topShape = createShape('top', true);
+
+			manager.setShape(bottomShape as unknown as BaseShape, false);
+			manager.setShape(topShape as unknown as BaseShape, false);
+
+			const result = manager.getShapeByPoint({ x: 10, y: 20 });
+
+			expect(result).toBe(topShape);
+			expect(topShape.container.toLocal).toHaveBeenCalledOnce();
+			expect(bottomShape.container.toLocal).not.toHaveBeenCalled();
 		});
 
 		it('没有图形命中时返回 undefined', () => {
