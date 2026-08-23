@@ -11,8 +11,10 @@ import {
 	type BasePropertyValue,
 	type LinePropertyValue,
 } from '@/shape/contract';
+import { MatrixService } from '@/common/service/MatrixService';
 
 const state: InteractionState = { hoveredShape: null };
+const matrixService = new MatrixService();
 
 function payload(x: number, y: number): EventPayload {
 	return {
@@ -98,6 +100,7 @@ describe('MoveHandler alignment snap', () => {
 			actionManager: { push },
 			actionLogManager: { setStreamStart: vi.fn(), setStreamEnd: vi.fn() },
 			alignmentSnapService,
+			matrixService,
 			ioc: {} as IocContainerService,
 		});
 

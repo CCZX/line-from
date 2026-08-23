@@ -20,6 +20,7 @@ import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 import { IocContainerService } from '@/common/contract';
 import { getShapesWorldBounds } from '@/domain/service/ShapeManager/ShapeBounds';
+import { IMatrixService } from '@/common/contract/MatrixService';
 
 const DRAG_THRESHOLD = 3;
 
@@ -48,6 +49,9 @@ export class MoveHandler implements IHandler {
 
 	@inject(IocContainerService)
 	private ioc!: IocContainerService;
+
+	@inject(IMatrixService)
+	private matrixService!: IMatrixService;
 
 	private isDragging = false;
 	private movingShapes: BaseShape[] = [];
@@ -216,6 +220,7 @@ export class MoveHandler implements IHandler {
 			  })
 			: { delta: rawDelta, guides: [] };
 		const { x: dx, y: dy } = snapped.delta;
+		const translation = this.matrixService.translationMatrix(dx, dy);
 
 		const shapeDatas: ShapeData[] = [];
 		for (const shape of this.movingShapes) {
@@ -224,17 +229,22 @@ export class MoveHandler implements IHandler {
 				continue;
 			}
 
+			const nextPosition = this.matrixService.transformPoint(translation, origin);
 			const properties: ShapeData['properties'] = {
-				base: { ...origin, x: origin.x + dx, y: origin.y + dy },
+				base: { ...origin, x: nextPosition.x, y: nextPosition.y },
 			};
 
 			const originLine = this.originLinePropsMap.get(shape.id);
 			if (originLine) {
+				const start = this.matrixService.transformPoint(translation, originLine.start);
+				const end = this.matrixService.transformPoint(translation, originLine.end);
 				properties.line = {
 					...originLine,
-					start: { ...originLine.start, x: originLine.start.x + dx, y: originLine.start.y + dy },
-					end: { ...originLine.end, x: originLine.end.x + dx, y: originLine.end.y + dy },
-					midPoints: originLine.midPoints?.map((mp) => ({ x: mp.x + dx, y: mp.y + dy })),
+					start: { ...originLine.start, ...start },
+					end: { ...originLine.end, ...end },
+					midPoints: originLine.midPoints?.map((point) =>
+						this.matrixService.transformPoint(translation, point),
+					),
 				};
 			}
 

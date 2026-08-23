@@ -1,4 +1,3 @@
-import { Point as PixiPoint } from '@pixi/core';
 import { BaseShape } from '@/shape/BaseShape';
 import { BaseProperty } from '@/shape/property/BaseProperty';
 import {
@@ -17,6 +16,8 @@ import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 import { IocContainerService } from '@/common/contract';
 import { SelectedBorder } from '@/shape/decorate/SelectedBorder';
+import { IViewportService } from '@/domain/contract/ViewportService';
+import { IMatrixService } from '@/common/contract/MatrixService';
 
 const MIN_SIZE = 10;
 const HANDLE_HIT_RADIUS = 8;
@@ -48,6 +49,12 @@ export class ResizeHandler implements IHandler {
 
 	@inject(ISelectService)
 	private selectService!: ISelectService;
+
+	@inject(IViewportService)
+	private viewportService!: IViewportService;
+
+	@inject(IMatrixService)
+	private matrixService!: IMatrixService;
 
 	private isResizing = false;
 	private resizingShape: BaseShape | null = null;
@@ -108,7 +115,7 @@ export class ResizeHandler implements IHandler {
 		this.actionLogManager.setStreamStart();
 
 		this.direction = handle;
-		this.startViewportPoint = payload.viewportPoint;
+		this.startViewportPoint = this.toWorldPoint(payload.viewportPoint);
 
 		const p = shape.getProperty<BaseProperty>(ShapePropertyEnum.Base).get();
 		this.originBaseProps = { ...p };
@@ -139,12 +146,11 @@ export class ResizeHandler implements IHandler {
 			return;
 		}
 
-		// 转换到容器本地坐标，适配旋转后的 resize
+		// 使用起始矩阵的逆矩阵转换到图形本地坐标，拖动过程中坐标系保持稳定。
 		const start = this.startViewportPoint!;
-		const localPoint = this.resizingShape.container.toLocal(
-			new PixiPoint(viewportPoint.x, viewportPoint.y),
-		);
-		const localStart = this.resizingShape.container.toLocal(new PixiPoint(start.x, start.y));
+		const inverse = this.matrixService.invertMatrix(this.createShapeMatrix(this.originBaseProps));
+		const localPoint = this.matrixService.transformPoint(inverse, this.toWorldPoint(viewportPoint));
+		const localStart = this.matrixService.transformPoint(inverse, start);
 		const dx = localPoint.x - localStart.x;
 		const dy = localPoint.y - localStart.y;
 
@@ -221,8 +227,11 @@ export class ResizeHandler implements IHandler {
 		const border = shape.getDecorate(ShapeDecorateTypeEnum.SelectedBorder) as SelectedBorder;
 		const { left, top, right, bottom } = border.getHandleBounds();
 
-		// 转换到容器本地坐标，适配旋转后的 resize 热区检测
-		const local = shape.container.toLocal(new PixiPoint(vp.x, vp.y));
+		const base = shape.getProperty<BaseProperty>(ShapePropertyEnum.Base).get();
+		const local = this.matrixService.transformPoint(
+			this.matrixService.invertMatrix(this.createShapeMatrix(base)),
+			this.toWorldPoint(vp),
+		);
 
 		const corners: { px: number; py: number; dir: ResizeDirection }[] = [
 			{ px: left, py: top, dir: ResizeDirection.TL },
@@ -280,6 +289,16 @@ export class ResizeHandler implements IHandler {
 		}
 
 		return null;
+	}
+
+	private createShapeMatrix(base: BasePropertyValue) {
+		return this.matrixService.createBoxTransformMatrix(base);
+	}
+
+	private toWorldPoint(viewportPoint: Point): Point {
+		return (
+			this.viewportService?.clientToViewportLocal(viewportPoint.x, viewportPoint.y) ?? viewportPoint
+		);
 	}
 
 	private reset() {

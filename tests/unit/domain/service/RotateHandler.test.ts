@@ -16,6 +16,7 @@ import {
 	ShapeStateEnum,
 	ShapeTypeEnum,
 } from '@/shape/contract';
+import { MatrixService } from '@/common/service/MatrixService';
 
 const state: InteractionState = { hoveredShape: null };
 
@@ -93,6 +94,7 @@ describe('RotateHandler', () => {
 			selectService: { getSelectedShapes: () => [shape] },
 			actionManager,
 			actionLogManager,
+			matrixService: new MatrixService(),
 			ioc,
 		});
 

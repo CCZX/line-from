@@ -1,5 +1,12 @@
 import { BaseProperty } from '@/shape/property/BaseProperty';
-import { BasePropertyValue, ShapeData, ShapePropertyEnum, ShapeStateEnum } from '@/shape/contract';
+import { LineProperty } from '@/shape/property/LineProperty';
+import {
+	BasePropertyValue,
+	LinePropertyValue,
+	ShapeData,
+	ShapePropertyEnum,
+	ShapeStateEnum,
+} from '@/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
 import { ISelectService } from '@/domain/contract/SelectService';
 import { IViewportService } from '@/domain/contract/ViewportService';
@@ -9,6 +16,7 @@ import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 import { IocContainerService } from '@/common/contract';
+import { IMatrixService } from '@/common/contract/MatrixService';
 
 const MIN_SIZE = 10;
 const HANDLE_HIT_RADIUS = 10;
@@ -48,11 +56,15 @@ export class MultiResizeHandler implements IHandler {
 	@inject(IocContainerService)
 	private ioc!: IocContainerService;
 
+	@inject(IMatrixService)
+	private matrixService!: IMatrixService;
+
 	private isResizing = false;
 	private direction: Dir | null = null;
 	private startLocalPoint: Point | null = null;
 	private originAABB: Rectangle | null = null;
 	private originShapeProps: Map<string, BasePropertyValue> = new Map();
+	private originLineProps: Map<string, LinePropertyValue> = new Map();
 
 	public enable(_state: InteractionState): boolean {
 		return this.selectService.getSelectedShapes().length >= 2;
@@ -142,10 +154,22 @@ export class MultiResizeHandler implements IHandler {
 
 		const selectedShapes = this.selectService.getSelectedShapes();
 		this.originShapeProps.clear();
+		this.originLineProps.clear();
 		for (const shape of selectedShapes) {
 			const p = shape.getProperty<BaseProperty>(ShapePropertyEnum.Base).get();
 			if (p) {
 				this.originShapeProps.set(shape.id, { ...p });
+			}
+			if (shape.hasProperty(ShapePropertyEnum.Line)) {
+				const line = shape.getProperty<LineProperty>(ShapePropertyEnum.Line)?.get();
+				if (line) {
+					this.originLineProps.set(shape.id, {
+						...line,
+						start: { ...line.start },
+						end: { ...line.end },
+						midPoints: line.midPoints?.map((point) => ({ ...point })),
+					});
+				}
 			}
 		}
 
@@ -184,6 +208,7 @@ export class MultiResizeHandler implements IHandler {
 
 		const scaleX = newAABB.width / ow;
 		const scaleY = newAABB.height / oh;
+		const resizeMatrix = this.matrixService.createRectMappingMatrix(this.originAABB, newAABB);
 
 		const selectedShapes = this.selectService.getSelectedShapes();
 		const shapeDatas: ShapeData[] = [];
@@ -193,20 +218,41 @@ export class MultiResizeHandler implements IHandler {
 				continue;
 			}
 
-			const relX = (origin.x - this.originAABB.x) / ow;
-			const relY = (origin.y - this.originAABB.y) / oh;
+			const originCenter = {
+				x: origin.x + origin.width / 2,
+				y: origin.y + origin.height / 2,
+			};
+			const nextCenter = this.matrixService.transformPoint(resizeMatrix, originCenter);
+			const width = Math.max(MIN_SIZE, origin.width * scaleX);
+			const height = Math.max(MIN_SIZE, origin.height * scaleY);
+			const properties: ShapeData['properties'] = {
+				base: {
+					...origin,
+					x: nextCenter.x - width / 2,
+					y: nextCenter.y - height / 2,
+					width,
+					height,
+				},
+			};
+
+			const originLine = this.originLineProps.get(shape.id);
+			if (originLine) {
+				const start = this.matrixService.transformPoint(resizeMatrix, originLine.start);
+				const end = this.matrixService.transformPoint(resizeMatrix, originLine.end);
+				properties.line = {
+					...originLine,
+					start: { ...originLine.start, ...start },
+					end: { ...originLine.end, ...end },
+					midPoints: originLine.midPoints?.map((point) =>
+						this.matrixService.transformPoint(resizeMatrix, point),
+					),
+				};
+			}
 
 			shapeDatas.push({
 				id: shape.id,
 				type: shape.type,
-				properties: {
-					base: {
-						x: newAABB.x + relX * newAABB.width,
-						y: newAABB.y + relY * newAABB.height,
-						width: Math.max(MIN_SIZE, origin.width * scaleX),
-						height: Math.max(MIN_SIZE, origin.height * scaleY),
-					},
-				},
+				properties,
 			});
 		}
 		this.actionManager.push(new UpdatePropsAction(shapeDatas, this.ioc));
@@ -279,5 +325,6 @@ export class MultiResizeHandler implements IHandler {
 		this.startLocalPoint = null;
 		this.originAABB = null;
 		this.originShapeProps.clear();
+		this.originLineProps.clear();
 	}
 }

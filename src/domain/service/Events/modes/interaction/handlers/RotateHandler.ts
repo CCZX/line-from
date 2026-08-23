@@ -1,4 +1,3 @@
-import { Point as PixiPoint } from '@pixi/core';
 import { BaseShape } from '@/shape/BaseShape';
 import { BaseProperty } from '@/shape/property/BaseProperty';
 import { SelectedBorder } from '@/shape/decorate/SelectedBorder';
@@ -16,6 +15,8 @@ import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAc
 import { IocContainerService } from '@/common/contract';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
+import { IViewportService } from '@/domain/contract/ViewportService';
+import { IMatrixService } from '@/common/contract/MatrixService';
 
 const ROTATE_HANDLE_HIT_RADIUS = 12;
 
@@ -36,10 +37,16 @@ export class RotateHandler implements IHandler {
 	@inject(IocContainerService)
 	private ioc!: IocContainerService;
 
+	@inject(IViewportService)
+	private viewportService!: IViewportService;
+
+	@inject(IMatrixService)
+	private matrixService!: IMatrixService;
+
 	private isRotating = false;
 	private rotatingShape: BaseShape | null = null;
 	private originRotation = 0;
-	private startPointerAngle = 0;
+	private startPointerVector: Point | null = null;
 
 	public enable(_state: InteractionState): boolean {
 		const selectedShapes = this.selectService.getSelectedShapes();
@@ -71,7 +78,7 @@ export class RotateHandler implements IHandler {
 			return false;
 		}
 
-		if (this.isOverRotateHandle(this.selectService.getSelectedShapes()[0], payload.viewportPoint)) {
+		if (this.isOverRotateHandle(this.selectService.getSelectedShapes()[0], payload)) {
 			document.body.style.cursor = 'grabbing';
 			return false;
 		}
@@ -81,13 +88,13 @@ export class RotateHandler implements IHandler {
 
 	private handlePointerDown(payload: EventPayload): boolean {
 		const shape = this.selectService.getSelectedShapes()[0];
-		if (!this.isOverRotateHandle(shape, payload.viewportPoint)) {
+		if (!this.isOverRotateHandle(shape, payload)) {
 			return true;
 		}
 
 		const p = shape.getProperty<BaseProperty>(ShapePropertyEnum.Base).get() as BasePropertyValue;
 		this.originRotation = p.rotation || 0;
-		this.startPointerAngle = this.getPointerAngle(shape, payload.viewportPoint);
+		this.startPointerVector = this.getPointerVector(shape, payload.viewportPoint);
 		this.actionLogManager.setStreamStart();
 
 		this.isRotating = true;
@@ -105,16 +112,23 @@ export class RotateHandler implements IHandler {
 		return this.finishRotate();
 	}
 
-	private applyRotate(vp: Point) {
-		if (!this.rotatingShape) {
+	private applyRotate(viewportPoint: Point) {
+		if (!this.rotatingShape || !this.startPointerVector) {
 			return;
 		}
 
-		const pointerAngle = this.getPointerAngle(this.rotatingShape, vp);
-		const angle = this.originRotation + pointerAngle - this.startPointerAngle;
-
-		// 规范化角度为 0-360
-		const normalized = ((angle % 360) + 360) % 360;
+		const pointerVector = this.getPointerVector(this.rotatingShape, viewportPoint);
+		const deltaRotation = this.matrixService.rotationBetweenVectors(
+			this.startPointerVector,
+			pointerVector,
+		);
+		const nextRotation = this.matrixService.composeMatrices(
+			deltaRotation,
+			this.matrixService.rotationMatrix(this.originRotation),
+		);
+		const normalized = this.matrixService.normalizeDegrees(
+			this.matrixService.getMatrixRotation(nextRotation),
+		);
 
 		const base = this.rotatingShape
 			.getProperty<BaseProperty>(ShapePropertyEnum.Base)
@@ -147,38 +161,51 @@ export class RotateHandler implements IHandler {
 		return false;
 	}
 
-	private isOverRotateHandle(shape: BaseShape, vp: Point): boolean {
+	private isOverRotateHandle(shape: BaseShape, payload: EventPayload): boolean {
 		const border = shape.getDecorate(ShapeDecorateTypeEnum.SelectedBorder) as SelectedBorder;
 		if (!border) {
 			return false;
 		}
 
 		const localCenter = border.getRotateHandleCenter();
-		// 转换到世界坐标
-		const global = shape.container.toGlobal(new PixiPoint(localCenter.x, localCenter.y));
-		const threshold = ROTATE_HANDLE_HIT_RADIUS;
+		const base = shape.getProperty<BaseProperty>(ShapePropertyEnum.Base).get() as BasePropertyValue;
+		const global = this.matrixService.transformPoint(this.createShapeMatrix(base), localCenter);
+		const worldPoint = this.toWorldPoint(payload.viewportPoint);
+		const threshold = ROTATE_HANDLE_HIT_RADIUS / payload.scale;
 
-		return Math.abs(vp.x - global.x) < threshold && Math.abs(vp.y - global.y) < threshold;
+		return (
+			Math.abs(worldPoint.x - global.x) < threshold && Math.abs(worldPoint.y - global.y) < threshold
+		);
 	}
 
-	/**
-	 * 正右方：0°
-	 * 正下方：90°
-	 * 正左方：180° 或 -180°
-	 * 正上方：-90°
-	 */
-	private getPointerAngle(shape: BaseShape, vp: Point): number {
-		// pivot 是图形的旋转中心；转成全局坐标后可正确适配视口缩放和平移。
-		const center = shape.container.toGlobal(
-			new PixiPoint(shape.container.pivot.x, shape.container.pivot.y),
+	private getPointerVector(shape: BaseShape, viewportPoint: Point): Point {
+		const base = shape.getProperty<BaseProperty>(ShapePropertyEnum.Base).get() as BasePropertyValue;
+		const matrix = this.createShapeMatrix(base);
+		const center = this.matrixService.transformPoint(matrix, {
+			x: base.width / 2,
+			y: base.height / 2,
+		});
+		const worldPoint = this.toWorldPoint(viewportPoint);
+		return this.matrixService.transformPoint(
+			this.matrixService.translationMatrix(-center.x, -center.y),
+			worldPoint,
 		);
-		return Math.atan2(vp.y - center.y, vp.x - center.x) * (180 / Math.PI);
+	}
+
+	private createShapeMatrix(base: BasePropertyValue) {
+		return this.matrixService.createBoxTransformMatrix(base);
+	}
+
+	private toWorldPoint(viewportPoint: Point): Point {
+		return (
+			this.viewportService?.clientToViewportLocal(viewportPoint.x, viewportPoint.y) ?? viewportPoint
+		);
 	}
 
 	private reset() {
 		this.isRotating = false;
 		this.rotatingShape = null;
 		this.originRotation = 0;
-		this.startPointerAngle = 0;
+		this.startPointerVector = null;
 	}
 }
