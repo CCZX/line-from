@@ -138,6 +138,7 @@ export class TextEditorService implements ITextEditorService {
 		textarea.addEventListener('keydown', this.onKeyDown);
 		textarea.addEventListener('input', this.syncEditorPosition);
 		textarea.addEventListener('blur', this.onBlur);
+		textarea.addEventListener('wheel', this.onWheel, { passive: false });
 		document.body.appendChild(textarea);
 		i18n.on('languageChanged', () => {
 			textarea.setAttribute('aria-label', i18n.t('editor.editText'));
@@ -239,6 +240,11 @@ export class TextEditorService implements ITextEditorService {
 		if (shape?.getState() === ShapeStateEnum.Edit) {
 			shape.setState(ShapeStateEnum.Selected);
 		}
+	};
+
+	private onWheel = (event: WheelEvent): void => {
+		// textarea 覆盖在 canvas 上时，滚轮事件不会到达 Viewport；阻止浏览器滚动或缩放页面。
+		event.preventDefault();
 	};
 
 	private teardown(shape: TextEditableShape): void {
