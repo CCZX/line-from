@@ -18,8 +18,8 @@ function createHandler(activeTool: ToolType) {
 		ioc: {} as IocContainerService,
 		actionManager: { push },
 		actionLogManager: { setStreamStart, setStreamEnd },
+		connectionSnapService: { resolveEndpoint: vi.fn(() => null) },
 		shapeManager: {
-			getShapeByPoint: vi.fn(() => undefined),
 			getShapeById: vi.fn(() => undefined),
 		},
 		viewportService: {

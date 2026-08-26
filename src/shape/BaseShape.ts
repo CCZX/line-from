@@ -258,6 +258,18 @@ export abstract class BaseShape<T extends Container = Container> {
 		return isPointInRect(localPoint, this.getBounds());
 	}
 
+	/** 本地坐标点到图形轮廓的最短距离；图形内部返回 0。 */
+	public distanceToPoint(localPoint: Point): number {
+		if (this.containsPoint(localPoint)) {
+			return 0;
+		}
+
+		const bounds = this.getBounds();
+		const dx = Math.max(bounds.x - localPoint.x, 0, localPoint.x - (bounds.x + bounds.width));
+		const dy = Math.max(bounds.y - localPoint.y, 0, localPoint.y - (bounds.y + bounds.height));
+		return Math.hypot(dx, dy);
+	}
+
 	/** 供支持文字的图形在尺寸变化后重新布局，默认图形无需处理 */
 	public layoutText(): void {}
 

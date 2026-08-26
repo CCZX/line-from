@@ -11,9 +11,8 @@ import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
 import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
 import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
 import { IViewportService } from '@/domain/contract/ViewportService';
-import { IShapeManager } from '@/domain/contract';
 import { ISelectService } from '@/domain/contract/SelectService';
-import { getShapeAnchorPoint } from '@/shape/geometry';
+import { IConnectionSnapService } from '@/domain/contract/ConnectionSnapService';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 import { IocContainerService } from '@/common/contract';
@@ -42,14 +41,14 @@ export class LineEditHandler implements IHandler {
 	@inject(IViewportService)
 	private viewportService!: IViewportService;
 
-	@inject(IShapeManager)
-	private shapeManager!: IShapeManager;
-
 	@inject(IocContainerService)
 	private ioc!: IocContainerService;
 
 	@inject(ISelectService)
 	private selectService!: ISelectService;
+
+	@inject(IConnectionSnapService)
+	private connectionSnapService!: IConnectionSnapService;
 
 	private isDragging = false;
 	private draggingShape: BaseShape | null = null;
@@ -183,14 +182,14 @@ export class LineEditHandler implements IHandler {
 		const newValue = this.cloneValue(line.value);
 		const target = this.dragTarget;
 		if (target.kind === 'start') {
-			const snapped = this.trySnapToShape(point, shape.id, newValue.end);
+			const snapped = this.trySnapToShape(point, shape.id, payload.scale);
 			if (snapped) {
 				newValue.start = snapped;
 			} else {
 				newValue.start = { x: point.x, y: point.y };
 			}
 		} else if (target.kind === 'end') {
-			const snapped = this.trySnapToShape(point, shape.id, newValue.start);
+			const snapped = this.trySnapToShape(point, shape.id, payload.scale);
 			if (snapped) {
 				newValue.end = snapped;
 			} else {
@@ -293,19 +292,13 @@ export class LineEditHandler implements IHandler {
 	private trySnapToShape(
 		point: Point,
 		excludeId: string,
-		refEndpoint: LineEndpointValue,
+		viewportScale: number,
 	): LineEndpointValue | null {
-		const snapShape = this.shapeManager.getShapeByPoint(point);
-		if (!snapShape || snapShape.id === excludeId || !snapShape.acceptsConnections) {
-			return null;
-		}
-		const anchorPt = getShapeAnchorPoint(snapShape, 'auto', refEndpoint);
-		return {
-			x: anchorPt.x,
-			y: anchorPt.y,
-			shapeId: snapShape.id,
-			anchor: 'auto',
-		};
+		return this.connectionSnapService.resolveEndpoint({
+			point,
+			viewportScale,
+			excludeIds: new Set([excludeId]),
+		});
 	}
 
 	private reset() {

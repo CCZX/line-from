@@ -8,6 +8,7 @@ import type { LineEndpointValue } from '@/shape/contract';
 interface ConnectionCreateHandlerInternals {
 	createLine(start: LineEndpointValue, end: LineEndpointValue): void;
 	updateLine(end: LineEndpointValue): void;
+	trySnapEndpoint(point: Point, sourceId: string, viewportScale: number): LineEndpointValue;
 	finish(): void;
 }
 
@@ -51,6 +52,26 @@ describe('ConnectionCreateHandler', () => {
 				base: { x: 10, y: 20, width: 70, height: 80 },
 				line: { start, end: finalEnd },
 			},
+		});
+	});
+
+	it('将当前端点和排除图形交给吸附服务解析', () => {
+		const snapped = { x: 160, y: 180, shapeId: 'target', anchor: 'bottom' as const };
+		const resolveEndpoint = vi.fn(() => snapped);
+		const handler = new ConnectionCreateHandler();
+		Object.assign(handler, {
+			connectionSnapService: { resolveEndpoint },
+		});
+
+		const endpoint = (
+			handler as unknown as ConnectionCreateHandlerInternals
+		).trySnapEndpoint({ x: 160, y: 190 }, 'source', 1);
+
+		expect(endpoint).toEqual(snapped);
+		expect(resolveEndpoint).toHaveBeenCalledWith({
+			point: { x: 160, y: 190 },
+			viewportScale: 1,
+			excludeIds: new Set(['source']),
 		});
 	});
 });

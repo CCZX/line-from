@@ -20,7 +20,7 @@ import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
 import { IShapeManager } from '@/domain/contract';
 import { ISelectService } from '@/domain/contract/SelectService';
 import { IViewportService } from '@/domain/contract/ViewportService';
-import { getShapeAnchorPoint } from '@/shape/geometry';
+import { IConnectionSnapService } from '@/domain/contract/ConnectionSnapService';
 import { BaseProperty } from '@/shape/property/BaseProperty';
 import { LineProperty } from '@/shape/property/LineProperty';
 import { inject } from 'inversify';
@@ -92,6 +92,9 @@ export class CreateHandler implements IHandler {
 	@inject(IViewportService)
 	private viewportService!: IViewportService;
 
+	@inject(IConnectionSnapService)
+	private connectionSnapService!: IConnectionSnapService;
+
 	@inject(IToolService)
 	private toolService!: IToolService;
 
@@ -136,7 +139,7 @@ export class CreateHandler implements IHandler {
 			this.actionLogManager.setStreamStart();
 
 			if (type === ShapeTypeEnum.Line) {
-				const startEndpoint = this.trySnapEndpoint(localPoint, null);
+				const startEndpoint = this.trySnapEndpoint(localPoint, payload.scale);
 
 				const shapeData: ShapeData = {
 					id: nextId(),
@@ -198,7 +201,7 @@ export class CreateHandler implements IHandler {
 		);
 
 		if (this.creatingType === ShapeTypeEnum.Line) {
-			this.pushLineUpdate(cur);
+			this.pushLineUpdate(cur, payload.scale);
 		} else {
 			this.pushBase(this.computeBase(cur));
 		}
@@ -226,9 +229,9 @@ export class CreateHandler implements IHandler {
 		if (this.creatingType === ShapeTypeEnum.Line) {
 			const isClick = Math.abs(dx) < DRAG_THRESHOLD && Math.abs(dy) < DRAG_THRESHOLD;
 			if (isClick) {
-				this.pushLineUpdate({ x: start.x + 100, y: start.y });
+				this.pushLineUpdate({ x: start.x + 100, y: start.y }, payload.scale);
 			} else {
-				this.pushLineUpdate(cur);
+				this.pushLineUpdate(cur, payload.scale);
 			}
 		} else {
 			const isClick = Math.abs(dx) < DRAG_THRESHOLD && Math.abs(dy) < DRAG_THRESHOLD;
@@ -285,7 +288,7 @@ export class CreateHandler implements IHandler {
 		);
 	}
 
-	private pushLineUpdate(cur: Point) {
+	private pushLineUpdate(cur: Point, viewportScale: number) {
 		const shape = this.shapeManager.getShapeById(this.creatingId!);
 		if (!shape) {
 			return;
@@ -296,7 +299,7 @@ export class CreateHandler implements IHandler {
 			return;
 		}
 
-		const endEndpoint = this.trySnapEndpoint(cur, line.start);
+		const endEndpoint = this.trySnapEndpoint(cur, viewportScale);
 		const base = shape.getProperty<BaseProperty>(ShapePropertyEnum.Base).get();
 
 		this.actionManager.push(
@@ -313,13 +316,15 @@ export class CreateHandler implements IHandler {
 		);
 	}
 
-	/** 检测点是否在某图形上，返回带 shapeId/anchor 的端点，否则返回自由坐标端点 */
-	private trySnapEndpoint(point: Point, refEndpoint: LineEndpointValue | null): LineEndpointValue {
-		const snapShape = this.shapeManager.getShapeByPoint(point);
-		if (snapShape?.acceptsConnections && snapShape.id !== this.creatingId) {
-			const ref = refEndpoint ?? point;
-			const anchorPt = getShapeAnchorPoint(snapShape, 'auto', ref);
-			return { x: anchorPt.x, y: anchorPt.y, shapeId: snapShape.id, anchor: 'auto' };
+	/** 检测点是否落在图形或其吸附范围内，返回绑定端点，否则返回自由坐标端点。 */
+	private trySnapEndpoint(point: Point, viewportScale: number): LineEndpointValue {
+		const snapped = this.connectionSnapService.resolveEndpoint({
+			point,
+			viewportScale,
+			excludeIds: new Set(this.creatingId ? [this.creatingId] : []),
+		});
+		if (snapped) {
+			return snapped;
 		}
 		return { x: point.x, y: point.y };
 	}

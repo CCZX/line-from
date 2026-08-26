@@ -1,6 +1,6 @@
 import { Graphics } from '@pixi/graphics';
 import { FillPropertyValue, ShapeContext, ShapeTypeEnum, StrokePropertyValue } from './contract';
-import { getDiamondPoints, isPointInDiamond } from './geometry';
+import { distToSegment, getDiamondPoints, isPointInDiamond } from './geometry';
 import { ClosedShape } from './ClosedShape';
 import { drawSketchyDiamond, drawSketchyFillDiamond } from './property/style';
 import type { TextLayoutBounds } from './TextEditableShape';
@@ -17,6 +17,20 @@ export class Diamond extends ClosedShape {
 	public override containsPoint(localPoint: Point): boolean {
 		const { width, height } = this.getWH();
 		return isPointInDiamond(localPoint, width, height);
+	}
+
+	public override distanceToPoint(localPoint: Point): number {
+		const { width, height } = this.getWH();
+		if (isPointInDiamond(localPoint, width, height)) {
+			return 0;
+		}
+
+		const points = getDiamondPoints(width, height);
+		return Math.min(
+			...points.map((point, index) =>
+				distToSegment(localPoint, point, points[(index + 1) % points.length]),
+			),
+		);
 	}
 
 	public override getTextLayoutBounds(): TextLayoutBounds {

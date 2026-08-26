@@ -216,6 +216,40 @@ export function sampleCurvePoints(points: Point[], samplesPerSegment = 16): Poin
 	return out;
 }
 
+export type ShapeSideAnchor = Exclude<NonNullable<LineEndpointValue['anchor']>, 'auto' | 'center'>;
+
+export interface NearestShapeAnchor {
+	anchor: ShapeSideAnchor;
+	point: Point;
+}
+
+/** 根据参考点选出矩形四边中最近的锚点。 */
+export function getNearestAnchorPoint(
+	base: BasePropertyValue,
+	refPoint: Point,
+): NearestShapeAnchor {
+	const { x, y, width, height } = base;
+	const cx = x + width / 2;
+	const cy = y + height / 2;
+	const sides: NearestShapeAnchor[] = [
+		{ anchor: 'top', point: { x: cx, y } },
+		{ anchor: 'right', point: { x: x + width, y: cy } },
+		{ anchor: 'bottom', point: { x: cx, y: y + height } },
+		{ anchor: 'left', point: { x, y: cy } },
+	];
+
+	let nearest = sides[0];
+	let nearestDistance = Infinity;
+	for (const side of sides) {
+		const distance = Math.hypot(side.point.x - refPoint.x, side.point.y - refPoint.y);
+		if (distance < nearestDistance) {
+			nearest = side;
+			nearestDistance = distance;
+		}
+	}
+	return nearest;
+}
+
 /** 计算图形某方向锚点的世界坐标 */
 export function getAnchorPoint(
 	base: BasePropertyValue,
@@ -243,27 +277,10 @@ export function getAnchorPoint(
 	}
 
 	// auto: 根据参考点选最近边的中点，无参考点则 center
-	const sides: { anchor: NonNullable<LineEndpointValue['anchor']>; pt: Point }[] = [
-		{ anchor: 'top', pt: { x: cx, y } },
-		{ anchor: 'bottom', pt: { x: cx, y: y + height } },
-		{ anchor: 'left', pt: { x, y: cy } },
-		{ anchor: 'right', pt: { x: x + width, y: cy } },
-	];
-
 	if (!refPoint) {
 		return { x: cx, y: cy };
 	}
-
-	let best = sides[0];
-	let bestDist = Infinity;
-	for (const s of sides) {
-		const d = Math.hypot(s.pt.x - refPoint.x, s.pt.y - refPoint.y);
-		if (d < bestDist) {
-			bestDist = d;
-			best = s;
-		}
-	}
-	return best.pt;
+	return getNearestAnchorPoint(base, refPoint).point;
 }
 
 /** 从图形实例获取锚点世界坐标 */
@@ -288,6 +305,27 @@ export function getShapeAnchorPoint(
 	const localRef = refPoint ? rotatePoint(refPoint, center, -radians) : undefined;
 	const unrotatedAnchor = getAnchorPoint(base, anchor, localRef);
 	return rotatePoint(unrotatedAnchor, center, radians);
+}
+
+/** 根据当前拖拽端点选择图形最近的一边，并返回可持久化的明确锚点方向。 */
+export function getNearestShapeAnchor(shape: BaseShape, refPoint: Point): NearestShapeAnchor {
+	const base = shape.getProperty<BaseProperty>(ShapePropertyEnum.Base).get();
+	const rotation = base.rotation ?? 0;
+	if (rotation === 0) {
+		return getNearestAnchorPoint(base, refPoint);
+	}
+
+	const center = {
+		x: base.x + base.width / 2,
+		y: base.y + base.height / 2,
+	};
+	const radians = (rotation * Math.PI) / 180;
+	const localRef = rotatePoint(refPoint, center, -radians);
+	const nearest = getNearestAnchorPoint(base, localRef);
+	return {
+		anchor: nearest.anchor,
+		point: rotatePoint(nearest.point, center, radians),
+	};
 }
 
 function rotatePoint(point: Point, center: Point, radians: number): Point {

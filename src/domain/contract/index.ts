@@ -10,3 +10,4 @@ export * from './ShortcutKey';
 export * from './ToolService';
 export * from './Action';
 export * from './AlignmentSnapService';
+export * from './ConnectionSnapService';

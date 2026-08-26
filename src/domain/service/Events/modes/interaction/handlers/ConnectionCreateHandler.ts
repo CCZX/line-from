@@ -7,7 +7,6 @@ import {
 	IHandler,
 	InteractionState,
 } from '@/domain/contract/EventManager';
-import { IShapeManager } from '@/domain/contract/ShapeManager';
 import { ISelectService } from '@/domain/contract/SelectService';
 import { IViewportService } from '@/domain/contract/ViewportService';
 import { CreateShapeAction } from '@/domain/service/Action/Actions/CreateShapeAction';
@@ -26,6 +25,7 @@ import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 import { IHandlerWithInteraction } from '@/domain/contract';
 import { SHAPE_COLORS } from '@/common/color';
+import { IConnectionSnapService } from '@/domain/contract/ConnectionSnapService';
 
 const HANDLE_HIT_RADIUS = 9;
 const DRAG_THRESHOLD = 3;
@@ -56,11 +56,11 @@ export class ConnectionCreateHandler implements IHandler {
 	@inject(IActionLogManager)
 	private actionLogManager!: IActionLogManager;
 
-	@inject(IShapeManager)
-	private shapeManager!: IShapeManager;
-
 	@inject(IViewportService)
 	private viewportService!: IViewportService;
+
+	@inject(IConnectionSnapService)
+	private connectionSnapService!: IConnectionSnapService;
 
 	@inject(ISelectService)
 	private selectService!: ISelectService;
@@ -132,7 +132,7 @@ export class ConnectionCreateHandler implements IHandler {
 			shapeId: shape.id,
 			anchor,
 		};
-		const endEndpoint = this.trySnapEndpoint(current, shape.id, startEndpoint);
+		const endEndpoint = this.trySnapEndpoint(current, shape.id, payload.scale);
 
 		if (!this.creatingData) {
 			this.createLine(startEndpoint, endEndpoint);
@@ -161,7 +161,7 @@ export class ConnectionCreateHandler implements IHandler {
 				shapeId: this.sourceShape.id,
 				anchor: this.sourceAnchor,
 			};
-			const endEndpoint = this.trySnapEndpoint(current, this.sourceShape.id, startEndpoint);
+			const endEndpoint = this.trySnapEndpoint(current, this.sourceShape.id, payload.scale);
 			if (!this.creatingData) {
 				this.createLine(startEndpoint, endEndpoint);
 			} else {
@@ -249,20 +249,16 @@ export class ConnectionCreateHandler implements IHandler {
 	private trySnapEndpoint(
 		point: Point,
 		sourceId: string,
-		refEndpoint: LineEndpointValue,
+		viewportScale: number,
 	): LineEndpointValue {
-		const target = this.shapeManager.getShapeByPoint(point);
-		if (!target || target.id === sourceId || !target.acceptsConnections) {
-			return { x: point.x, y: point.y };
-		}
-
-		const anchorPoint = getShapeAnchorPoint(target, 'auto', refEndpoint);
-		return {
-			x: anchorPoint.x,
-			y: anchorPoint.y,
-			shapeId: target.id,
-			anchor: 'auto',
-		};
+		const snapped = this.connectionSnapService.resolveEndpoint({
+			point,
+			viewportScale,
+			excludeIds: new Set(
+				[sourceId, this.creatingData?.id].filter((id): id is string => Boolean(id)),
+			),
+		});
+		return snapped ?? { x: point.x, y: point.y };
 	}
 
 	private getLineBounds(start: Point, end: Point) {

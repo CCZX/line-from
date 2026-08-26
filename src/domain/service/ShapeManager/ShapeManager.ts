@@ -1,6 +1,6 @@
 import { Point as PixiPoint } from '@pixi/core';
 import { BaseShape } from '@/shape/BaseShape';
-import { IShapeManager, IViewportService } from '../../contract';
+import { IShapeManager, IViewportService, type ShapeHitTestOptions } from '../../contract';
 import { provide } from 'inversify-binding-decorators';
 import { inject } from 'inversify';
 import { QuadTreeManager } from './QuadTreeManager';
@@ -46,17 +46,51 @@ export class ShapeManager implements IShapeManager {
 		return this.shapes.get(id);
 	}
 
-	public getShapeByPoint(point: Point) {
+	public getShapeByPoint(point: Point, options: ShapeHitTestOptions = {}) {
 		const viewport = this.viewportService.getStage().getViewport();
-		const candidates = this.getShapesByRect({ x: point.x, y: point.y, width: 0, height: 0 });
+		const requestedHitSlop = options.hitSlop ?? 0;
+		const hitSlop = Number.isFinite(requestedHitSlop) ? Math.max(0, requestedHitSlop) : 0;
+		const candidates = this.getShapesByRect({
+			x: point.x - hitSlop,
+			y: point.y - hitSlop,
+			width: hitSlop * 2,
+			height: hitSlop * 2,
+		});
+		const misses: Array<{ shape: BaseShape; localPoint: Point }> = [];
+
 		for (let index = candidates.length - 1; index >= 0; index -= 1) {
 			const shape = candidates[index];
+			if (options.filter && !options.filter(shape)) {
+				continue;
+			}
+
 			// 将 viewport 点转换为 shape 容器坐标系
 			const local = shape.container.toLocal(new PixiPoint(point.x, point.y), viewport);
-			if (shape.containsPoint({ x: local.x, y: local.y })) {
+			const localPoint = { x: local.x, y: local.y };
+			if (shape.containsPoint(localPoint)) {
 				return shape;
 			}
+			misses.push({ shape, localPoint });
 		}
+
+		// 精确命中优先；只有指针不在任何候选图形内时才使用扩展命中区。
+		if (hitSlop === 0) {
+			return undefined;
+		}
+
+		let nearestShape: BaseShape | undefined;
+		let nearestDistance = hitSlop;
+		for (const { shape, localPoint } of misses) {
+			const distance = shape.distanceToPoint(localPoint);
+			if (distance > hitSlop) {
+				continue;
+			}
+			if (!nearestShape || distance < nearestDistance) {
+				nearestShape = shape;
+				nearestDistance = distance;
+			}
+		}
+		return nearestShape;
 	}
 
 	public getShapesByRect(rect: Rectangle): BaseShape[] {

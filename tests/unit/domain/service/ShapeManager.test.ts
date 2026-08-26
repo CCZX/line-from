@@ -17,6 +17,7 @@ interface ShapeMock {
 	getBounds: Mock;
 	getWorldBounds: Mock;
 	containsPoint: Mock;
+	distanceToPoint: Mock;
 }
 
 function createShape(id: string, containsPoint = false, x = 0, y = 0): ShapeMock {
@@ -39,6 +40,7 @@ function createShape(id: string, containsPoint = false, x = 0, y = 0): ShapeMock
 			height: 100,
 		})),
 		containsPoint: vi.fn(() => containsPoint),
+		distanceToPoint: vi.fn(() => Infinity),
 	};
 	return shape;
 }
@@ -148,6 +150,44 @@ describe('ShapeManager', () => {
 
 			expect(manager.getShapeByPoint({ x: 0, y: 0 })).toBe(nearShape);
 			expect(farShape.container.toLocal).not.toHaveBeenCalled();
+		});
+
+		it('过滤不可连接的上层图形后继续命中下层图形', () => {
+			const targetShape = createShape('target', true);
+			const coveringShape = createShape('covering', true);
+			manager.setShape(targetShape as unknown as BaseShape, false);
+			manager.setShape(coveringShape as unknown as BaseShape, false);
+
+			const result = manager.getShapeByPoint(
+				{ x: 0, y: 0 },
+				{ filter: (shape) => shape.id !== coveringShape.id },
+			);
+
+			expect(result).toBe(targetShape);
+			expect(coveringShape.container.toLocal).not.toHaveBeenCalled();
+		});
+
+		it('在扩展命中距离内吸附到最近图形', () => {
+			const fartherShape = createShape('farther');
+			const nearerShape = createShape('nearer');
+			fartherShape.distanceToPoint.mockReturnValue(10);
+			nearerShape.distanceToPoint.mockReturnValue(5);
+			manager.setShape(fartherShape as unknown as BaseShape, false);
+			manager.setShape(nearerShape as unknown as BaseShape, false);
+
+			const result = manager.getShapeByPoint({ x: 55, y: 0 }, { hitSlop: 12 });
+
+			expect(result).toBe(nearerShape);
+			expect(fartherShape.distanceToPoint).toHaveBeenCalledOnce();
+			expect(nearerShape.distanceToPoint).toHaveBeenCalledOnce();
+		});
+
+		it('扩展命中距离外不返回图形', () => {
+			const shape = createShape('shape-1');
+			shape.distanceToPoint.mockReturnValue(13);
+			manager.setShape(shape as unknown as BaseShape, false);
+
+			expect(manager.getShapeByPoint({ x: 55, y: 0 }, { hitSlop: 12 })).toBeUndefined();
 		});
 	});
 

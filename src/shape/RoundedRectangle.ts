@@ -18,6 +18,16 @@ export class RoundedRectangle extends ClosedShape {
 		return isPointInRoundedRect(localPoint, width, height, getRoundedRectRadius(width, height));
 	}
 
+	public override distanceToPoint(localPoint: Point): number {
+		const { width, height } = this.getWH();
+		const radius = getRoundedRectRadius(width, height);
+		const x = Math.abs(localPoint.x - width / 2) - (width / 2 - radius);
+		const y = Math.abs(localPoint.y - height / 2) - (height / 2 - radius);
+		const signedDistance =
+			Math.hypot(Math.max(x, 0), Math.max(y, 0)) + Math.min(Math.max(x, y), 0) - radius;
+		return Math.max(0, signedDistance);
+	}
+
 	protected drawPath(graphics: Graphics, width: number, height: number): void {
 		graphics.drawRoundedRect(0, 0, width, height, getRoundedRectRadius(width, height));
 	}

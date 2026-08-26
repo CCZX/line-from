@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
 	getDiamondPoints,
+	getNearestAnchorPoint,
+	getNearestShapeAnchor,
 	getRoundedRectRadius,
 	isPointInDiamond,
 	isPointInRoundedRect,
 } from '@/shape/geometry';
+import type { BaseShape } from '@/shape/BaseShape';
+import { ShapePropertyEnum } from '@/shape/contract';
 
 describe('shape geometry', () => {
 	it('生成菱形四个方向的顶点', () => {
@@ -28,5 +32,34 @@ describe('shape geometry', () => {
 		expect(isPointInRoundedRect({ x: 0, y: 0 }, 100, 80, 16)).toBe(false);
 		expect(isPointInRoundedRect({ x: 8, y: 8 }, 100, 80, 16)).toBe(true);
 		expect(isPointInRoundedRect({ x: 50, y: 40 }, 100, 80, 16)).toBe(true);
+	});
+
+	it('根据当前端点位置选择最近的图形边', () => {
+		const base = { x: 100, y: 200, width: 120, height: 80 };
+
+		expect(getNearestAnchorPoint(base, { x: 230, y: 240 })).toEqual({
+			anchor: 'right',
+			point: { x: 220, y: 240 },
+		});
+		expect(getNearestAnchorPoint(base, { x: 160, y: 290 })).toEqual({
+			anchor: 'bottom',
+			point: { x: 160, y: 280 },
+		});
+	});
+
+	it('旋转图形按自身方向选择离当前端点最近的边', () => {
+		const base = { x: 0, y: 0, width: 100, height: 60, rotation: 90 };
+		const shape = {
+			getProperty: (type: ShapePropertyEnum) => {
+				expect(type).toBe(ShapePropertyEnum.Base);
+				return { get: () => base };
+			},
+		} as unknown as BaseShape;
+
+		const nearest = getNearestShapeAnchor(shape, { x: 90, y: 30 });
+
+		expect(nearest.anchor).toBe('top');
+		expect(nearest.point.x).toBeCloseTo(80);
+		expect(nearest.point.y).toBeCloseTo(30);
 	});
 });
