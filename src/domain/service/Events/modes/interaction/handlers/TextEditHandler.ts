@@ -1,10 +1,12 @@
 import { ShapeStateEnum } from '@/shape/contract';
+import { Point as PixiPoint } from '@pixi/core';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
 import {
 	IHandlerWithInteraction,
 	IHandler,
 	ISelectService,
 	IShapeManager,
+	ITextSelectionService,
 } from '@/domain/contract';
 import { IViewportService } from '@/domain/contract/ViewportService';
 import { inject } from 'inversify';
@@ -24,7 +26,8 @@ interface PointerDownSnapshot {
 @provide(IHandlerWithInteraction)
 export class TextEditHandler implements IHandler {
 	public type: HandlerEnum = HandlerEnum.TextEdit;
-	public sort = 70;
+	// 编辑态的选区交互必须先于 Select/Move，否则点击文字会被当成移动图形。
+	public sort = 30;
 
 	@inject(IShapeManager)
 	private shapeManager!: IShapeManager;
@@ -35,6 +38,9 @@ export class TextEditHandler implements IHandler {
 	@inject(ISelectService)
 	private selectService!: ISelectService;
 
+	@inject(ITextSelectionService)
+	private selectionService!: ITextSelectionService;
+
 	private lastPointerDown: PointerDownSnapshot | null = null;
 
 	public enable(_state: InteractionState): boolean {
@@ -42,11 +48,20 @@ export class TextEditHandler implements IHandler {
 	}
 
 	public execute(e: PointerEvent, _state: InteractionState, payload: EventPayload): boolean {
+		const selectedShapes = this.selectService.getSelectedShapes();
+		const editingShape = selectedShapes.find(
+			(shape): shape is TextEditableShape =>
+				shape instanceof TextEditableShape && shape.getState() === ShapeStateEnum.Edit,
+		);
+
+		if (editingShape && this.selectionService.isActive(editingShape)) {
+			return this.executeSelection(e, payload, editingShape);
+		}
+
 		if (e.type !== 'pointerdown') {
 			return true;
 		}
 
-		const selectedShapes = this.selectService.getSelectedShapes();
 		if (selectedShapes.length !== 1) {
 			this.lastPointerDown = null;
 			return true;
@@ -95,7 +110,57 @@ export class TextEditHandler implements IHandler {
 		}
 
 		shapeUnderCursor.setState(ShapeStateEnum.Edit);
+		const localPoint = this.toShapeLocal(shapeUnderCursor, worldPoint);
+		this.selectionService.pointerDown(shapeUnderCursor, localPoint, { selectWord: true });
+		e.preventDefault();
 
 		return false;
+	}
+
+	private executeSelection(
+		e: PointerEvent,
+		payload: EventPayload,
+		shape: TextEditableShape,
+	): boolean {
+		const worldPoint = this.viewportService.clientToViewportLocal(
+			payload.viewportPoint.x,
+			payload.viewportPoint.y,
+		);
+		const localPoint = this.toShapeLocal(shape, worldPoint);
+
+		if (e.type === 'pointerdown') {
+			const shapeUnderCursor = this.shapeManager.getShapeByPoint(worldPoint);
+			if (shapeUnderCursor !== shape) {
+				return true;
+			}
+
+			e.preventDefault();
+			this.selectionService.pointerDown(shape, localPoint, {
+				extend: e.shiftKey,
+				selectWord: e.detail === 2,
+				selectLine: e.detail >= 3,
+			});
+			return false;
+		}
+
+		if (e.type === 'pointermove') {
+			if (e.buttons !== 1) {
+				this.selectionService.pointerUp();
+				return true;
+			}
+			return this.selectionService.pointerMove(shape, localPoint) ? false : true;
+		}
+
+		if (e.type === 'pointerup' || e.type === 'pointercancel') {
+			return this.selectionService.pointerUp() ? false : true;
+		}
+
+		return true;
+	}
+
+	private toShapeLocal(shape: TextEditableShape, worldPoint: PixiPoint): Point {
+		const viewport = this.viewportService.getStage().getViewport();
+		const local = shape.container.toLocal(worldPoint, viewport);
+		return { x: local.x, y: local.y };
 	}
 }

@@ -9,3 +9,4 @@ export * from './Select/SelectService';
 export * from './ViewportService';
 export * from './ToolService';
 export * from './TextEditorService';
+export * from './TextSelectionService';

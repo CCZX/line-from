@@ -1,8 +1,12 @@
 import { Point } from '@pixi/core';
-import { TextMetrics } from '@pixi/text';
 import { inject } from 'inversify';
 import { IocContainerService } from '@/common/contract';
-import { IActionManager, ITextEditorService, IViewportService } from '@/domain/contract';
+import {
+	IActionManager,
+	ITextEditorService,
+	ITextSelectionService,
+	IViewportService,
+} from '@/domain/contract';
 import { UpdatePropsAction } from './Action/Actions/UpdatePropsAction';
 import { BaseProperty } from '@/shape/property/BaseProperty';
 import { TextProperty } from '@/shape/property/TextProperty';
@@ -10,7 +14,6 @@ import { ShapePropertyEnum, ShapeStateEnum, TextPropertyValue } from '@/shape/co
 import type { TextEditableShape } from '@/shape/TextEditableShape';
 import { provide } from 'inversify-binding-decorators';
 import i18n from '@/i18n';
-import { colorToHex, SHAPE_COLORS } from '@/common/color';
 
 @provide(ITextEditorService)
 export class TextEditorService implements ITextEditorService {
@@ -22,6 +25,9 @@ export class TextEditorService implements ITextEditorService {
 
 	@inject(IViewportService)
 	private viewportService!: IViewportService;
+
+	@inject(ITextSelectionService)
+	private selectionService!: ITextSelectionService;
 
 	private textarea: HTMLTextAreaElement | null = null;
 	private activeShape: TextEditableShape | null = null;
@@ -41,8 +47,9 @@ export class TextEditorService implements ITextEditorService {
 		textarea.value = this.originalValue.text;
 		this.applyTextStyle(shape);
 		textarea.style.display = 'block';
+		textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+		this.selectionService.begin(shape, textarea, this.syncEditorPosition);
 		this.syncEditorPosition();
-		shape.textView.visible = false;
 
 		this.unsubscribeViewport?.();
 		this.unsubscribeViewport = this.viewportService.store.subscribe(this.syncEditorPosition);
@@ -51,8 +58,7 @@ export class TextEditorService implements ITextEditorService {
 		requestAnimationFrame(() => {
 			if (this.activeShape === shape) {
 				this.syncEditorPosition();
-				textarea.focus();
-				textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+				textarea.focus({ preventScroll: true });
 			}
 		});
 	}
@@ -62,19 +68,22 @@ export class TextEditorService implements ITextEditorService {
 			return;
 		}
 
+		const originalValue = this.originalValue;
 		const nextValue: TextPropertyValue = {
-			...this.originalValue,
+			...originalValue,
 			text: this.textarea.value,
 		};
-		const changed = nextValue.text !== this.originalValue.text;
+		const changed = nextValue.text !== originalValue.text;
 
-		this.teardown(shape);
+		this.teardown();
 
 		if (!changed) {
 			shape.getProperty<TextProperty>(ShapePropertyEnum.Text).draw();
 			return;
 		}
 
+		// 编辑过程中会实时更新 Pixi。提交前先恢复旧值，确保 Action 能生成正确的撤销数据。
+		shape.getProperty<TextProperty>(ShapePropertyEnum.Text).set({ ...originalValue });
 		const base = shape.getProperty<BaseProperty>(ShapePropertyEnum.Base).value;
 		this.actionManager.push(
 			new UpdatePropsAction(
@@ -98,13 +107,16 @@ export class TextEditorService implements ITextEditorService {
 			return;
 		}
 
-		this.teardown(shape);
-		shape.getProperty<TextProperty>(ShapePropertyEnum.Text).draw();
+		const originalValue = this.originalValue;
+		this.teardown();
+		if (originalValue) {
+			shape.getProperty<TextProperty>(ShapePropertyEnum.Text).set({ ...originalValue });
+		}
 	}
 
 	public close(shape: TextEditableShape): void {
 		if (this.activeShape === shape) {
-			this.teardown(shape);
+			this.teardown();
 		}
 	}
 
@@ -116,7 +128,7 @@ export class TextEditorService implements ITextEditorService {
 		const textarea = document.createElement('textarea');
 		textarea.setAttribute('aria-label', i18n.t('editor.editText'));
 		textarea.spellcheck = false;
-		textarea.wrap = 'soft';
+		textarea.wrap = 'off';
 
 		Object.assign(textarea.style, {
 			position: 'fixed',
@@ -124,6 +136,8 @@ export class TextEditorService implements ITextEditorService {
 			left: '0',
 			top: '0',
 			display: 'none',
+			width: '1px',
+			height: '1px',
 			boxSizing: 'border-box',
 			margin: '0',
 			padding: '0',
@@ -132,11 +146,17 @@ export class TextEditorService implements ITextEditorService {
 			resize: 'none',
 			overflow: 'hidden',
 			background: 'transparent',
-			transformOrigin: '0 0',
+			color: 'transparent',
+			caretColor: 'transparent',
+			opacity: '0',
+			pointerEvents: 'none',
 		});
 
 		textarea.addEventListener('keydown', this.onKeyDown);
-		textarea.addEventListener('input', this.syncEditorPosition);
+		textarea.addEventListener('input', this.onInput);
+		textarea.addEventListener('select', this.onSelectionChange);
+		textarea.addEventListener('keyup', this.onSelectionChange);
+		textarea.addEventListener('compositionend', this.onSelectionChange);
 		textarea.addEventListener('blur', this.onBlur);
 		textarea.addEventListener('wheel', this.onWheel, { passive: false });
 		document.body.appendChild(textarea);
@@ -154,21 +174,13 @@ export class TextEditorService implements ITextEditorService {
 		}
 
 		const value = shape.getTextValue();
-		const horizontalAlign = shape.getTextHorizontalAlign();
 
-		this.textarea.style.color = colorToHex(value.color ?? SHAPE_COLORS.text.default);
-		this.textarea.style.caretColor = colorToHex(value.color ?? SHAPE_COLORS.text.default);
-		this.textarea.style.fontSize = `${value.fontSize ?? 16}px`;
+		// iOS 会放大字号小于 16px 的输入框；元素不可见，保持 16px 下限即可避免页面缩放。
+		this.textarea.style.fontSize = `${Math.max(16, value.fontSize ?? 16)}px`;
 		this.textarea.style.fontFamily =
 			value.fontFamily ?? "-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif";
 		this.textarea.style.fontWeight = value.fontWeight ?? 'normal';
-		const metrics = TextMetrics.measureText(
-			value.text || ' ',
-			shape.textView.style,
-			shape.textView.style.wordWrap,
-		);
-		this.textarea.style.lineHeight = `${metrics.lineHeight}px`;
-		this.textarea.style.textAlign = horizontalAlign;
+		this.textarea.style.lineHeight = '1';
 	}
 
 	private syncEditorPosition = (): void => {
@@ -177,41 +189,43 @@ export class TextEditorService implements ITextEditorService {
 		}
 
 		const shape = this.activeShape;
-		const bounds = shape.getTextLayoutBounds();
-		const verticalAlign = shape.getTextVerticalAlign();
-		const metrics = TextMetrics.measureText(
-			this.textarea.value || ' ',
-			shape.textView.style,
-			shape.textView.style.wordWrap,
-		);
-		const remainingHeight = Math.max(0, bounds.height - metrics.height);
-		const paddingTop =
-			verticalAlign === 'top'
-				? 0
-				: verticalAlign === 'bottom'
-				? remainingHeight
-				: remainingHeight / 2;
-		const paddingBottom = remainingHeight - paddingTop;
-		const origin = shape.container.toGlobal(new Point(bounds.x, bounds.y));
-		const xUnit = shape.container.toGlobal(new Point(bounds.x + 1, bounds.y));
-		const yUnit = shape.container.toGlobal(new Point(bounds.x, bounds.y + 1));
+		const caret = this.selectionService.getCaretRect();
+		if (!caret) {
+			return;
+		}
+
+		const origin = shape.container.toGlobal(new Point(caret.x, caret.y));
+		const bottom = shape.container.toGlobal(new Point(caret.x, caret.y + caret.height));
 		const canvasRect = this.viewportService
 			.getStage()
 			.getViewport()
 			.canvasEl.getBoundingClientRect();
 
-		const a = xUnit.x - origin.x;
-		const b = xUnit.y - origin.y;
-		const c = yUnit.x - origin.x;
-		const d = yUnit.y - origin.y;
-		const tx = canvasRect.left + origin.x;
-		const ty = canvasRect.top + origin.y;
+		this.textarea.style.left = `${canvasRect.left + origin.x}px`;
+		this.textarea.style.top = `${canvasRect.top + origin.y}px`;
+		this.textarea.style.width = '1px';
+		this.textarea.style.height = `${Math.max(
+			1,
+			Math.hypot(bottom.x - origin.x, bottom.y - origin.y),
+		)}px`;
+	};
 
-		this.textarea.style.width = `${bounds.width}px`;
-		this.textarea.style.height = `${bounds.height}px`;
-		this.textarea.style.paddingTop = `${paddingTop}px`;
-		this.textarea.style.paddingBottom = `${paddingBottom}px`;
-		this.textarea.style.transform = `matrix(${a}, ${b}, ${c}, ${d}, ${tx}, ${ty})`;
+	private onInput = (): void => {
+		if (!this.textarea || !this.activeShape) {
+			return;
+		}
+
+		this.activeShape
+			.getProperty<TextProperty>(ShapePropertyEnum.Text)
+			.update({ text: this.textarea.value });
+		this.selectionService.refresh();
+	};
+
+	private onSelectionChange = (): void => {
+		if (!this.activeShape) {
+			return;
+		}
+		this.selectionService.refresh();
 	};
 
 	private onKeyDown = (event: KeyboardEvent): void => {
@@ -232,6 +246,11 @@ export class TextEditorService implements ITextEditorService {
 		if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
 			event.preventDefault();
 			shape.setState(ShapeStateEnum.Selected);
+			return;
+		}
+
+		if (this.selectionService.handleKeyDown(event)) {
+			event.preventDefault();
 		}
 	};
 
@@ -247,8 +266,8 @@ export class TextEditorService implements ITextEditorService {
 		event.preventDefault();
 	};
 
-	private teardown(shape: TextEditableShape): void {
-		shape.textView.visible = true;
+	private teardown(): void {
+		this.selectionService.end();
 		this.activeShape = null;
 		this.originalValue = null;
 		this.unsubscribeViewport?.();
