@@ -16,7 +16,7 @@ export default tseslint.config(
 		},
 	},
 	{
-		files: ['src/**/*.{ts,tsx}', 'tests/**/*.ts', 'vitest.config.ts'],
+		files: ['src/**/*.{ts,tsx}', 'tests/**/*.ts', 'vitest.config.ts', 'playwright.config.ts'],
 		languageOptions: {
 			parser: tseslint.parser,
 			globals: {
@@ -51,5 +51,5 @@ export default tseslint.config(
 				},
 			],
 		},
-	}
+	},
 );

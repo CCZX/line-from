@@ -62,22 +62,12 @@ export class TextEditHandler implements IHandler {
 			return true;
 		}
 
-		if (selectedShapes.length !== 1) {
-			this.lastPointerDown = null;
-			return true;
-		}
-
 		const worldPoint = this.viewportService.clientToViewportLocal(
 			payload.viewportPoint.x,
 			payload.viewportPoint.y,
 		);
 		const shapeUnderCursor = this.shapeManager.getShapeByPoint(worldPoint);
 		if (!(shapeUnderCursor instanceof TextEditableShape)) {
-			this.lastPointerDown = null;
-			return true;
-		}
-
-		if (selectedShapes[0].id !== shapeUnderCursor.id) {
 			this.lastPointerDown = null;
 			return true;
 		}
@@ -99,6 +89,12 @@ export class TextEditHandler implements IHandler {
 		const isNativeDoubleClick = e.detail === 2;
 
 		this.lastPointerDown = isSequentialDoubleClick || isNativeDoubleClick ? null : current;
+
+		// 第一次 pointerdown 发生时图形可能尚未被 SelectHandler 选中，但仍需保留快照，
+		// 这样第二次 pointerdown 才能识别为对未选中图形的直接双击。
+		if (selectedShapes.length !== 1 || selectedShapes[0].id !== shapeUnderCursor.id) {
+			return true;
+		}
 
 		// 单击只负责选中；同一图形上的连续两次点击进入文字编辑
 		if (!isSequentialDoubleClick && !isNativeDoubleClick) {
