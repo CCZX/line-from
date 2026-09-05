@@ -2,6 +2,7 @@
   "name": "line-from",
   "private": false,
   "version": "0.0.1",
+  "packageManager": "pnpm@11.19.0",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -9,9 +10,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:typecheck": "tsc --project tests/tsconfig.json",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
     "prepare": "husky install",
-    "lint": "eslint src tests vitest.config.ts tsconfig.json --ext .ts,.tsx",
-    "lint:fix": "eslint src tests vitest.config.ts tsconfig.json --ext .ts,.tsx --fix"
+    "lint": "eslint src tests vitest.config.ts playwright.config.ts tsconfig.json --ext .ts,.tsx",
+    "lint:fix": "eslint src tests vitest.config.ts playwright.config.ts tsconfig.json --ext .ts,.tsx --fix"
   },
   "dependencies": {
     "@pixi/app": "^7.4.3",
@@ -35,6 +39,7 @@
     "@commitlint/cli": "^17.5.1",
     "@commitlint/config-conventional": "^17.4.4",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
     "@types/lodash": "^4.17.25",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",

@@ -74,8 +74,8 @@ WebGL 加速渲染，围绕图形创建、选择、变换、连接和样式编�
 
 ### 环境要求
 
-- Node.js 18 或更高版本
-- pnpm 8 或更高版本
+- Node.js 20 或更高版本
+- pnpm 11 或更高版本
 
 ### 安装依赖
 
@@ -108,6 +108,8 @@ pnpm preview
 | `pnpm test`           | 运行全部单元测试                   |
 | `pnpm test:watch`     | 以监听模式运行测试                 |
 | `pnpm test:typecheck` | 检查测试代码类型                   |
+| `pnpm test:e2e`       | 使用 Playwright 运行端到端测试     |
+| `pnpm test:e2e:ui`    | 在 Playwright UI 中调试端到端测试  |
 | `pnpm lint`           | 检查源码与测试代码                 |
 | `pnpm lint:fix`       | 自动修复可修复的代码规范问题       |
 
@@ -123,7 +125,7 @@ pnpm preview
 | 事件流   | RxJS、Pointer Events          |
 | 国际化   | i18next、react-i18next        |
 | 工程化   | Vite、ESLint、Prettier、Husky |
-| 测试     | Vitest                        |
+| 测试     | Vitest、Playwright            |
 
 ## 项目结构
 
@@ -140,6 +142,7 @@ pnpm preview
 │   ├── shape/                # 图形、属性、装饰器、状态机与几何计算
 │   └── widget/               # 编辑器、工具栏和属性面板
 ├── tests/unit/               # 单元测试
+├── tests/e2e/                # Playwright 端到端测试
 ├── DESIGN.md                 # 视觉设计规范
 └── vite.config.ts            # Vite 与路径别名配置
 ```
@@ -175,6 +178,7 @@ ShapeData 包含图形类型和对应属性，例如位置、尺寸、旋转、�
 ```bash
 pnpm test
 pnpm test:typecheck
+pnpm test:e2e
 pnpm lint
 pnpm build
 ```
