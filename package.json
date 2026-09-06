@@ -3,6 +3,10 @@
   "private": false,
   "version": "0.0.1",
   "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=22.13.0",
+    "pnpm": "11.19.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -18,6 +22,7 @@
     "lint:fix": "eslint src tests vitest.config.ts playwright.config.ts tsconfig.json --ext .ts,.tsx --fix"
   },
   "dependencies": {
+    "@base-ui/react": "^1.7.0",
     "@pixi/app": "^7.4.3",
     "@pixi/core": "^7.4.3",
     "@pixi/display": "^7.4.3",

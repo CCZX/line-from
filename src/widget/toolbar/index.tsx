@@ -1,4 +1,10 @@
-import { useCallback, useMemo, useRef, type ChangeEvent } from 'react';
+import { useCallback, useMemo, useRef, type ChangeEvent, type ReactNode } from 'react';
+import { Menu } from '@base-ui/react/menu';
+import { Toast } from '@base-ui/react/toast';
+import { Toggle } from '@base-ui/react/toggle';
+import { ToggleGroup } from '@base-ui/react/toggle-group';
+import { Toolbar as BaseToolbar } from '@base-ui/react/toolbar';
+import { Tooltip } from '@base-ui/react/tooltip';
 import {
 	IActionLogManager,
 	ToolType,
@@ -132,6 +138,52 @@ function SketchIcon({ name }: { name: SketchIconName }) {
 	);
 }
 
+interface ToolbarButtonProps {
+	title: string;
+	children: ReactNode;
+	onClick?: () => void;
+	disabled?: boolean;
+}
+
+function ToolbarActionButton({ title, children, onClick, disabled = false }: ToolbarButtonProps) {
+	return (
+		<Tooltip.Root disabled={disabled}>
+			<Tooltip.Trigger
+				render={<BaseToolbar.Button disabled={disabled} focusableWhenDisabled={false} />}
+				className='tb-button'
+				aria-label={title}
+				onClick={onClick}
+			>
+				{children}
+			</Tooltip.Trigger>
+			<Tooltip.Portal>
+				<Tooltip.Positioner className='ui-tooltip-positioner' sideOffset={8}>
+					<Tooltip.Popup className='ui-tooltip'>{title}</Tooltip.Popup>
+				</Tooltip.Positioner>
+			</Tooltip.Portal>
+		</Tooltip.Root>
+	);
+}
+
+function ToolbarToolButton({ tool, title, children }: ToolbarButtonProps & { tool: ToolType }) {
+	return (
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={<BaseToolbar.Button render={<Toggle value={tool} />} />}
+				className='tb-button'
+				aria-label={title}
+			>
+				{children}
+			</Tooltip.Trigger>
+			<Tooltip.Portal>
+				<Tooltip.Positioner className='ui-tooltip-positioner' sideOffset={8}>
+					<Tooltip.Popup className='ui-tooltip'>{title}</Tooltip.Popup>
+				</Tooltip.Positioner>
+			</Tooltip.Portal>
+		</Tooltip.Root>
+	);
+}
+
 export function Toolbar() {
 	const { t, i18n } = useTranslation();
 	const toolService = useInject<IToolService>(IToolService);
@@ -139,6 +191,7 @@ export function Toolbar() {
 	const shapeManager = useInject<IShapeManager>(IShapeManager);
 	const canvasInitService = useInject<ICanvasInitService>(ICanvasInitService);
 	const viewportService = useInject<IViewportService>(IViewportService);
+	const toastManager = Toast.useToastManager();
 	const activeTool = toolService.store((s) => s.activeTool);
 	const setActiveTool = toolService.store((s) => s.setActiveTool);
 	const canUndo = actionLogManager.store((s) => s.canUndo);
@@ -218,144 +271,125 @@ export function Toolbar() {
 				canvasInitService.replace(shapeData);
 			} catch (error) {
 				console.error('Failed to import ShapeData JSON.', error);
-				window.alert(t('toolbar.importError'));
+				toastManager.add({
+					description: t('toolbar.importError'),
+					priority: 'high',
+					type: 'error',
+				});
 			}
 		},
-		[canvasInitService, t],
-	);
-
-	const ToolButton = ({
-		tool,
-		title,
-		children,
-	}: {
-		tool: ToolType;
-		title: string;
-		children: React.ReactNode;
-	}) => (
-		<button
-			type='button'
-			className={`tb-button${activeTool === tool ? ' tb-button--active' : ''}`}
-			title={title}
-			aria-label={title}
-			aria-pressed={activeTool === tool}
-			onClick={() => handleToolClick(tool)}
-		>
-			{children}
-		</button>
-	);
-
-	const ActionButton = ({
-		title,
-		children,
-		onClick,
-		disabled = false,
-	}: {
-		title: string;
-		children: React.ReactNode;
-		onClick?: () => void;
-		disabled?: boolean;
-	}) => (
-		<button
-			type='button'
-			className='tb-button'
-			title={title}
-			aria-label={title}
-			disabled={disabled}
-			onClick={onClick}
-		>
-			{children}
-		</button>
+		[canvasInitService, t, toastManager],
 	);
 
 	return (
-		<nav id='toolbar' aria-label={t('toolbar.label')}>
+		<BaseToolbar.Root id='toolbar' aria-label={t('toolbar.label')}>
 			{/* Undo / Redo */}
-			<div className='tb-group'>
-				<ActionButton title={t('toolbar.undo')} onClick={handleUndo} disabled={!canUndo}>
+			<BaseToolbar.Group className='tb-group'>
+				<ToolbarActionButton title={t('toolbar.undo')} onClick={handleUndo} disabled={!canUndo}>
 					<SketchIcon name='undo' />
-				</ActionButton>
-				<ActionButton title={t('toolbar.redo')} onClick={handleRedo} disabled={!canRedo}>
+				</ToolbarActionButton>
+				<ToolbarActionButton title={t('toolbar.redo')} onClick={handleRedo} disabled={!canRedo}>
 					<SketchIcon name='redo' />
-				</ActionButton>
-			</div>
+				</ToolbarActionButton>
+			</BaseToolbar.Group>
 
-			<div className='tb-sep' />
+			<BaseToolbar.Separator className='tb-sep' />
 
 			{/* Tools */}
-			<div className='tb-group'>
-				<ToolButton tool={ToolType.Select} title={t('toolbar.select')}>
+			<ToggleGroup
+				className='tb-group'
+				aria-label={t('toolbar.label')}
+				value={[activeTool]}
+				onValueChange={(tools) => {
+					if (tools[0]) {
+						handleToolClick(tools[0] as ToolType);
+					}
+				}}
+			>
+				<ToolbarToolButton tool={ToolType.Select} title={t('toolbar.select')}>
 					<SketchIcon name='select' />
-				</ToolButton>
-				<ToolButton tool={ToolType.Rect} title={t('toolbar.rect')}>
+				</ToolbarToolButton>
+				<ToolbarToolButton tool={ToolType.Rect} title={t('toolbar.rect')}>
 					<SketchIcon name='rect' />
-				</ToolButton>
-				<ToolButton tool={ToolType.RoundedRect} title={t('toolbar.roundedRect')}>
+				</ToolbarToolButton>
+				<ToolbarToolButton tool={ToolType.RoundedRect} title={t('toolbar.roundedRect')}>
 					<SketchIcon name='roundedRect' />
-				</ToolButton>
-				<ToolButton tool={ToolType.Diamond} title={t('toolbar.diamond')}>
+				</ToolbarToolButton>
+				<ToolbarToolButton tool={ToolType.Diamond} title={t('toolbar.diamond')}>
 					<SketchIcon name='diamond' />
-				</ToolButton>
-				<ToolButton tool={ToolType.Circle} title={t('toolbar.circle')}>
+				</ToolbarToolButton>
+				<ToolbarToolButton tool={ToolType.Circle} title={t('toolbar.circle')}>
 					<SketchIcon name='circle' />
-				</ToolButton>
-				<ToolButton tool={ToolType.Line} title={t('toolbar.line')}>
+				</ToolbarToolButton>
+				<ToolbarToolButton tool={ToolType.Line} title={t('toolbar.line')}>
 					<SketchIcon name='line' />
-				</ToolButton>
-				<ToolButton tool={ToolType.Arrow} title={t('toolbar.arrow')}>
+				</ToolbarToolButton>
+				<ToolbarToolButton tool={ToolType.Arrow} title={t('toolbar.arrow')}>
 					<SketchIcon name='arrow' />
-				</ToolButton>
-				<ToolButton tool={ToolType.Text} title={t('toolbar.text')}>
+				</ToolbarToolButton>
+				<ToolbarToolButton tool={ToolType.Text} title={t('toolbar.text')}>
 					<SketchIcon name='text' />
-				</ToolButton>
-			</div>
+				</ToolbarToolButton>
+			</ToggleGroup>
 
-			<div className='tb-sep' />
+			<BaseToolbar.Separator className='tb-sep' />
 
 			{/* Zoom */}
-			<div className='zoom-wrap'>
-				<ActionButton title={t('toolbar.zoomOut')} onClick={handleZoomOut} disabled={!canZoomOut}>
+			<BaseToolbar.Group className='zoom-wrap'>
+				<ToolbarActionButton
+					title={t('toolbar.zoomOut')}
+					onClick={handleZoomOut}
+					disabled={!canZoomOut}
+				>
 					<SketchIcon name='zoomOut' />
-				</ActionButton>
-				<div className='zoom-menu'>
-					<button
-						type='button'
+				</ToolbarActionButton>
+				<Menu.Root>
+					<BaseToolbar.Button
+						render={<Menu.Trigger />}
 						className='zoom-label'
-						title={t('toolbar.zoomReset')}
 						aria-label={`${t('toolbar.zoomReset')}，${zoom}%`}
-						aria-haspopup='menu'
-						onClick={handleZoomReset}
 					>
 						{zoom}%
-					</button>
-					<div className='zoom-menu__popover'>
-						<div className='zoom-menu__surface' role='menu'>
-							<button
-								type='button'
-								className='zoom-menu__item'
-								role='menuitem'
-								onClick={handleZoomToFit}
-							>
-								<SketchIcon name='zoomToFit' />
-								<span>{t('toolbar.zoomToFit')}</span>
-							</button>
-						</div>
-					</div>
-				</div>
-				<ActionButton title={t('toolbar.zoomIn')} onClick={handleZoomIn} disabled={!canZoomIn}>
+					</BaseToolbar.Button>
+					<Menu.Portal>
+						<Menu.Positioner
+							className='ui-menu-positioner zoom-menu__positioner'
+							sideOffset={8}
+							align='center'
+						>
+							<Menu.Popup className='zoom-menu__surface'>
+								<Menu.Item className='zoom-menu__item' onClick={handleZoomReset}>
+									<span className='zoom-menu__value' aria-hidden='true'>
+										100%
+									</span>
+									<span>{t('toolbar.zoomReset')}</span>
+								</Menu.Item>
+								<Menu.Item className='zoom-menu__item' onClick={handleZoomToFit}>
+									<SketchIcon name='zoomToFit' />
+									<span>{t('toolbar.zoomToFit')}</span>
+								</Menu.Item>
+							</Menu.Popup>
+						</Menu.Positioner>
+					</Menu.Portal>
+				</Menu.Root>
+				<ToolbarActionButton
+					title={t('toolbar.zoomIn')}
+					onClick={handleZoomIn}
+					disabled={!canZoomIn}
+				>
 					<SketchIcon name='zoomIn' />
-				</ActionButton>
-			</div>
+				</ToolbarActionButton>
+			</BaseToolbar.Group>
 
-			<div className='tb-sep' />
+			<BaseToolbar.Separator className='tb-sep' />
 
-			<div className='tb-group'>
-				<ActionButton title={t('toolbar.importJson')} onClick={handleImportClick}>
+			<BaseToolbar.Group className='tb-group'>
+				<ToolbarActionButton title={t('toolbar.importJson')} onClick={handleImportClick}>
 					<SketchIcon name='upload' />
-				</ActionButton>
-				<ActionButton title={t('toolbar.exportJson')} onClick={handleExport}>
+				</ToolbarActionButton>
+				<ToolbarActionButton title={t('toolbar.exportJson')} onClick={handleExport}>
 					<SketchIcon name='download' />
-				</ActionButton>
+				</ToolbarActionButton>
 				<input
 					ref={fileInputRef}
 					type='file'
@@ -363,9 +397,9 @@ export function Toolbar() {
 					hidden
 					onChange={handleImportFile}
 				/>
-			</div>
+			</BaseToolbar.Group>
 
-			<div className='tb-sep' />
+			<BaseToolbar.Separator className='tb-sep' />
 
 			<select
 				className='language-select'
@@ -377,6 +411,6 @@ export function Toolbar() {
 				<option value='zh-CN'>{t('language.zhCN')}</option>
 				<option value='en'>{t('language.en')}</option>
 			</select>
-		</nav>
+		</BaseToolbar.Root>
 	);
 }

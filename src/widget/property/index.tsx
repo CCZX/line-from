@@ -1,4 +1,8 @@
-import { useState, useEffect, useCallback, useRef, type CSSProperties } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Collapsible } from '@base-ui/react/collapsible';
+import { Slider } from '@base-ui/react/slider';
+import { Toggle } from '@base-ui/react/toggle';
+import { ToggleGroup } from '@base-ui/react/toggle-group';
 import {
 	ShapePropertyEnum,
 	type FillPropertyValue,
@@ -46,6 +50,7 @@ export function Property() {
 	const [visible, setVisible] = useState(false);
 	const [collapsed, setCollapsed] = useState(false);
 	const visibleRef = useRef(false);
+	const panelRef = useRef<HTMLDivElement>(null);
 
 	const syncFromShape = useCallback(() => {
 		const ids = selectService.store.getState().selectedShapeIds;
@@ -101,6 +106,12 @@ export function Property() {
 		document.addEventListener('pointerup', onPointerUp);
 		return () => document.removeEventListener('pointerup', onPointerUp);
 	}, [syncFromShape]);
+
+	useEffect(() => {
+		if (panelRef.current) {
+			panelRef.current.inert = !visible;
+		}
+	}, [visible]);
 
 	const updateSelectedStroke = (patch: Partial<StrokePropertyValue>) => {
 		const data: ShapeData[] = selectedShapeIds.flatMap((id) => {
@@ -200,165 +211,189 @@ export function Property() {
 	};
 
 	return (
-		<div className={`ctx-panel ${visible ? 'ctx-panel--visible' : ''}`}>
-			<div className={`ctx-card${collapsed ? ' ctx-card--collapsed' : ''}`}>
+		<div
+			ref={panelRef}
+			className={`ctx-panel ${visible ? 'ctx-panel--visible' : ''}`}
+			aria-hidden={!visible}
+		>
+			<Collapsible.Root
+				className={`ctx-card${collapsed ? ' ctx-card--collapsed' : ''}`}
+				open={!collapsed}
+				onOpenChange={(open) => setCollapsed(!open)}
+			>
 				<div className='ctx-heading'>
 					<span>{t('property.title')}</span>
-					<button
-						type='button'
+					<Collapsible.Trigger
 						className={`ctx-collapse-btn${collapsed ? ' ctx-collapse-btn--collapsed' : ''}`}
-						aria-expanded={!collapsed}
 						aria-label={t(collapsed ? 'property.expandPanel' : 'property.collapsePanel')}
-						onClick={() => setCollapsed((value) => !value)}
 					>
 						<svg viewBox='0 0 16 16' aria-hidden='true'>
 							<path d='M4 6.25 8 10l4-3.75' />
 						</svg>
-					</button>
+					</Collapsible.Trigger>
 				</div>
 
-				{!collapsed && (
-					<div className='ctx-body'>
-						{selectedShapeIds.length > 1 && (
-							<div className='ctx-selection-note'>
-								{t('property.selected', { count: selectedShapeIds.length })}
-							</div>
-						)}
+				<Collapsible.Panel className='ctx-body'>
+					{selectedShapeIds.length > 1 && (
+						<div className='ctx-selection-note'>
+							{t('property.selected', { count: selectedShapeIds.length })}
+						</div>
+					)}
 
-						<section className='ctx-section'>
-							<h3 className='ctx-section-title'>{t('property.stroke')}</h3>
-							<div className='ctx-colors'>
-								{BORDER_COLOR_PRESETS.map((preset) => (
-									<button
-										type='button'
-										key={preset.hex}
-										className={`ctx-dot${strokeColor === preset.hex ? ' ctx-dot--active' : ''}`}
-										data-color={preset.hex}
-										style={{ backgroundColor: preset.hex }}
-										aria-label={t('property.strokeColor', { color: t(preset.nameKey) })}
-										aria-pressed={strokeColor === preset.hex}
-										title={t(preset.nameKey)}
-										onClick={() => handleStrokeColor(preset)}
-									/>
+					<section className='ctx-section'>
+						<h3 className='ctx-section-title'>{t('property.stroke')}</h3>
+						<ToggleGroup
+							className='ctx-colors'
+							aria-label={t('property.stroke')}
+							value={[strokeColor]}
+							onValueChange={(colors) => {
+								const preset = BORDER_COLOR_PRESETS.find(({ hex }) => hex === colors[0]);
+								if (preset) {
+									handleStrokeColor(preset);
+								}
+							}}
+						>
+							{BORDER_COLOR_PRESETS.map((preset) => (
+								<Toggle
+									key={preset.hex}
+									className='ctx-dot'
+									value={preset.hex}
+									data-color={preset.hex}
+									style={{ backgroundColor: preset.hex }}
+									aria-label={t('property.strokeColor', { color: t(preset.nameKey) })}
+									title={t(preset.nameKey)}
+								/>
+							))}
+						</ToggleGroup>
+
+						<div className='ctx-field'>
+							<span className='ctx-label'>{t('property.widthLabel')}</span>
+							<ToggleGroup
+								className='ctx-segmented ctx-segmented--width'
+								aria-label={t('property.strokeWidth')}
+								value={[String(strokeWidth)]}
+								onValueChange={(widths) => {
+									if (widths[0] !== undefined) {
+										handleStrokeWidth(Number(widths[0]));
+									}
+								}}
+							>
+								{STROKE_WIDTH_OPTIONS.map((option) => (
+									<Toggle
+										key={option.value}
+										className='ctx-segment-btn'
+										value={String(option.value)}
+										aria-label={t(option.labelKey)}
+									>
+										{option.value}
+									</Toggle>
 								))}
-							</div>
+							</ToggleGroup>
+						</div>
 
-							<div className='ctx-field'>
-								<span className='ctx-label'>{t('property.widthLabel')}</span>
-								<div className='ctx-segmented ctx-segmented--width'>
-									{STROKE_WIDTH_OPTIONS.map((option) => (
-										<button
-											type='button'
-											key={option.value}
-											className={`ctx-segment-btn${
-												strokeWidth === option.value ? ' ctx-segment-btn--active' : ''
-											}`}
-											aria-label={t(option.labelKey)}
-											aria-pressed={strokeWidth === option.value}
-											onClick={() => handleStrokeWidth(option.value)}
-										>
-											{option.value}
-										</button>
-									))}
-								</div>
-							</div>
+						<div className='ctx-field'>
+							<span className='ctx-label'>{t('property.styleLabel')}</span>
+							<ToggleGroup
+								className='ctx-segmented'
+								aria-label={t('property.strokeStyle')}
+								value={[strokeStyle]}
+								onValueChange={(styles) => {
+									if (styles[0]) {
+										handleStrokeStyle(styles[0] as StrokeStyle);
+									}
+								}}
+							>
+								<Toggle className='ctx-segment-btn' value='regular'>
+									{t('property.regular')}
+								</Toggle>
+								<Toggle className='ctx-segment-btn' value='sketchy'>
+									{t('property.sketchy')}
+								</Toggle>
+							</ToggleGroup>
+						</div>
+					</section>
 
-							<div className='ctx-field'>
-								<span className='ctx-label'>{t('property.styleLabel')}</span>
-								<div className='ctx-segmented'>
-									<button
-										type='button'
-										className={`ctx-segment-btn${
-											strokeStyle === 'regular' ? ' ctx-segment-btn--active' : ''
-										}`}
-										aria-pressed={strokeStyle === 'regular'}
-										onClick={() => handleStrokeStyle('regular')}
-									>
-										{t('property.regular')}
-									</button>
-									<button
-										type='button'
-										className={`ctx-segment-btn${
-											strokeStyle === 'sketchy' ? ' ctx-segment-btn--active' : ''
-										}`}
-										aria-pressed={strokeStyle === 'sketchy'}
-										onClick={() => handleStrokeStyle('sketchy')}
-									>
-										{t('property.sketchy')}
-									</button>
-								</div>
-							</div>
-						</section>
+					<div className='ctx-sep' />
 
-						<div className='ctx-sep' />
-
-						<section className='ctx-section'>
-							<h3 className='ctx-section-title'>{t('property.fill')}</h3>
-							<div className='ctx-colors'>
-								{BACKGROUND_COLOR_PRESETS.map((preset) => {
-									const isActive = preset.transparent
-										? isTransparent
-										: fillColor === preset.hex && !isTransparent;
-									return (
-										<button
-											type='button'
-											key={preset.hex}
-											className={`ctx-dot${isActive ? ' ctx-dot--active' : ''}${
-												preset.transparent ? ' ctx-dot--transparent' : ''
-											}`}
-											data-color={preset.hex}
-											style={preset.transparent ? undefined : { backgroundColor: preset.hex }}
-											aria-label={t('property.backgroundColor', {
-												color: t(preset.nameKey),
-											})}
-											aria-pressed={isActive}
-											title={t(preset.nameKey)}
-											onClick={() => handleFillColor(preset)}
-										/>
-									);
-								})}
-							</div>
-
-							<div className='ctx-field'>
-								<span className='ctx-label'>{t('property.opacity')}</span>
-								<div className='ctx-alpha-row'>
-									<input
-										className='ctx-range'
-										type='range'
-										min={0}
-										max={100}
-										step={1}
-										value={fillAlpha}
-										aria-label={t('property.backgroundAlpha')}
-										style={{ '--ctx-range-value': `${fillAlpha}%` } as CSSProperties}
-										onChange={(e) => handleFillAlpha(Number(e.target.value))}
+					<section className='ctx-section'>
+						<h3 className='ctx-section-title'>{t('property.fill')}</h3>
+						<ToggleGroup
+							className='ctx-colors'
+							aria-label={t('property.background')}
+							value={[isTransparent ? 'transparent' : fillColor]}
+							onValueChange={(colors) => {
+								const preset = BACKGROUND_COLOR_PRESETS.find(({ hex }) => hex === colors[0]);
+								if (preset) {
+									handleFillColor(preset);
+								}
+							}}
+						>
+							{BACKGROUND_COLOR_PRESETS.map((preset) => {
+								return (
+									<Toggle
+										key={preset.hex}
+										className={`ctx-dot${preset.transparent ? ' ctx-dot--transparent' : ''}`}
+										value={preset.hex}
+										data-color={preset.hex}
+										style={preset.transparent ? undefined : { backgroundColor: preset.hex }}
+										aria-label={t('property.backgroundColor', {
+											color: t(preset.nameKey),
+										})}
+										title={t(preset.nameKey)}
 									/>
-									<span className='ctx-alpha-value'>{fillAlpha}%</span>
-								</div>
-							</div>
+								);
+							})}
+						</ToggleGroup>
 
-							<div className='ctx-field'>
-								<span className='ctx-label'>{t('property.pattern')}</span>
-								<div className='ctx-segmented'>
-									{(['solid', 'sketchy'] as const).map((style) => (
-										<button
-											type='button'
-											key={style}
-											className={`ctx-segment-btn${
-												fillStyle === style ? ' ctx-segment-btn--active' : ''
-											}`}
-											aria-pressed={fillStyle === style}
-											onClick={() => handleFillStyle(style)}
-										>
-											{t(`property.${style}`)}
-										</button>
-									))}
+						<div className='ctx-field'>
+							<Slider.Root
+								className='ctx-slider'
+								min={0}
+								max={100}
+								step={1}
+								value={fillAlpha}
+								onValueChange={handleFillAlpha}
+							>
+								<Slider.Label className='ctx-label'>{t('property.opacity')}</Slider.Label>
+								<div className='ctx-alpha-row'>
+									<Slider.Control className='ctx-slider__control'>
+										<Slider.Track className='ctx-slider__track'>
+											<Slider.Indicator className='ctx-slider__indicator' />
+										</Slider.Track>
+										<Slider.Thumb
+											className='ctx-slider__thumb'
+											getAriaLabel={() => t('property.backgroundAlpha')}
+										/>
+									</Slider.Control>
+									<Slider.Value className='ctx-alpha-value'>
+										{(_formattedValues, values) => `${values[0]}%`}
+									</Slider.Value>
 								</div>
-							</div>
-						</section>
-					</div>
-				)}
-			</div>
+							</Slider.Root>
+						</div>
+
+						<div className='ctx-field'>
+							<span className='ctx-label'>{t('property.pattern')}</span>
+							<ToggleGroup
+								className='ctx-segmented'
+								aria-label={t('property.fillStyle')}
+								value={[fillStyle]}
+								onValueChange={(styles) => {
+									if (styles[0]) {
+										handleFillStyle(styles[0] as FillStyle);
+									}
+								}}
+							>
+								{(['solid', 'sketchy'] as const).map((style) => (
+									<Toggle key={style} className='ctx-segment-btn' value={style}>
+										{t(`property.${style}`)}
+									</Toggle>
+								))}
+							</ToggleGroup>
+						</div>
+					</section>
+				</Collapsible.Panel>
+			</Collapsible.Root>
 		</div>
 	);
 }

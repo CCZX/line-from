@@ -74,12 +74,15 @@ WebGL 加速渲染，围绕图形创建、选择、变换、连接和样式编�
 
 ### 环境要求
 
-- Node.js 20 或更高版本
-- pnpm 11 或更高版本
+- Node.js 22.13 或更高版本（推荐使用仓库 `.nvmrc` 指定的 Node.js 22）
+- pnpm 11.19.0（由 `package.json` 的 `packageManager` 字段锁定）
 
 ### 安装依赖
 
 ```bash
+nvm install
+nvm use
+corepack enable
 pnpm install
 ```
 

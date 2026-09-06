@@ -71,5 +71,8 @@ export default {
 	},
 	editor: {
 		editText: '编辑图形文字',
+		emptyTitle: '开始画点什么吧',
+		emptyDescription: '从上方选择一种图形，然后在画布任意位置拖拽创建。',
+		createExample: '打开示例画布',
 	},
 } as const;

@@ -10,9 +10,20 @@ test('启动后显示工具栏和 Pixi 画布', async ({ page }) => {
 	page.on('pageerror', (error) => pageErrors.push(error));
 
 	await expect(page).toHaveTitle('线构');
-	await expect(page.getByRole('navigation', { name: '画布工具栏' })).toBeVisible();
+	await expect(page.getByRole('toolbar', { name: '画布工具栏' })).toBeVisible();
 	await expect(page.locator('.editor-canvas-container canvas')).toBeVisible();
+	await expect(page.getByRole('heading', { name: '开始画点什么吧' })).toBeVisible();
+	await expect(page.getByRole('button', { name: '打开示例画布' })).toBeVisible();
 	expect(pageErrors).toEqual([]);
+});
+
+test('可以从空状态一键生成示例图形', async ({ page }) => {
+	await page.getByRole('button', { name: '打开示例画布' }).click();
+
+	await expect(page.getByRole('heading', { name: '开始画点什么吧' })).toBeHidden();
+	const shapes = await exportShapes(page);
+	expect(shapes.length).toBeGreaterThan(0);
+	expect(shapes.some(({ id }) => id === 'agent-loop-goal')).toBe(true);
 });
 
 test('可以拖拽创建矩形并导出准确的图形数据', async ({ page }) => {
