@@ -1,0 +1,93 @@
+:root {
+	--ui-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+	--ui-color-text: #403b35;
+	--ui-color-text-strong: #292621;
+	--ui-color-text-muted: #5d564d;
+	--ui-color-surface: #fffefa;
+	--ui-color-hover: #f4f1ed;
+	--ui-color-accent: #615ba4;
+	--ui-color-accent-strong: #514c9a;
+	--ui-color-accent-soft: #eeecfa;
+	--ui-focus-ring: 0 0 0 3px rgba(97, 91, 164, 0.18);
+	--ui-floating-shadow: 0 1px 2px rgba(70, 61, 48, 0.06), 0 8px 24px rgba(70, 61, 48, 0.12);
+}
+
+.ui-tooltip-positioner,
+.ui-menu-positioner {
+	z-index: 300;
+}
+
+.ui-tooltip {
+	max-width: 240px;
+	padding: 6px 8px;
+	color: var(--ui-color-surface);
+	font: 550 12px/1.25 var(--ui-font-sans);
+	text-align: center;
+	background: var(--ui-color-text-strong);
+	border-radius: 6px;
+	box-shadow: 0 4px 14px rgba(47, 43, 38, 0.18);
+	transform-origin: var(--transform-origin);
+	transition: opacity 100ms ease, transform 100ms ease;
+
+	&[data-starting-style],
+	&[data-ending-style] {
+		opacity: 0;
+		transform: scale(0.96);
+	}
+}
+
+.ui-toast-viewport {
+	position: fixed;
+	right: 20px;
+	bottom: 20px;
+	z-index: 400;
+	display: flex;
+	width: min(360px, calc(100vw - 40px));
+	flex-direction: column;
+	gap: 8px;
+	pointer-events: none;
+}
+
+.ui-toast {
+	box-sizing: border-box;
+	width: 100%;
+	color: var(--ui-color-text);
+	background: var(--ui-color-surface);
+	border: 1px solid rgba(73, 67, 57, 0.24);
+	border-left: 3px solid #d75d58;
+	border-radius: 9px;
+	box-shadow: var(--ui-floating-shadow);
+	pointer-events: auto;
+	transform: translateX(var(--toast-swipe-movement-x));
+	transition: opacity 160ms ease, transform 180ms ease;
+
+	&[data-starting-style],
+	&[data-ending-style] {
+		opacity: 0;
+		transform: translateX(calc(var(--toast-swipe-movement-x) + 20px));
+	}
+}
+
+.ui-toast__content {
+	padding: 11px 13px;
+}
+
+.ui-toast__description {
+	margin: 0;
+	font: 550 13px/1.45 var(--ui-font-sans);
+}
+
+@media (max-width: 640px) {
+	.ui-toast-viewport {
+		right: 12px;
+		bottom: 12px;
+		width: calc(100vw - 24px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ui-tooltip,
+	.ui-toast {
+		transition-duration: 0ms;
+	}
+}

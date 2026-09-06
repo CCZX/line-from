@@ -1,4 +1,9 @@
 import { BaseShape } from '@/shape/BaseShape';
+import { StoreApi, UseBoundStore } from 'zustand';
+
+export interface ShapeManagerState {
+	shapeCount: number;
+}
 
 export interface ShapeHitTestOptions {
 	/** 世界坐标下额外扩展的命中距离。 */
@@ -8,6 +13,8 @@ export interface ShapeHitTestOptions {
 }
 
 export interface IShapeManager {
+	store: UseBoundStore<StoreApi<ShapeManagerState>>;
+
 	setShape(shape: BaseShape, appendToStage?: boolean): void;
 
 	/** 图形几何属性修改完成后刷新空间索引。 */

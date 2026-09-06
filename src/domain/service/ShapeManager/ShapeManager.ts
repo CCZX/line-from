@@ -1,10 +1,16 @@
 import { Point as PixiPoint } from '@pixi/core';
 import { BaseShape } from '@/shape/BaseShape';
-import { IShapeManager, IViewportService, type ShapeHitTestOptions } from '../../contract';
+import {
+	IShapeManager,
+	IViewportService,
+	type ShapeHitTestOptions,
+	type ShapeManagerState,
+} from '../../contract';
 import { provide } from 'inversify-binding-decorators';
 import { inject } from 'inversify';
 import { QuadTreeManager } from './QuadTreeManager';
 import { getShapeWorldBounds } from './ShapeBounds';
+import { create } from 'zustand';
 
 @provide(IShapeManager)
 export class ShapeManager implements IShapeManager {
@@ -16,12 +22,17 @@ export class ShapeManager implements IShapeManager {
 	private nextShapeOrder = 0;
 	private spatialIndex = new QuadTreeManager();
 
+	public store = create<ShapeManagerState>(() => ({
+		shapeCount: 0,
+	}));
+
 	public setShape(shape: BaseShape, appendToStage = true) {
 		if (appendToStage) {
 			const stage = this.viewportService.getStage();
 			stage.appendShape(shape.container);
 		}
 		this.shapes.set(shape.id, shape);
+		this.syncShapeCount();
 
 		let order = this.shapeOrder.get(shape.id);
 		if (order === undefined) {
@@ -114,6 +125,7 @@ export class ShapeManager implements IShapeManager {
 		this.shapeOrder.clear();
 		this.nextShapeOrder = 0;
 		this.spatialIndex.clear();
+		this.syncShapeCount();
 	}
 
 	public removeShape(id: string) {
@@ -124,6 +136,11 @@ export class ShapeManager implements IShapeManager {
 			this.spatialIndex.remove(id);
 			this.shapeOrder.delete(id);
 			this.shapes.delete(id);
+			this.syncShapeCount();
 		}
+	}
+
+	private syncShapeCount(): void {
+		this.store.setState({ shapeCount: this.shapes.size });
 	}
 }

@@ -71,5 +71,8 @@ export default {
 	},
 	editor: {
 		editText: 'Edit shape text',
+		emptyTitle: 'Start drawing something',
+		emptyDescription: 'Choose a shape above, then drag anywhere on the canvas to create it.',
+		createExample: 'Open example canvas',
 	},
 } as const;

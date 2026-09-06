@@ -19,8 +19,8 @@
 .ctx-card {
 	box-sizing: border-box;
 	padding: 14px;
-	color: #403b35;
-	background: #fffefa;
+	color: var(--ui-color-text);
+	background: var(--ui-color-surface);
 	border: 1px solid rgba(73, 67, 57, 0.22);
 	border-radius: 12px;
 	box-shadow: 0 1px 2px rgba(70, 61, 48, 0.06), 0 8px 24px rgba(70, 61, 48, 0.1);
@@ -37,11 +37,11 @@
 	align-items: center;
 	justify-content: space-between;
 	min-height: 24px;
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+	font-family: var(--ui-font-sans);
 	font-size: 15px;
 	font-weight: 650;
 	line-height: 1.2;
-	color: #292621;
+	color: var(--ui-color-text-strong);
 }
 
 .ctx-collapse-btn {
@@ -74,13 +74,13 @@
 	}
 
 	&:hover {
-		color: #292621;
+		color: var(--ui-color-text-strong);
 		background: #f3f0eb;
 		border-color: transparent;
 	}
 
 	&:focus-visible {
-		box-shadow: 0 0 0 3px rgba(97, 91, 164, 0.18);
+		box-shadow: var(--ui-focus-ring);
 	}
 }
 
@@ -97,8 +97,8 @@
 	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 	font-size: 12px;
 	line-height: 1.3;
-	color: #514c9a;
-	background: #eeecfa;
+	color: var(--ui-color-accent-strong);
+	background: var(--ui-color-accent-soft);
 	border-radius: 6px;
 }
 
@@ -112,8 +112,8 @@
 
 .ctx-section-title,
 .ctx-label {
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-	color: #5d564d;
+	font-family: var(--ui-font-sans);
+	color: var(--ui-color-text-muted);
 }
 
 .ctx-section-title {
@@ -175,9 +175,9 @@
 		box-shadow: 0 0 0 3px rgba(97, 91, 164, 0.2);
 	}
 
-	&--active {
-		border-color: #514c9a;
-		box-shadow: 0 0 0 2px #fffefa, 0 0 0 3.5px #615ba4;
+	&[data-pressed] {
+		border-color: var(--ui-color-accent-strong);
+		box-shadow: 0 0 0 2px var(--ui-color-surface), 0 0 0 3.5px var(--ui-color-accent);
 	}
 
 	&--transparent {
@@ -215,11 +215,11 @@
 	height: 30px;
 	min-width: 0;
 	padding: 0 8px;
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+	font-family: var(--ui-font-sans);
 	font-size: 12px;
 	font-weight: 550;
 	line-height: 28px;
-	color: #403b35;
+	color: var(--ui-color-text);
 	background: transparent;
 	border: 0;
 	border-right: 1px solid rgba(73, 67, 57, 0.18);
@@ -233,8 +233,8 @@
 	}
 
 	&:hover {
-		color: #292621;
-		background: #f4f1ed;
+		color: var(--ui-color-text-strong);
+		background: var(--ui-color-hover);
 		border-color: rgba(73, 67, 57, 0.18);
 	}
 
@@ -244,10 +244,10 @@
 		box-shadow: inset 0 0 0 2px rgba(97, 91, 164, 0.5);
 	}
 
-	&--active,
-	&--active:hover {
-		color: #514c9a;
-		background: #eeecfa;
+	&[data-pressed],
+	&[data-pressed]:hover {
+		color: var(--ui-color-accent-strong);
+		background: var(--ui-color-accent-soft);
 		font-weight: 650;
 	}
 }
@@ -259,72 +259,71 @@
 	width: 100%;
 }
 
-.ctx-range {
-	--ctx-range-value: 0%;
-
+.ctx-slider {
+	display: flex;
 	width: 100%;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.ctx-slider__control {
+	display: flex;
 	height: 18px;
-	margin: 0;
-	background: transparent;
-	outline: none;
-	appearance: none;
+	flex: 1;
+	align-items: center;
 	cursor: pointer;
+	touch-action: none;
+	user-select: none;
+}
 
-	&::-webkit-slider-runnable-track {
-		height: 3px;
-		background: linear-gradient(
-			to right,
-			#615ba4 0 var(--ctx-range-value),
-			#d8d1c7 var(--ctx-range-value) 100%
-		);
-		border-radius: 3px;
-	}
+.ctx-slider__track {
+	position: relative;
+	width: 100%;
+	height: 3px;
+	background: #d8d1c7;
+	border-radius: 3px;
+}
 
-	&::-webkit-slider-thumb {
-		width: 16px;
-		height: 16px;
-		margin-top: -6.5px;
-		background: #fffefa;
-		border: 1.5px solid #615ba4;
-		border-radius: 50%;
-		box-shadow: 0 1px 2px rgba(73, 67, 57, 0.18);
-		appearance: none;
-	}
+.ctx-slider__indicator {
+	height: 100%;
+	background: var(--ui-color-accent);
+	border-radius: inherit;
+}
 
-	&::-moz-range-track {
-		height: 3px;
-		background: #d8d1c7;
-		border-radius: 3px;
-	}
+.ctx-slider__thumb {
+	box-sizing: border-box;
+	width: 16px;
+	height: 16px;
+	background: var(--ui-color-surface);
+	border: 1.5px solid var(--ui-color-accent);
+	border-radius: 50%;
+	box-shadow: 0 1px 2px rgba(73, 67, 57, 0.18);
+	outline: none;
 
-	&::-moz-range-progress {
-		height: 3px;
-		background: #615ba4;
-		border-radius: 3px;
-	}
-
-	&::-moz-range-thumb {
-		width: 14px;
-		height: 14px;
-		background: #fffefa;
-		border: 1.5px solid #615ba4;
-		border-radius: 50%;
-	}
-
-	&:focus-visible::-webkit-slider-thumb {
-		box-shadow: 0 0 0 3px rgba(97, 91, 164, 0.18);
+	&:has(input:focus-visible) {
+		box-shadow: var(--ui-focus-ring);
 	}
 }
 
 .ctx-alpha-value {
 	min-width: 34px;
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+	font-family: var(--ui-font-sans);
 	font-size: 11px;
 	font-weight: 550;
 	line-height: 1;
-	color: #5d564d;
+	color: var(--ui-color-text-muted);
 	text-align: right;
 	font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ctx-panel,
+	.ctx-card,
+	.ctx-collapse-btn svg,
+	.ctx-dot,
+	.ctx-segment-btn {
+		transition-duration: 0ms;
+	}
 }
 
 @media (max-width: 720px) {

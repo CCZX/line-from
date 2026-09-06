@@ -1,5 +1,171 @@
-.editor-canvas-container {
+.editor {
+	position: relative;
 	flex: 1;
+	min-width: 0;
 	height: 100%;
 	overflow: hidden;
+}
+
+.editor-canvas-container {
+	position: absolute;
+	inset: 0;
+}
+
+.editor-empty-state {
+	position: absolute;
+	top: 52%;
+	left: 50%;
+	z-index: 10;
+	display: flex;
+	width: min(420px, calc(100% - 48px));
+	flex-direction: column;
+	align-items: center;
+	box-sizing: border-box;
+	padding: 0;
+	color: #403b35;
+	text-align: center;
+	pointer-events: none;
+	transform: translate(-50%, -50%);
+}
+
+.editor-empty-state__illustration {
+	width: 184px;
+	height: 96px;
+	margin-bottom: 18px;
+
+	svg {
+		display: block;
+		width: 100%;
+		height: 100%;
+		overflow: visible;
+	}
+
+	path,
+	rect,
+	circle {
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	.editor-empty-state__scribble {
+		fill: none;
+		stroke: rgba(116, 108, 98, 0.26);
+		stroke-width: 1.4;
+	}
+
+	.editor-empty-state__connector,
+	.editor-empty-state__connector-arrow {
+		fill: none;
+		stroke: #8d867d;
+		stroke-width: 1.7;
+		stroke-dasharray: 4 5;
+	}
+
+	.editor-empty-state__connector-arrow {
+		stroke-dasharray: none;
+	}
+
+	.editor-empty-state__circle {
+		fill: #fffefa;
+		stroke: #8d867d;
+		stroke-width: 1.7;
+	}
+
+	.editor-empty-state__rectangle {
+		fill: #eeecfa;
+		stroke: #615ba4;
+		stroke-width: 1.8;
+	}
+
+	.editor-empty-state__plus {
+		fill: none;
+		stroke: #615ba4;
+		stroke-width: 1.8;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+}
+
+.editor-empty-state__title {
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+	font-size: 22px;
+	font-weight: 650;
+	line-height: 1.25;
+	letter-spacing: -0.015em;
+}
+
+.editor-empty-state__description {
+	max-width: 360px;
+	margin: 9px 0 20px;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+	font-size: 14px;
+	line-height: 1.55;
+	color: #8a8279;
+}
+
+.editor-empty-state__button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 38px;
+	gap: 7px;
+	padding: 0 14px;
+	color: #514c9a;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1;
+	pointer-events: auto;
+	background: rgba(255, 254, 250, 0.72);
+	border: 1px solid rgba(97, 91, 164, 0.42);
+	border-radius: 8px;
+	box-shadow: 0 1px 2px rgba(70, 61, 48, 0.06);
+	outline: none;
+	cursor: pointer;
+	transition: background-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+
+	&:hover {
+		color: #464184;
+		background: #eeecfa;
+		border-color: rgba(81, 76, 154, 0.7);
+		box-shadow: 0 3px 9px rgba(81, 76, 154, 0.12);
+		transform: translateY(-1px);
+	}
+
+	&:active {
+		box-shadow: 0 1px 2px rgba(70, 61, 48, 0.08);
+		transform: translateY(0) scale(0.98);
+	}
+
+	&:focus-visible {
+		box-shadow: 0 0 0 3px rgba(97, 91, 164, 0.18);
+	}
+}
+
+.editor-empty-state__button-arrow {
+	font-size: 16px;
+	font-weight: 400;
+	line-height: 1;
+	transition: transform 120ms ease;
+
+	.editor-empty-state__button:hover & {
+		transform: translateX(2px);
+	}
+}
+
+@media (max-width: 640px) {
+	.editor-empty-state {
+		top: 54%;
+		width: min(360px, calc(100% - 40px));
+	}
+
+	.editor-empty-state__illustration {
+		margin-bottom: 12px;
+		transform: scale(0.84);
+	}
+
+	.editor-empty-state__title {
+		font-size: 20px;
+	}
 }

@@ -84,6 +84,7 @@ describe('ShapeManager', () => {
 			expect(stage.appendShape).toHaveBeenCalledWith(shape.container);
 			expect(manager.getShapeById(shape.id)).toBe(shape);
 			expect(manager.getAllShapes()).toEqual([shape]);
+			expect(manager.store.getState().shapeCount).toBe(1);
 		});
 
 		it('appendToStage 为 false 时只保存图形', () => {
@@ -230,6 +231,7 @@ describe('ShapeManager', () => {
 			expect(stage.removeShape).toHaveBeenCalledWith(shape.container);
 			expect(manager.getShapeById(shape.id)).toBeUndefined();
 			expect(shape.container.destroy).not.toHaveBeenCalled();
+			expect(manager.store.getState().shapeCount).toBe(0);
 		});
 
 		it('删除不存在的图形时不访问舞台', () => {
@@ -255,6 +257,7 @@ describe('ShapeManager', () => {
 			expect(firstShape.container.destroy).toHaveBeenCalledWith({ children: true });
 			expect(secondShape.container.destroy).toHaveBeenCalledWith({ children: true });
 			expect(manager.getAllShapes()).toEqual([]);
+			expect(manager.store.getState().shapeCount).toBe(0);
 		});
 	});
 });
