@@ -76,6 +76,7 @@ WebGL 加速渲染，围绕图形创建、选择、变换、连接和样式编�
 
 - Node.js 22.13 或更高版本（推荐使用仓库 `.nvmrc` 指定的 Node.js 22）
 - pnpm 11.19.0（由 `package.json` 的 `packageManager` 字段锁定）
+- Java 17 或更高版本、Maven 3.6.3 或更高版本（后端开发）
 
 ### 安装依赖
 
@@ -94,6 +95,14 @@ pnpm dev
 
 启动后访问 [http://localhost:5173](http://localhost:5173)。
 
+另开一个终端启动后端：
+
+```bash
+pnpm dev:backend
+```
+
+开发服务器会把 `/api` 请求代理到 `http://localhost:8080`。
+
 ### 构建与预览
 
 ```bash
@@ -106,9 +115,12 @@ pnpm preview
 | 命令                  | 说明                               |
 | --------------------- | ---------------------------------- |
 | `pnpm dev`            | 启动 Vite 开发服务器               |
+| `pnpm dev:backend`    | 启动 Spring Boot 后端              |
 | `pnpm build`          | 执行 TypeScript 检查并构建生产资源 |
+| `pnpm build:backend`  | 测试并构建 Spring Boot 后端        |
 | `pnpm preview`        | 本地预览生产构建                   |
 | `pnpm test`           | 运行全部单元测试                   |
+| `pnpm test:backend`   | 运行 Spring Boot 后端测试          |
 | `pnpm test:watch`     | 以监听模式运行测试                 |
 | `pnpm test:typecheck` | 检查测试代码类型                   |
 | `pnpm test:e2e`       | 使用 Playwright 运行端到端测试     |
@@ -135,6 +147,7 @@ pnpm preview
 ```text
 .
 ├── public/                    # favicon 等静态资源
+├── backend/                   # Spring Boot 后端服务
 ├── src/
 │   ├── canvas/core/          # PixiJS Stage 与 Viewport
 │   ├── common/               # IoC 容器、React 上下文与公共服务

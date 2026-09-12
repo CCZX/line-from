@@ -9,9 +9,12 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:backend": "mvn -f backend/pom.xml spring-boot:run",
     "build": "tsc && vite build",
+    "build:backend": "mvn -f backend/pom.xml package",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:backend": "mvn -f backend/pom.xml test",
     "test:watch": "vitest",
     "test:typecheck": "tsc --project tests/tsconfig.json",
     "test:e2e": "playwright test",
