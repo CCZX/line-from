@@ -1,4 +1,4 @@
-package cn.ccxhq.graphs.api;
+package cn.ccxhq.graphs.interfaces.rest;
 
 import java.time.Instant;
 
