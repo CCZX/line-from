@@ -6,9 +6,7 @@ export class MovingState extends AbsState {
 
 	public override allowNextStateTypes = [ShapeStateEnum.Selected, ShapeStateEnum.MultiSelected];
 
-	public onActivate() {
-		console.log('ccdebug ');
-	}
+	public onActivate(): void {}
 
 	public onDeactivate(): void {}
 }

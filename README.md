@@ -127,6 +127,10 @@ pnpm preview
 | `pnpm test:e2e:ui`    | 在 Playwright UI 中调试端到端测试  |
 | `pnpm lint`           | 检查源码与测试代码                 |
 | `pnpm lint:fix`       | 自动修复可修复的代码规范问题       |
+| `pnpm verify:fast`    | 运行单元测试、测试类型检查和 lint  |
+| `pnpm verify:frontend` | 运行完整前端检查、构建和 E2E      |
+| `pnpm verify:backend` | 运行 Maven 后端验证                |
+| `pnpm verify`         | 运行前后端完整验证                 |
 
 ## 技术栈
 
@@ -148,6 +152,7 @@ pnpm preview
 .
 ├── public/                    # favicon 等静态资源
 ├── backend/                   # Spring Boot 后端服务
+├── docs/                      # 架构、数据契约等开发文档
 ├── src/
 │   ├── canvas/core/          # PixiJS Stage 与 Viewport
 │   ├── common/               # IoC 容器、React 上下文与公共服务
@@ -159,6 +164,7 @@ pnpm preview
 │   └── widget/               # 编辑器、工具栏和属性面板
 ├── tests/unit/               # 单元测试
 ├── tests/e2e/                # Playwright 端到端测试
+├── AGENTS.md                 # AI 开发约定与文档路由
 ├── DESIGN.md                 # 视觉设计规范
 └── vite.config.ts            # Vite 与路径别名配置
 ```
@@ -176,6 +182,9 @@ pnpm preview
 - **服务层**：领域接口与实现分离，通过 InversifyJS 完成依赖注入；React 组件通过
   Context 获取所需服务。
 
+详细的模块边界、事件链、坐标系、Action 历史和实现不变量见
+[docs/architecture.md](./docs/architecture.md)。
+
 ## 数据格式
 
 工具栏可以导出当前画布的 ShapeData JSON。导入时会先校验数据结构，再使用文件内容
@@ -187,14 +196,11 @@ ShapeData 包含图形类型和对应属性，例如位置、尺寸、旋转、�
 ## 开发约定
 
 - 源码使用 `@/` 作为 `src/` 的路径别名。
-- 目录使用 lowerCamelCase，React 组件与类使用 UpperCamelCase。
+- 新目录默认使用 lowerCamelCase，React 组件、类及其同名文件使用 UpperCamelCase；
+  现有领域模块中的历史大写目录只在专项重构中调整。
 - 领域服务优先通过接口 Token 注入，不直接依赖具体实现。
-- 提交前建议运行：
+- 完整验证运行：
 
 ```bash
-pnpm test
-pnpm test:typecheck
-pnpm test:e2e
-pnpm lint
-pnpm build
+pnpm verify
 ```

@@ -28,26 +28,21 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Unit tests
-        run: pnpm test
-
-      - name: Test typecheck
-        run: pnpm test:typecheck
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Build
-        run: pnpm build
-
-      - name: End-to-end tests
-        run: pnpm test:e2e
+      - name: Verify project
+        run: pnpm verify
 
       - name: Upload Playwright artifacts
         if: ${{ !cancelled() }}

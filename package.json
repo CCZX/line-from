@@ -1,6 +1,6 @@
 {
-  "name": "line-from",
-  "private": false,
+  "name": "lineform",
+  "private": true,
   "version": "0.0.1",
   "packageManager": "pnpm@11.19.0",
   "engines": {
@@ -20,6 +20,10 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
+    "verify:fast": "pnpm test && pnpm test:typecheck && pnpm lint",
+    "verify:frontend": "pnpm verify:fast && pnpm build && pnpm test:e2e",
+    "verify:backend": "mvn -f backend/pom.xml verify",
+    "verify": "pnpm verify:frontend && pnpm verify:backend",
     "prepare": "husky install",
     "lint": "eslint src tests vitest.config.ts playwright.config.ts tsconfig.json --ext .ts,.tsx",
     "lint:fix": "eslint src tests vitest.config.ts playwright.config.ts tsconfig.json --ext .ts,.tsx --fix"
