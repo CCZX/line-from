@@ -4,7 +4,7 @@ import {
 	drawSketchyCircle,
 	drawSketchyDiamond,
 	drawSketchyRoundedRect,
-} from '@/shape/property/style';
+} from '@lineform/shape/property/style';
 
 class RecordingGraphics {
 	public points: Point[] = [];

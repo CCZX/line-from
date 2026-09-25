@@ -1,5 +1,11 @@
-import { control, ISelectService, IShapeManager, IShortcutKey, meta } from '@/domain/contract';
-import { ShapeStateEnum } from '@/shape/contract';
+import {
+	control,
+	ISelectService,
+	IShapeManager,
+	IShortcutKey,
+	meta,
+} from '@lineform/domain/contract';
+import { ShapeStateEnum } from '@lineform/shape/contract';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 

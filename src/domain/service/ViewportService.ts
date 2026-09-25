@@ -1,10 +1,10 @@
 import { Point as PixiPoint } from '@pixi/core';
-import { Stage } from '@/canvas/core/Stage';
-import { IViewportService, ViewportState } from '@/domain/contract/ViewportService';
+import { Stage } from '@lineform/canvas/core/Stage';
+import { IViewportService, ViewportState } from '@lineform/domain/contract/ViewportService';
 import { provide } from 'inversify-binding-decorators';
 import { create } from 'zustand';
-import { provideMultiple } from '@/common/context';
-import { IDestroyable } from '@/common/contract/Destroyable';
+import { provideMultiple } from '@lineform/common/context';
+import { IDestroyable } from '@lineform/common/contract/Destroyable';
 import { Subscription } from 'rxjs';
 
 const viewportStore = create<ViewportState>((set) => ({

@@ -1,7 +1,7 @@
 import { AbsProperty } from './AbsProperty';
 import { StrokePropertyValue } from '../contract';
 import { BaseShape } from '../BaseShape';
-import { SHAPE_COLORS } from '@/common/color';
+import { SHAPE_COLORS } from '@lineform/common/color';
 
 const DEFAULT_VALUE: StrokePropertyValue = {
 	color: SHAPE_COLORS.border.fallback,

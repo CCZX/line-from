@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { IocContainerService } from '@/common/contract';
-import type { ISelectService, IShapeManager } from '@/domain/contract';
-import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
-import { UpdatePropsActionExecute } from '@/domain/service/Action/ActionExecutes/UpdatePropsActionExecute';
-import type { BaseShape } from '@/shape/BaseShape';
-import { ShapePropertyEnum, ShapeTypeEnum } from '@/shape/contract';
+import type { IocContainerService } from '@lineform/common/contract';
+import type { ISelectService, IShapeManager } from '@lineform/domain/contract';
+import { UpdatePropsAction } from '@lineform/domain/service/Action/Actions/UpdatePropsAction';
+import { UpdatePropsActionExecute } from '@lineform/domain/service/Action/ActionExecutes/UpdatePropsActionExecute';
+import type { BaseShape } from '@lineform/shape/BaseShape';
+import { ShapePropertyEnum, ShapeTypeEnum } from '@lineform/shape/contract';
 
 describe('UpdatePropsActionExecute', () => {
 	it('图形全部属性更新完成后刷新一次空间索引', () => {

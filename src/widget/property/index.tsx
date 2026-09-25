@@ -10,20 +10,20 @@ import {
 	type ShapeData,
 	type StrokePropertyValue,
 	type StrokeStyle,
-} from '@/shape/contract';
+} from '@lineform/shape/contract';
 import { BACKGROUND_COLOR_PRESETS, BORDER_COLOR_PRESETS } from './const';
 import type { PresetColor } from './const';
 import './index.less';
-import { useInject } from '@/common/context';
-import { IActionManager, IShapeManager } from '@/domain/contract';
-import { ISelectService } from '@/domain/contract/SelectService';
-import { StrokeProperty } from '@/shape/property/StrokeProperty';
-import { FillProperty } from '@/shape/property/FillProperty';
-import { BaseProperty } from '@/shape/property/BaseProperty';
-import { IocContainerService } from '@/common/contract';
-import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
+import { useInject } from '@lineform/common/context';
+import { IActionManager, IShapeManager } from '@lineform/domain/contract';
+import { ISelectService } from '@lineform/domain/contract/SelectService';
+import { StrokeProperty } from '@lineform/shape/property/StrokeProperty';
+import { FillProperty } from '@lineform/shape/property/FillProperty';
+import { BaseProperty } from '@lineform/shape/property/BaseProperty';
+import { IocContainerService } from '@lineform/common/contract';
+import { UpdatePropsAction } from '@lineform/domain/service/Action/Actions/UpdatePropsAction';
 import { useTranslation } from 'react-i18next';
-import { colorToHex, SHAPE_COLORS } from '@/common/color';
+import { colorToHex, SHAPE_COLORS } from '@lineform/common/color';
 
 const STROKE_WIDTH_OPTIONS = [
 	{ labelKey: 'property.width.none', value: 0 },

@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi, type Mock } from 'vitest';
-import type { IActionManager, ISelectService, IShapeManager } from '@/domain/contract';
-import { CreateShapeAction } from '@/domain/service/Action/Actions/CreateShapeAction';
-import { DuplicateShortcutKey } from '@/domain/service/ShortcutKey/shortcutKeys/duplicate';
-import { type ShapeData, ShapeStateEnum, ShapeTypeEnum } from '@/shape/contract';
+import type { IActionManager, ISelectService, IShapeManager } from '@lineform/domain/contract';
+import { CreateShapeAction } from '@lineform/domain/service/Action/Actions/CreateShapeAction';
+import { DuplicateShortcutKey } from '@lineform/domain/service/ShortcutKey/shortcutKeys/duplicate';
+import { type ShapeData, ShapeStateEnum, ShapeTypeEnum } from '@lineform/shape/contract';
 
 interface ShapeMock {
 	id: string;

@@ -1,31 +1,31 @@
 import { Point as PixiPoint } from '@pixi/core';
-import { IocContainerService } from '@/common/contract';
-import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
+import { IocContainerService } from '@lineform/common/contract';
+import { IActionLogManager, IActionManager } from '@lineform/domain/contract/Action';
 import {
 	EventPayload,
 	HandlerEnum,
 	IHandler,
 	InteractionState,
-} from '@/domain/contract/EventManager';
-import { ISelectService } from '@/domain/contract/SelectService';
-import { IViewportService } from '@/domain/contract/ViewportService';
-import { CreateShapeAction } from '@/domain/service/Action/Actions/CreateShapeAction';
-import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
-import { BaseShape } from '@/shape/BaseShape';
+} from '@lineform/domain/contract/EventManager';
+import { ISelectService } from '@lineform/domain/contract/SelectService';
+import { IViewportService } from '@lineform/domain/contract/ViewportService';
+import { CreateShapeAction } from '@lineform/domain/service/Action/Actions/CreateShapeAction';
+import { UpdatePropsAction } from '@lineform/domain/service/Action/Actions/UpdatePropsAction';
+import { BaseShape } from '@lineform/shape/BaseShape';
 import {
 	LineEndpointValue,
 	LinePropertyValue,
 	ShapeData,
 	ShapeDecorateTypeEnum,
 	ShapeTypeEnum,
-} from '@/shape/contract';
-import { ConnectionAnchor, SelectedBorder } from '@/shape/decorate/SelectedBorder';
-import { getShapeAnchorPoint } from '@/shape/geometry';
+} from '@lineform/shape/contract';
+import { ConnectionAnchor, SelectedBorder } from '@lineform/shape/decorate/SelectedBorder';
+import { getShapeAnchorPoint } from '@lineform/shape/geometry';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
-import { IHandlerWithInteraction } from '@/domain/contract';
-import { SHAPE_COLORS } from '@/common/color';
-import { IConnectionSnapService } from '@/domain/contract/ConnectionSnapService';
+import { IHandlerWithInteraction } from '@lineform/domain/contract';
+import { SHAPE_COLORS } from '@lineform/common/color';
+import { IConnectionSnapService } from '@lineform/domain/contract/ConnectionSnapService';
 
 const HANDLE_HIT_RADIUS = 9;
 const DRAG_THRESHOLD = 3;

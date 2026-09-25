@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { BaseShape } from '@/shape/BaseShape';
-import { ShapeTypeEnum } from '@/shape/contract';
-import { AlignmentSnapService } from '@/domain/service/AlignmentSnap';
+import { BaseShape } from '@lineform/shape/BaseShape';
+import { ShapeTypeEnum } from '@lineform/shape/contract';
+import { AlignmentSnapService } from '@lineform/domain/service/AlignmentSnap';
 
 function createShape(
 	id: string,

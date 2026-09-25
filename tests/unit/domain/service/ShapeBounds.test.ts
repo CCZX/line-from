@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { BaseShape } from '@/shape/BaseShape';
-import { Line } from '@/shape/Line';
-import { ShapePropertyEnum, ShapeTypeEnum } from '@/shape/contract';
-import { getShapeWorldBounds } from '@/domain/service/ShapeManager';
+import { BaseShape } from '@lineform/shape/BaseShape';
+import { Line } from '@lineform/shape/Line';
+import { ShapePropertyEnum, ShapeTypeEnum } from '@lineform/shape/contract';
+import { getShapeWorldBounds } from '@lineform/domain/service/ShapeManager';
 
 describe('getShapeWorldBounds', () => {
 	it('计算旋转图形的世界坐标 AABB', () => {

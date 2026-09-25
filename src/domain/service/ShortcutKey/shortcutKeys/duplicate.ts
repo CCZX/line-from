@@ -1,4 +1,4 @@
-import { IocContainerService } from '@/common/contract';
+import { IocContainerService } from '@lineform/common/contract';
 import {
 	IActionManager,
 	ISelectService,
@@ -6,14 +6,14 @@ import {
 	IShortcutKey,
 	control,
 	meta,
-} from '@/domain/contract';
-import { CreateShapeAction } from '@/domain/service/Action/Actions/CreateShapeAction';
+} from '@lineform/domain/contract';
+import { CreateShapeAction } from '@lineform/domain/service/Action/Actions/CreateShapeAction';
 import {
 	type LineEndpointValue,
 	type LinePropertyValue,
 	type ShapeData,
 	ShapeStateEnum,
-} from '@/shape/contract';
+} from '@lineform/shape/contract';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 

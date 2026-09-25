@@ -1,4 +1,4 @@
-import { ShapeTypeEnum, type ShapeData } from '@/shape/contract';
+import { ShapeTypeEnum, type ShapeData } from '@lineform/shape/contract';
 
 type UnknownRecord = Record<string, unknown>;
 

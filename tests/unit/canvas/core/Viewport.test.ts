@@ -1,6 +1,6 @@
 import { Point } from '@pixi/core';
 import { describe, expect, it, vi } from 'vitest';
-import { MAX_ZOOM_SCALE, MIN_ZOOM_SCALE, Viewport } from '@/canvas/core/Viewport';
+import { MAX_ZOOM_SCALE, MIN_ZOOM_SCALE, Viewport } from '@lineform/canvas/core/Viewport';
 
 interface CanvasMock {
 	style: { cursor: string };

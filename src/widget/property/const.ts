@@ -3,8 +3,8 @@ import {
 	BORDER_COLOR_NAMES,
 	COLOR_PALETTE,
 	colorToHex,
-} from '@/common/color';
-import type { PaletteColorName } from '@/common/color';
+} from '@lineform/common/color';
+import type { PaletteColorName } from '@lineform/common/color';
 
 export interface PresetColor {
 	nameKey: string;

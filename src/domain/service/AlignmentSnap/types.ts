@@ -1,4 +1,4 @@
-import type { SnapAxis } from '@/domain/contract/AlignmentSnapService';
+import type { SnapAxis } from '@lineform/domain/contract/AlignmentSnapService';
 
 export type SnapAnchorKind = 'start' | 'center' | 'end';
 

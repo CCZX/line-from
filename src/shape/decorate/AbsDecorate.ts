@@ -1,5 +1,5 @@
 import { ShapeDecorateTypeEnum } from '../contract';
-import type { IViewportService } from '@/domain/contract/ViewportService';
+import type { IViewportService } from '@lineform/domain/contract/ViewportService';
 import type { BaseShape } from '../BaseShape';
 
 export interface DecorateViewport {

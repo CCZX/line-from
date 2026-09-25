@@ -1,0 +1,20 @@
+{
+  "name": "@lineform/canvas",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./core/Stage": "./core/Stage.ts",
+    "./core/Viewport": "./core/Viewport.ts"
+  },
+  "dependencies": {
+    "@lineform/common": "workspace:*",
+    "@pixi/app": "^7.4.3",
+    "@pixi/core": "^7.4.3",
+    "@pixi/display": "^7.4.3",
+    "@pixi/graphics": "^7.4.3",
+    "lodash": "^4.18.1",
+    "rxjs": "^7.8.2"
+  }
+}

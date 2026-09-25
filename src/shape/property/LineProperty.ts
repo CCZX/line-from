@@ -6,9 +6,9 @@ import { StrokeProperty } from './StrokeProperty';
 import { applyLineStyle, drawSketchyArrowhead, drawSketchyLine } from './style';
 import { catmullRomToBezier, cubicBezierPoint, getShapeAnchorPoint } from '../geometry';
 import { Graphics } from '@pixi/graphics';
-import { IShapeManager } from '@/domain/contract';
-import { IocContainerService } from '@/common/contract';
-import { SHAPE_COLORS } from '@/common/color';
+import { IShapeManager } from '@lineform/domain/contract';
+import { IocContainerService } from '@lineform/common/contract';
+import { SHAPE_COLORS } from '@lineform/common/color';
 
 const DEFAULT_VALUE: LinePropertyValue = {
 	start: { x: 0, y: 0 },

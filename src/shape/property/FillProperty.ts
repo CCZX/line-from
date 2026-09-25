@@ -1,7 +1,7 @@
 import { AbsProperty } from './AbsProperty';
 import { FillPropertyValue } from '../contract';
 import { BaseShape } from '../BaseShape';
-import { SHAPE_COLORS } from '@/common/color';
+import { SHAPE_COLORS } from '@lineform/common/color';
 
 const DEFAULT_VALUE: FillPropertyValue = {
 	color: SHAPE_COLORS.background.fallback,

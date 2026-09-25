@@ -1,23 +1,23 @@
-import { BaseShape } from '@/shape/BaseShape';
-import { BaseProperty } from '@/shape/property/BaseProperty';
+import { BaseShape } from '@lineform/shape/BaseShape';
+import { BaseProperty } from '@lineform/shape/property/BaseProperty';
 import {
 	BasePropertyValue,
 	ResizeDirection,
 	ShapeDecorateTypeEnum,
 	ShapePropertyEnum,
 	ShapeStateEnum,
-} from '@/shape/contract';
+} from '@lineform/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
-import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
-import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
-import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
-import { ISelectService } from '@/domain/contract/SelectService';
+import { IActionLogManager, IActionManager } from '@lineform/domain/contract/Action';
+import { UpdatePropsAction } from '@lineform/domain/service/Action/Actions/UpdatePropsAction';
+import { IHandlerWithInteraction, IHandler } from '@lineform/domain/contract';
+import { ISelectService } from '@lineform/domain/contract/SelectService';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
-import { IocContainerService } from '@/common/contract';
-import { SelectedBorder } from '@/shape/decorate/SelectedBorder';
-import { IViewportService } from '@/domain/contract/ViewportService';
-import { IMatrixService } from '@/common/contract/MatrixService';
+import { IocContainerService } from '@lineform/common/contract';
+import { SelectedBorder } from '@lineform/shape/decorate/SelectedBorder';
+import { IViewportService } from '@lineform/domain/contract/ViewportService';
+import { IMatrixService } from '@lineform/common/contract/MatrixService';
 
 const MIN_SIZE = 10;
 const HANDLE_HIT_RADIUS = 8;

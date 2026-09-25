@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { IocContainerService } from '@/common/contract';
-import { ToolType } from '@/domain/contract';
-import type { EventPayload, InteractionState } from '@/domain/contract/EventManager';
-import { CreateShapeAction } from '@/domain/service/Action/Actions/CreateShapeAction';
-import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
-import { CreateHandler } from '@/domain/service/Events/modes/creator/handlers/CreateHandler';
-import { ShapeTypeEnum } from '@/shape/contract';
+import type { IocContainerService } from '@lineform/common/contract';
+import { ToolType } from '@lineform/domain/contract';
+import type { EventPayload, InteractionState } from '@lineform/domain/contract/EventManager';
+import { CreateShapeAction } from '@lineform/domain/service/Action/Actions/CreateShapeAction';
+import { UpdatePropsAction } from '@lineform/domain/service/Action/Actions/UpdatePropsAction';
+import { CreateHandler } from '@lineform/domain/service/Events/modes/creator/handlers/CreateHandler';
+import { ShapeTypeEnum } from '@lineform/shape/contract';
 
 function createHandler(activeTool: ToolType) {
 	const push = vi.fn();

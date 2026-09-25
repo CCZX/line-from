@@ -5,8 +5,8 @@ import {
 	ShapePropertyEnum,
 	ShapeStateEnum,
 	ShapeTypeEnum,
-} from '@/shape/contract';
-import { ToolType, IToolService } from '@/domain/contract/ToolService';
+} from '@lineform/shape/contract';
+import { ToolType, IToolService } from '@lineform/domain/contract/ToolService';
 import {
 	HandlerEnum,
 	InteractionState,
@@ -14,19 +14,19 @@ import {
 	IHandler,
 	IHandlerWithCreator,
 } from '../../../../../contract/EventManager';
-import { CreateShapeAction } from '@/domain/service/Action/Actions/CreateShapeAction';
-import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
-import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
-import { IShapeManager } from '@/domain/contract';
-import { ISelectService } from '@/domain/contract/SelectService';
-import { IViewportService } from '@/domain/contract/ViewportService';
-import { IConnectionSnapService } from '@/domain/contract/ConnectionSnapService';
-import { BaseProperty } from '@/shape/property/BaseProperty';
-import { LineProperty } from '@/shape/property/LineProperty';
+import { CreateShapeAction } from '@lineform/domain/service/Action/Actions/CreateShapeAction';
+import { UpdatePropsAction } from '@lineform/domain/service/Action/Actions/UpdatePropsAction';
+import { IActionLogManager, IActionManager } from '@lineform/domain/contract/Action';
+import { IShapeManager } from '@lineform/domain/contract';
+import { ISelectService } from '@lineform/domain/contract/SelectService';
+import { IViewportService } from '@lineform/domain/contract/ViewportService';
+import { IConnectionSnapService } from '@lineform/domain/contract/ConnectionSnapService';
+import { BaseProperty } from '@lineform/shape/property/BaseProperty';
+import { LineProperty } from '@lineform/shape/property/LineProperty';
 import { inject } from 'inversify';
-import { IocContainerService } from '@/common/contract';
+import { IocContainerService } from '@lineform/common/contract';
 import { provide } from 'inversify-binding-decorators';
-import { SHAPE_COLORS } from '@/common/color';
+import { SHAPE_COLORS } from '@lineform/common/color';
 
 let _idCounter = 0;
 function nextId(): string {

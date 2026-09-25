@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { IShapeManager, ShapeHitTestOptions } from '@/domain/contract';
+import type { IShapeManager, ShapeHitTestOptions } from '@lineform/domain/contract';
 import {
 	CONNECTION_SNAP_RADIUS,
 	ConnectionSnapService,
-} from '@/domain/service/ConnectionSnap';
-import type { BaseShape } from '@/shape/BaseShape';
+} from '@lineform/domain/service/ConnectionSnap';
+import type { BaseShape } from '@lineform/shape/BaseShape';
 
 describe('ConnectionSnapService', () => {
 	let service: ConnectionSnapService;

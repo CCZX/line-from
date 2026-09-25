@@ -1,0 +1,14 @@
+{
+  "name": "@lineform/ui",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./AppUiProvider": "./AppUiProvider.tsx"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.7.0",
+    "react": "^18.2.0"
+  }
+}

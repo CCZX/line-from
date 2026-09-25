@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { IocContainerService } from '@/common/contract';
-import { CreateShapeAction } from '@/domain/service/Action/Actions/CreateShapeAction';
-import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
-import { ConnectionCreateHandler } from '@/domain/service/Events/modes/interaction/handlers/ConnectionCreateHandler';
-import type { LineEndpointValue } from '@/shape/contract';
+import type { IocContainerService } from '@lineform/common/contract';
+import { CreateShapeAction } from '@lineform/domain/service/Action/Actions/CreateShapeAction';
+import { UpdatePropsAction } from '@lineform/domain/service/Action/Actions/UpdatePropsAction';
+import { ConnectionCreateHandler } from '@lineform/domain/service/Events/modes/interaction/handlers/ConnectionCreateHandler';
+import type { LineEndpointValue } from '@lineform/shape/contract';
 
 interface ConnectionCreateHandlerInternals {
 	createLine(start: LineEndpointValue, end: LineEndpointValue): void;

@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
-import type { BaseShape } from '@/shape/BaseShape';
-import type { IViewportService } from '@/domain/contract';
-import { ShapeManager } from '@/domain/service/ShapeManager';
-import { ShapeTypeEnum } from '@/shape/contract';
+import type { BaseShape } from '@lineform/shape/BaseShape';
+import type { IViewportService } from '@lineform/domain/contract';
+import { ShapeManager } from '@lineform/domain/service/ShapeManager';
+import { ShapeTypeEnum } from '@lineform/shape/contract';
 
 interface ShapeMock {
 	id: string;

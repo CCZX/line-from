@@ -1,12 +1,12 @@
-import { ShapeStateEnum } from '@/shape/contract';
+import { ShapeStateEnum } from '@lineform/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
 import {
 	IHandler,
 	IHandlerWithInteraction,
 	ISelectService,
 	IShapeManager,
-} from '@/domain/contract';
-import { IViewportService } from '@/domain/contract/ViewportService';
+} from '@lineform/domain/contract';
+import { IViewportService } from '@lineform/domain/contract/ViewportService';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 

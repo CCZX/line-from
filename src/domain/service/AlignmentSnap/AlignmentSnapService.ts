@@ -5,11 +5,11 @@ import {
 	type SnapGuide,
 	type SnapMoveRequest,
 	type SnapMoveResult,
-} from '@/domain/contract/AlignmentSnapService';
-import { IShapeManager } from '@/domain/contract/ShapeManager';
-import { IViewportService } from '@/domain/contract/ViewportService';
-import { getShapeWorldBounds } from '@/domain/service/ShapeManager/ShapeBounds';
-import type { BaseShape } from '@/shape/BaseShape';
+} from '@lineform/domain/contract/AlignmentSnapService';
+import { IShapeManager } from '@lineform/domain/contract/ShapeManager';
+import { IViewportService } from '@lineform/domain/contract/ViewportService';
+import { getShapeWorldBounds } from '@lineform/domain/service/ShapeManager/ShapeBounds';
+import type { BaseShape } from '@lineform/shape/BaseShape';
 import { SnapGuideRenderer } from './SnapGuideRenderer';
 import type { SnapAnchorKind, SnapMatch, SourceAnchor, TargetAnchor } from './types';
 

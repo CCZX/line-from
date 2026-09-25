@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { QuadTreeManager } from '@/domain/service/ShapeManager';
+import { QuadTreeManager } from '@lineform/domain/service/ShapeManager';
 
 function item(id: string, bounds: Rectangle, order: number) {
 	return { id, bounds, order };

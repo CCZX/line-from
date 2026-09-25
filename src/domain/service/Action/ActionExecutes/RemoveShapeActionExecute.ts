@@ -1,8 +1,8 @@
 import { AbsActionExecute } from '../AbsActionExecute';
 import { RemoveShapeAction } from '../Actions/RemoveShapeAction';
 import { ActionTypeEnum, IActionExecute } from '../../../contract/Action';
-import { IShapeManager } from '@/domain/contract';
-import { ISelectService } from '@/domain/contract/SelectService';
+import { IShapeManager } from '@lineform/domain/contract';
+import { ISelectService } from '@lineform/domain/contract/SelectService';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 

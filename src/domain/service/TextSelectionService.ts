@@ -2,14 +2,14 @@ import { Graphics } from '@pixi/graphics';
 import { TextMetrics, type TextStyle } from '@pixi/text';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
-import { DECORATE_COLORS, SHAPE_COLORS } from '@/common/color';
+import { DECORATE_COLORS, SHAPE_COLORS } from '@lineform/common/color';
 import {
 	ITextSelectionService,
 	type TextCaretRect,
 	type TextSelectionPointerOptions,
-} from '@/domain/contract/TextSelectionService';
-import { IViewportService } from '@/domain/contract/ViewportService';
-import type { TextEditableShape } from '@/shape/TextEditableShape';
+} from '@lineform/domain/contract/TextSelectionService';
+import { IViewportService } from '@lineform/domain/contract/ViewportService';
+import type { TextEditableShape } from '@lineform/shape/TextEditableShape';
 
 const CARET_BLINK_INTERVAL = 530;
 const SELECTION_ALPHA = 0.28;

@@ -1,7 +1,7 @@
 import { Graphics } from '@pixi/graphics';
-import type { IViewportService } from '@/domain/contract/ViewportService';
-import type { SnapGuide } from '@/domain/contract/AlignmentSnapService';
-import { DECORATE_COLORS } from '@/common/color';
+import type { IViewportService } from '@lineform/domain/contract/ViewportService';
+import type { SnapGuide } from '@lineform/domain/contract/AlignmentSnapService';
+import { DECORATE_COLORS } from '@lineform/common/color';
 
 export class SnapGuideRenderer {
 	private graphics: Graphics | null = null;

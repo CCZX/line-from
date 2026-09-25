@@ -3,7 +3,7 @@ import { Container } from '@pixi/display';
 import { Graphics } from '@pixi/graphics';
 import debounce from 'lodash/debounce';
 import { Viewport } from './Viewport';
-import { CANVAS_COLORS, colorToHex } from '@/common/color';
+import { CANVAS_COLORS, colorToHex } from '@lineform/common/color';
 
 const RESIZE_DEBOUNCE_MS = 100;
 

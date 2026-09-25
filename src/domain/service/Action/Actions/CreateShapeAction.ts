@@ -1,7 +1,7 @@
-import { ShapeData } from '@/shape/contract';
+import { ShapeData } from '@lineform/shape/contract';
 import { AbsAction } from '../AbsAction';
 import { ActionTypeEnum } from '../../../contract/Action';
-import { IocContainerService } from '@/common/contract';
+import { IocContainerService } from '@lineform/common/contract';
 import { RemoveShapeAction } from './RemoveShapeAction';
 
 export class CreateShapeAction extends AbsAction<ShapeData[]> {

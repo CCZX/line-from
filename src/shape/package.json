@@ -1,0 +1,36 @@
+{
+  "name": "@lineform/shape",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./BaseShape": "./BaseShape.ts",
+    "./Circle": "./Circle.ts",
+    "./Diamond": "./Diamond.ts",
+    "./Line": "./Line.ts",
+    "./Rectangle": "./Rectangle.ts",
+    "./RoundedRectangle": "./RoundedRectangle.ts",
+    "./ShapeFactory": "./ShapeFactory.ts",
+    "./Text": "./Text.ts",
+    "./TextEditableShape": "./TextEditableShape.ts",
+    "./contract": "./contract/index.ts",
+    "./decorate/AbsDecorate": "./decorate/AbsDecorate.ts",
+    "./decorate/SelectedBorder": "./decorate/SelectedBorder.ts",
+    "./geometry": "./geometry.ts",
+    "./property/BaseProperty": "./property/BaseProperty.ts",
+    "./property/FillProperty": "./property/FillProperty.ts",
+    "./property/LineProperty": "./property/LineProperty.ts",
+    "./property/StrokeProperty": "./property/StrokeProperty.ts",
+    "./property/TextProperty": "./property/TextProperty.ts",
+    "./property/style": "./property/style.ts"
+  },
+  "dependencies": {
+    "@lineform/common": "workspace:*",
+    "@lineform/domain": "workspace:*",
+    "@pixi/display": "^7.4.3",
+    "@pixi/graphics": "^7.4.3",
+    "@pixi/text": "^7.4.3",
+    "roughjs": "^4.6.6"
+  }
+}

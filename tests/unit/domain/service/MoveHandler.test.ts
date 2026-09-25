@@ -1,17 +1,17 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { IocContainerService } from '@/common/contract';
-import type { EventPayload, InteractionState } from '@/domain/contract/EventManager';
-import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
-import { MoveHandler } from '@/domain/service/Events/modes/interaction/handlers/MoveHandler';
-import { BaseShape } from '@/shape/BaseShape';
+import type { IocContainerService } from '@lineform/common/contract';
+import type { EventPayload, InteractionState } from '@lineform/domain/contract/EventManager';
+import { UpdatePropsAction } from '@lineform/domain/service/Action/Actions/UpdatePropsAction';
+import { MoveHandler } from '@lineform/domain/service/Events/modes/interaction/handlers/MoveHandler';
+import { BaseShape } from '@lineform/shape/BaseShape';
 import {
 	ShapePropertyEnum,
 	ShapeStateEnum,
 	ShapeTypeEnum,
 	type BasePropertyValue,
 	type LinePropertyValue,
-} from '@/shape/contract';
-import { MatrixService } from '@/common/service/MatrixService';
+} from '@lineform/shape/contract';
+import { MatrixService } from '@lineform/common/service/MatrixService';
 
 const state: InteractionState = { hoveredShape: null };
 const matrixService = new MatrixService();

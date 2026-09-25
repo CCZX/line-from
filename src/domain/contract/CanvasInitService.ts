@@ -1,4 +1,4 @@
-import { ShapeData } from '@/shape/contract';
+import { ShapeData } from '@lineform/shape/contract';
 
 export interface ICanvasInitService {
 	init(data: ShapeData[]): void;

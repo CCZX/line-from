@@ -1,4 +1,4 @@
-import type { BaseShape } from '@/shape/BaseShape';
+import type { BaseShape } from '@lineform/shape/BaseShape';
 
 export type SnapAxis = 'x' | 'y';
 

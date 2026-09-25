@@ -1,4 +1,4 @@
-import type { LineEndpointValue } from '@/shape/contract';
+import type { LineEndpointValue } from '@lineform/shape/contract';
 
 export interface ConnectionSnapRequest {
 	/** 当前拖拽端点的世界坐标。 */

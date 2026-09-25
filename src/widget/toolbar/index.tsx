@@ -12,14 +12,14 @@ import {
 	IShapeManager,
 	ICanvasInitService,
 	IViewportService,
-} from '@/domain/contract';
-import { useInject } from '@/common/context';
+} from '@lineform/domain/contract';
+import { useInject } from '@lineform/common/context';
 import { RoughGenerator } from 'roughjs/bin/generator';
 import { useTranslation } from 'react-i18next';
-import type { Locale } from '@/i18n';
+import type { Locale } from '@lineform/i18n';
 import { parseShapeDataJson } from './shapeDataJson';
-import { MAX_ZOOM_SCALE, MIN_ZOOM_SCALE } from '@/canvas/core/Viewport';
-import { getShapesWorldBounds } from '@/domain/service/ShapeManager';
+import { MAX_ZOOM_SCALE, MIN_ZOOM_SCALE } from '@lineform/canvas/core/Viewport';
+import { getShapesWorldBounds } from '@lineform/domain/service/ShapeManager';
 import './index.less';
 
 type SketchIconName =

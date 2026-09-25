@@ -1,0 +1,23 @@
+{
+  "name": "@lineform/widget",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./editor": "./editor/index.tsx",
+    "./property": "./property/index.tsx",
+    "./toolbar": "./toolbar/index.tsx"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.7.0",
+    "@lineform/canvas": "workspace:*",
+    "@lineform/common": "workspace:*",
+    "@lineform/domain": "workspace:*",
+    "@lineform/i18n": "workspace:*",
+    "@lineform/shape": "workspace:*",
+    "react": "^18.2.0",
+    "react-i18next": "^17.0.11",
+    "roughjs": "^4.6.6"
+  }
+}

@@ -1,4 +1,4 @@
-import { ShapeTypeEnum, type ShapeData } from '@/shape/contract';
+import { ShapeTypeEnum, type ShapeData } from '@lineform/shape/contract';
 
 export function createSingleRectangleFixture(): ShapeData[] {
 	return [

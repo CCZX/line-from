@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
-import type { BaseShape } from '@/shape/BaseShape';
-import { ShapePropertyEnum, ShapeTypeEnum } from '@/shape/contract';
-import { SelectedBorder } from '@/shape/decorate/SelectedBorder';
-import type { DecorateViewport } from '@/shape/decorate/AbsDecorate';
+import type { BaseShape } from '@lineform/shape/BaseShape';
+import { ShapePropertyEnum, ShapeTypeEnum } from '@lineform/shape/contract';
+import { SelectedBorder } from '@lineform/shape/decorate/SelectedBorder';
+import type { DecorateViewport } from '@lineform/shape/decorate/AbsDecorate';
 
 vi.mock('@pixi/graphics', () => {
 	class GraphicsMock {

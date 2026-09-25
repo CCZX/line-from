@@ -1,12 +1,12 @@
 import { AbsActionExecute } from '../AbsActionExecute';
 import { CreateShapeAction } from '../Actions/CreateShapeAction';
 import { ActionTypeEnum, IActionExecute } from '../../../contract/Action';
-import { IShapeManager } from '@/domain/contract';
+import { IShapeManager } from '@lineform/domain/contract';
 import { inject } from 'inversify';
-import { IocContainerService } from '@/common/contract';
+import { IocContainerService } from '@lineform/common/contract';
 import { provide } from 'inversify-binding-decorators';
-import { createShapeFromData } from '@/shape/ShapeFactory';
-import { ShapeTypeEnum } from '@/shape/contract';
+import { createShapeFromData } from '@lineform/shape/ShapeFactory';
+import { ShapeTypeEnum } from '@lineform/shape/contract';
 
 @provide(IActionExecute)
 export class CreateShapeActionExecute extends AbsActionExecute {

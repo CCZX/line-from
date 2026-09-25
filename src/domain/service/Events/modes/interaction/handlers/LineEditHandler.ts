@@ -1,21 +1,21 @@
-import { BaseShape } from '@/shape/BaseShape';
-import { LineProperty } from '@/shape/property/LineProperty';
+import { BaseShape } from '@lineform/shape/BaseShape';
+import { LineProperty } from '@lineform/shape/property/LineProperty';
 import {
 	LineEndpointValue,
 	LinePropertyValue,
 	ShapePropertyEnum,
 	ShapeStateEnum,
-} from '@/shape/contract';
+} from '@lineform/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
-import { IActionLogManager, IActionManager } from '@/domain/contract/Action';
-import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
-import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
-import { IViewportService } from '@/domain/contract/ViewportService';
-import { ISelectService } from '@/domain/contract/SelectService';
-import { IConnectionSnapService } from '@/domain/contract/ConnectionSnapService';
+import { IActionLogManager, IActionManager } from '@lineform/domain/contract/Action';
+import { UpdatePropsAction } from '@lineform/domain/service/Action/Actions/UpdatePropsAction';
+import { IHandlerWithInteraction, IHandler } from '@lineform/domain/contract';
+import { IViewportService } from '@lineform/domain/contract/ViewportService';
+import { ISelectService } from '@lineform/domain/contract/SelectService';
+import { IConnectionSnapService } from '@lineform/domain/contract/ConnectionSnapService';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
-import { IocContainerService } from '@/common/contract';
+import { IocContainerService } from '@lineform/common/contract';
 
 const HANDLE_HIT_RADIUS = 8;
 const DOUBLE_CLICK_MS = 300;

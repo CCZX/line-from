@@ -1,4 +1,4 @@
-import { BaseShape } from '@/shape/BaseShape';
+import { BaseShape } from '@lineform/shape/BaseShape';
 import { StoreApi, UseBoundStore } from 'zustand';
 
 export interface ShapeManagerState {

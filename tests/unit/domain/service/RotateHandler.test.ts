@@ -1,22 +1,22 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { IocContainerService } from '@/common/contract';
+import type { IocContainerService } from '@lineform/common/contract';
 import {
 	IActionManager,
 	IShapeManager,
 	type IAction,
-} from '@/domain/contract';
-import type { EventPayload, InteractionState } from '@/domain/contract/EventManager';
-import { ActionLogManager } from '@/domain/service/Action/ActionLogManager';
-import { UpdatePropsAction } from '@/domain/service/Action/Actions/UpdatePropsAction';
-import { RotateHandler } from '@/domain/service/Events/modes/interaction/handlers/RotateHandler';
-import type { BasePropertyValue } from '@/shape/contract';
+} from '@lineform/domain/contract';
+import type { EventPayload, InteractionState } from '@lineform/domain/contract/EventManager';
+import { ActionLogManager } from '@lineform/domain/service/Action/ActionLogManager';
+import { UpdatePropsAction } from '@lineform/domain/service/Action/Actions/UpdatePropsAction';
+import { RotateHandler } from '@lineform/domain/service/Events/modes/interaction/handlers/RotateHandler';
+import type { BasePropertyValue } from '@lineform/shape/contract';
 import {
 	ShapeDecorateTypeEnum,
 	ShapePropertyEnum,
 	ShapeStateEnum,
 	ShapeTypeEnum,
-} from '@/shape/contract';
-import { MatrixService } from '@/common/service/MatrixService';
+} from '@lineform/shape/contract';
+import { MatrixService } from '@lineform/common/service/MatrixService';
 
 const state: InteractionState = { hoveredShape: null };
 

@@ -21,6 +21,12 @@ React UI
 
 ## 目录职责
 
+`src/` 下每个一级目录都有独立 `package.json`，由根目录的 pnpm workspace 管理。
+跨包依赖必须在各自清单中显式声明，并通过 `@lineform/*` 包名及其 `exports` 导入；
+不要重新引入指向整个 `src/` 的路径别名。应用入口 `src/main.tsx` 与 `src/App.tsx`
+留在根包中。共享全局几何类型由 `@lineform/types` 提供，并通过 TypeScript 的
+`types` 配置加载。
+
 | 路径 | 职责 |
 | --- | --- |
 | `src/common/` | IoC 桥接、矩阵、日志及跨领域基础能力 |
@@ -28,6 +34,8 @@ React UI
 | `src/domain/contract/` | 领域接口、状态类型和依赖注入 Token |
 | `src/domain/service/` | 事件、Action、选择、工具、吸附、图形索引等实现 |
 | `src/shape/` | 图形、属性、装饰器、状态机和几何算法 |
+| `src/types/` | 跨包共享的全局几何类型声明 |
+| `src/ui/` | 应用级 UI Provider 与基础组件 |
 | `src/widget/` | React 编辑器、工具栏和属性面板 |
 | `src/i18n/` | 中英文资源与初始化 |
 | `tests/unit/` | 无浏览器或最小 DOM 环境下的领域与几何测试 |

@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { TextEditorService } from '@/domain/service/TextEditorService';
-import { ShapePropertyEnum, ShapeTypeEnum } from '@/shape/contract';
+import { TextEditorService } from '@lineform/domain/service/TextEditorService';
+import { ShapePropertyEnum, ShapeTypeEnum } from '@lineform/shape/contract';
 
-vi.mock('@/i18n', () => ({
+vi.mock('@lineform/i18n', () => ({
 	default: {
 		t: vi.fn(() => '编辑图形文字'),
 		on: vi.fn(),

@@ -1,12 +1,12 @@
 import { Container } from '@pixi/display';
 import { Graphics } from '@pixi/graphics';
 import { Text as PixiText, TextStyle } from '@pixi/text';
-import { ITextEditorService } from '@/domain/contract';
+import { ITextEditorService } from '@lineform/domain/contract';
 import { BaseShape } from './BaseShape';
 import { ShapeContext, ShapePropertyEnum, TextPropertyValue } from './contract';
 import { FillProperty } from './property/FillProperty';
 import { TextProperty } from './property/TextProperty';
-import { SHAPE_COLORS } from '@/common/color';
+import { SHAPE_COLORS } from '@lineform/common/color';
 
 const DEFAULT_PADDING = 8;
 const TEXT_BACKGROUND_PADDING = 2;

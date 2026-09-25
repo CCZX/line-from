@@ -1,11 +1,11 @@
-import { BaseShape } from '@/shape/BaseShape';
-import { ShapeStateEnum } from '@/shape/contract';
+import { BaseShape } from '@lineform/shape/BaseShape';
+import { ShapeStateEnum } from '@lineform/shape/contract';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
-import { IShapeManager } from '@/domain/contract';
-import { ISelectService } from '@/domain/contract/SelectService';
-import { IViewportService } from '@/domain/contract/ViewportService';
-import { isPointInRect } from '@/shape/geometry';
-import { IHandlerWithInteraction, IHandler } from '@/domain/contract';
+import { IShapeManager } from '@lineform/domain/contract';
+import { ISelectService } from '@lineform/domain/contract/SelectService';
+import { IViewportService } from '@lineform/domain/contract/ViewportService';
+import { isPointInRect } from '@lineform/shape/geometry';
+import { IHandlerWithInteraction, IHandler } from '@lineform/domain/contract';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 

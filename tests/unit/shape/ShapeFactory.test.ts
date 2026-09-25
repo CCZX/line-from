@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { IocContainerService } from '@/common/contract';
-import { Circle } from '@/shape/Circle';
-import { Diamond } from '@/shape/Diamond';
-import { Line } from '@/shape/Line';
-import { Rectangle } from '@/shape/Rectangle';
-import { RoundedRectangle } from '@/shape/RoundedRectangle';
-import { createShapeFromData } from '@/shape/ShapeFactory';
-import { Text } from '@/shape/Text';
-import { ShapePropertyEnum, ShapeTypeEnum, type ShapeData } from '@/shape/contract';
+import type { IocContainerService } from '@lineform/common/contract';
+import { Circle } from '@lineform/shape/Circle';
+import { Diamond } from '@lineform/shape/Diamond';
+import { Line } from '@lineform/shape/Line';
+import { Rectangle } from '@lineform/shape/Rectangle';
+import { RoundedRectangle } from '@lineform/shape/RoundedRectangle';
+import { createShapeFromData } from '@lineform/shape/ShapeFactory';
+import { Text } from '@lineform/shape/Text';
+import { ShapePropertyEnum, ShapeTypeEnum, type ShapeData } from '@lineform/shape/contract';
 
 function shapeModule(className: string) {
 	return {
@@ -22,12 +22,12 @@ function shapeModule(className: string) {
 	};
 }
 
-vi.mock('@/shape/Circle', () => shapeModule('Circle'));
-vi.mock('@/shape/Rectangle', () => shapeModule('Rectangle'));
-vi.mock('@/shape/RoundedRectangle', () => shapeModule('RoundedRectangle'));
-vi.mock('@/shape/Diamond', () => shapeModule('Diamond'));
-vi.mock('@/shape/Text', () => shapeModule('Text'));
-vi.mock('@/shape/Line', () => shapeModule('Line'));
+vi.mock('@lineform/shape/Circle', () => shapeModule('Circle'));
+vi.mock('@lineform/shape/Rectangle', () => shapeModule('Rectangle'));
+vi.mock('@lineform/shape/RoundedRectangle', () => shapeModule('RoundedRectangle'));
+vi.mock('@lineform/shape/Diamond', () => shapeModule('Diamond'));
+vi.mock('@lineform/shape/Text', () => shapeModule('Text'));
+vi.mock('@lineform/shape/Line', () => shapeModule('Line'));
 
 const CONSTRUCTORS = {
 	[ShapeTypeEnum.Circle]: Circle,

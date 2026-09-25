@@ -1,19 +1,19 @@
 import { Point } from '@pixi/core';
 import { inject } from 'inversify';
-import { IocContainerService } from '@/common/contract';
+import { IocContainerService } from '@lineform/common/contract';
 import {
 	IActionManager,
 	ITextEditorService,
 	ITextSelectionService,
 	IViewportService,
-} from '@/domain/contract';
+} from '@lineform/domain/contract';
 import { UpdatePropsAction } from './Action/Actions/UpdatePropsAction';
-import { BaseProperty } from '@/shape/property/BaseProperty';
-import { TextProperty } from '@/shape/property/TextProperty';
-import { ShapePropertyEnum, ShapeStateEnum, TextPropertyValue } from '@/shape/contract';
-import type { TextEditableShape } from '@/shape/TextEditableShape';
+import { BaseProperty } from '@lineform/shape/property/BaseProperty';
+import { TextProperty } from '@lineform/shape/property/TextProperty';
+import { ShapePropertyEnum, ShapeStateEnum, TextPropertyValue } from '@lineform/shape/contract';
+import type { TextEditableShape } from '@lineform/shape/TextEditableShape';
 import { provide } from 'inversify-binding-decorators';
-import i18n from '@/i18n';
+import i18n from '@lineform/i18n';
 
 @provide(ITextEditorService)
 export class TextEditorService implements ITextEditorService {

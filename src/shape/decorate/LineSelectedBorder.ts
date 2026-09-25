@@ -1,5 +1,5 @@
 import { Graphics } from '@pixi/graphics';
-import { DECORATE_COLORS } from '@/common/color';
+import { DECORATE_COLORS } from '@lineform/common/color';
 import { ShapeDecorateTypeEnum, ShapePropertyEnum } from '../contract';
 import { BaseShape } from '../BaseShape';
 import { AbsDecorate, type DecorateViewport } from './AbsDecorate';

@@ -1,12 +1,12 @@
 import { Graphics } from '@pixi/graphics';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
-import { IHandler, IHandlerWithInteraction, IShapeManager } from '@/domain/contract';
-import { ISelectService } from '@/domain/contract/SelectService';
-import { IViewportService } from '@/domain/contract/ViewportService';
-import { ShapeStateEnum } from '@/shape/contract';
+import { IHandler, IHandlerWithInteraction, IShapeManager } from '@lineform/domain/contract';
+import { ISelectService } from '@lineform/domain/contract/SelectService';
+import { IViewportService } from '@lineform/domain/contract/ViewportService';
+import { ShapeStateEnum } from '@lineform/shape/contract';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
-import { DECORATE_COLORS } from '@/common/color';
+import { DECORATE_COLORS } from '@lineform/common/color';
 
 const DRAG_THRESHOLD = 3;
 

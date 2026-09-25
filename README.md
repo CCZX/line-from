@@ -153,20 +153,22 @@ pnpm preview
 ├── public/                    # favicon 等静态资源
 ├── backend/                   # Spring Boot 后端服务
 ├── docs/                      # 架构、数据契约等开发文档
-├── src/
-│   ├── canvas/core/          # PixiJS Stage 与 Viewport
-│   ├── common/               # IoC 容器、React 上下文与公共服务
-│   ├── domain/
+├── src/                      # @lineform/* pnpm workspace 子包与应用入口
+│   ├── canvas/               # @lineform/canvas：PixiJS Stage 与 Viewport
+│   ├── common/               # @lineform/common：IoC、React 上下文与公共服务
+│   ├── domain/               # @lineform/domain
 │   │   ├── contract/         # 领域接口与依赖注入 Token
 │   │   └── service/          # 事件、动作、选择、快捷键等领域服务
-│   ├── i18n/                 # 中英文资源与语言初始化
-│   ├── shape/                # 图形、属性、装饰器、状态机与几何计算
-│   └── widget/               # 编辑器、工具栏和属性面板
+│   ├── i18n/                 # @lineform/i18n：中英文资源与语言初始化
+│   ├── shape/                # @lineform/shape：图形、属性、状态机与几何计算
+│   ├── types/                # @lineform/types：共享全局类型声明
+│   ├── ui/                   # @lineform/ui：应用级 UI 基础组件
+│   └── widget/               # @lineform/widget：编辑器、工具栏和属性面板
 ├── tests/unit/               # 单元测试
 ├── tests/e2e/                # Playwright 端到端测试
 ├── AGENTS.md                 # AI 开发约定与文档路由
 ├── DESIGN.md                 # 视觉设计规范
-└── vite.config.ts            # Vite 与路径别名配置
+└── vite.config.ts            # Vite 构建配置
 ```
 
 ## 架构概览
@@ -195,7 +197,8 @@ ShapeData 包含图形类型和对应属性，例如位置、尺寸、旋转、�
 
 ## 开发约定
 
-- 源码使用 `@/` 作为 `src/` 的路径别名。
+- `src/` 下的一级目录是独立的 pnpm workspace 子包；跨包导入使用
+  `@lineform/<package>` 或该包在 `exports` 中声明的子路径。
 - 新目录默认使用 lowerCamelCase，React 组件、类及其同名文件使用 UpperCamelCase；
   现有领域模块中的历史大写目录只在专项重构中调整。
 - 领域服务优先通过接口 Token 注入，不直接依赖具体实现。

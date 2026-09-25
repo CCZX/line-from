@@ -1,7 +1,7 @@
 import { inject } from 'inversify';
 import { IAction, IActionLogManager, IActionManager } from '../../contract';
 import { provide } from 'inversify-binding-decorators';
-import { IocContainerService } from '@/common/contract';
+import { IocContainerService } from '@lineform/common/contract';
 import { create } from 'zustand';
 
 @provide(IActionLogManager)

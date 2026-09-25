@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
-import { ActionTypeEnum, IAction, IActionManager, IShapeManager } from '@/domain/contract';
-import { ActionLogManager } from '@/domain/service/Action/ActionLogManager';
-import { RemoveShapeAction } from '@/domain/service/Action/Actions/RemoveShapeAction';
-import type { IocContainerService } from '@/common/contract';
-import { ShapeTypeEnum } from '@/shape/contract';
+import { ActionTypeEnum, IAction, IActionManager, IShapeManager } from '@lineform/domain/contract';
+import { ActionLogManager } from '@lineform/domain/service/Action/ActionLogManager';
+import { RemoveShapeAction } from '@lineform/domain/service/Action/Actions/RemoveShapeAction';
+import type { IocContainerService } from '@lineform/common/contract';
+import { ShapeTypeEnum } from '@lineform/shape/contract';
 
 class TestAction implements IAction<string> {
 	public type = ActionTypeEnum.UpdateShapeProps;

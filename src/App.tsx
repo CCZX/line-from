@@ -1,8 +1,6 @@
 import { FC } from 'react';
-import Editor from './widget/editor';
-import { Toolbar } from './widget/toolbar';
-import { Property } from './widget/property';
-import { AppUiProvider } from './ui/AppUiProvider';
+import { Editor, Property, Toolbar } from '@lineform/widget';
+import { AppUiProvider } from '@lineform/ui';
 
 interface DemoProps {}
 

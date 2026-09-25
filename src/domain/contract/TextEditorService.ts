@@ -1,4 +1,4 @@
-import type { TextEditableShape } from '@/shape/TextEditableShape';
+import type { TextEditableShape } from '@lineform/shape/TextEditableShape';
 
 export interface ITextEditorService {
 	begin(shape: TextEditableShape): void;

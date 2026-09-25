@@ -1,6 +1,11 @@
-import { IActionManager, IEventManager, ISelectService, IShortcutKey } from '@/domain/contract';
-import { RemoveShapeAction } from '@/domain/service/Action/Actions/RemoveShapeAction';
-import { IocContainerService } from '@/common/contract';
+import {
+	IActionManager,
+	IEventManager,
+	ISelectService,
+	IShortcutKey,
+} from '@lineform/domain/contract';
+import { RemoveShapeAction } from '@lineform/domain/service/Action/Actions/RemoveShapeAction';
+import { IocContainerService } from '@lineform/common/contract';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 

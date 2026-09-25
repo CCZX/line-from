@@ -1,4 +1,4 @@
-import { IShortcutKey, IToolService, ToolType } from '@/domain/contract';
+import { IShortcutKey, IToolService, ToolType } from '@lineform/domain/contract';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 

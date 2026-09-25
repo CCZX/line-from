@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi, type Mock } from 'vitest';
-import type { ISelectService, IShapeManager } from '@/domain/contract';
-import { SelectAllShortcutKey } from '@/domain/service/ShortcutKey/shortcutKeys/selectAll';
-import type { BaseShape } from '@/shape/BaseShape';
-import { ShapeStateEnum } from '@/shape/contract';
+import type { ISelectService, IShapeManager } from '@lineform/domain/contract';
+import { SelectAllShortcutKey } from '@lineform/domain/service/ShortcutKey/shortcutKeys/selectAll';
+import type { BaseShape } from '@lineform/shape/BaseShape';
+import { ShapeStateEnum } from '@lineform/shape/contract';
 
 interface ShapeMock {
 	id: string;

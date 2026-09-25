@@ -1,0 +1,22 @@
+{
+  "name": "@lineform/common",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./color": "./color.ts",
+    "./container": "./container.ts",
+    "./context": "./context.tsx",
+    "./contract": "./contract/index.ts",
+    "./contract/Destroyable": "./contract/Destroyable.ts",
+    "./contract/MatrixService": "./contract/MatrixService.ts",
+    "./service/MatrixService": "./service/MatrixService.ts"
+  },
+  "dependencies": {
+    "@lineform/domain": "workspace:*",
+    "inversify": "^5.1.1",
+    "inversify-binding-decorators": "^4.0.0",
+    "react": "^18.2.0"
+  }
+}

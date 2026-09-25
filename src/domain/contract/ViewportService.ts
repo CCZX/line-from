@@ -1,4 +1,4 @@
-import { Stage } from '@/canvas/core/Stage';
+import { Stage } from '@lineform/canvas/core/Stage';
 import { Point as PixiPoint } from '@pixi/core';
 import { StoreApi, UseBoundStore } from 'zustand';
 

@@ -1,4 +1,4 @@
-import { control, IActionLogManager, IShortcutKey, meta, shift } from '@/domain/contract';
+import { control, IActionLogManager, IShortcutKey, meta, shift } from '@lineform/domain/contract';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { IToolService } from '@/domain/contract';
-import { ToolType } from '@/domain/contract';
-import { ToolShortcutKey } from '@/domain/service/ShortcutKey/shortcutKeys/tool';
+import type { IToolService } from '@lineform/domain/contract';
+import { ToolType } from '@lineform/domain/contract';
+import { ToolShortcutKey } from '@lineform/domain/service/ShortcutKey/shortcutKeys/tool';
 
 function createShortcut() {
 	const setActiveTool = vi.fn();

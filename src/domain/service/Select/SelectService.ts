@@ -1,13 +1,13 @@
 import { Graphics } from '@pixi/graphics';
-import { getShapesAABB } from '@/shape/geometry';
-import { BaseShape } from '@/shape/BaseShape';
-import { Stage } from '@/canvas/core/Stage';
-import { ISelectService, SelectionState } from '@/domain/contract/SelectService';
+import { getShapesAABB } from '@lineform/shape/geometry';
+import { BaseShape } from '@lineform/shape/BaseShape';
+import { Stage } from '@lineform/canvas/core/Stage';
+import { ISelectService, SelectionState } from '@lineform/domain/contract/SelectService';
 import { provide } from 'inversify-binding-decorators';
 import { create } from 'zustand';
-import { IViewportService } from '@/domain/contract';
+import { IViewportService } from '@lineform/domain/contract';
 import { inject } from 'inversify';
-import { DECORATE_COLORS } from '@/common/color';
+import { DECORATE_COLORS } from '@lineform/common/color';
 
 const HANDLE_SIZE = 8;
 

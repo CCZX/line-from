@@ -4,7 +4,7 @@ import {
 	IHandler,
 	IHandlerWithInteraction,
 } from '../../../../contract/EventManager';
-import { ToolType, IToolService } from '@/domain/contract/ToolService';
+import { ToolType, IToolService } from '@lineform/domain/contract/ToolService';
 import { inject, multiInject, postConstruct } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 

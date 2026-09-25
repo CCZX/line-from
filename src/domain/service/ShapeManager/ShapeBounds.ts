@@ -1,4 +1,4 @@
-import { BaseShape } from '@/shape/BaseShape';
+import { BaseShape } from '@lineform/shape/BaseShape';
 
 /** 计算图形在 viewport 世界坐标系中的轴对齐包围盒。 */
 export function getShapeWorldBounds(shape: BaseShape): Rectangle {

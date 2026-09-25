@@ -1,12 +1,12 @@
 import { AbsActionExecute } from '../AbsActionExecute';
 import { ActionTypeEnum, IActionExecute } from '../../../contract/Action';
-import { IShapeManager } from '@/domain/contract';
-import { ISelectService } from '@/domain/contract/SelectService';
-import { ShapePropertyEnum } from '@/shape/contract';
+import { IShapeManager } from '@lineform/domain/contract';
+import { ISelectService } from '@lineform/domain/contract/SelectService';
+import { ShapePropertyEnum } from '@lineform/shape/contract';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 import { UpdatePropsAction } from '../Actions/UpdatePropsAction';
-import { BaseShape } from '@/shape/BaseShape';
+import { BaseShape } from '@lineform/shape/BaseShape';
 
 @provide(IActionExecute)
 export class UpdatePropsActionExecute extends AbsActionExecute {

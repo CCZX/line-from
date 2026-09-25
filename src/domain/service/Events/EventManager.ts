@@ -1,8 +1,8 @@
 import { InteractionState, EventPayload } from '../../contract/EventManager';
 import { IEventManager, IEventMode, IViewportService } from '../../contract';
 import { inject, multiInject } from 'inversify';
-import { provideMultiple } from '@/common/context';
-import { IDestroyable } from '@/common/contract/Destroyable';
+import { provideMultiple } from '@lineform/common/context';
+import { IDestroyable } from '@lineform/common/contract/Destroyable';
 
 @provideMultiple(IEventManager, IDestroyable)
 export class EventManager implements IEventManager, IDestroyable {

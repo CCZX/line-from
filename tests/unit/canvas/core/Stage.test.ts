@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Stage } from '@/canvas/core/Stage';
+import { Stage } from '@lineform/canvas/core/Stage';
 
 const mocks = vi.hoisted(() => ({
 	addChild: vi.fn(),
@@ -29,7 +29,7 @@ vi.mock('@pixi/app', () => ({
 	},
 }));
 
-vi.mock('@/canvas/core/Viewport', () => ({
+vi.mock('@lineform/canvas/core/Viewport', () => ({
 	Viewport: class {
 		public addChild = vi.fn();
 

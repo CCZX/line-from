@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MatrixService } from '@/common/service/MatrixService';
+import { MatrixService } from '@lineform/common/service/MatrixService';
 
 describe('二维仿射矩阵', () => {
 	const matrixService = new MatrixService();

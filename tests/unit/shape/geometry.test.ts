@@ -6,9 +6,9 @@ import {
 	getRoundedRectRadius,
 	isPointInDiamond,
 	isPointInRoundedRect,
-} from '@/shape/geometry';
-import type { BaseShape } from '@/shape/BaseShape';
-import { ShapePropertyEnum } from '@/shape/contract';
+} from '@lineform/shape/geometry';
+import type { BaseShape } from '@lineform/shape/BaseShape';
+import { ShapePropertyEnum } from '@lineform/shape/contract';
 
 describe('shape geometry', () => {
 	it('生成菱形四个方向的顶点', () => {

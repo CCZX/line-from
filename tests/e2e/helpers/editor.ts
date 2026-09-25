@@ -1,7 +1,7 @@
 import { Buffer } from 'node:buffer';
 import { readFile } from 'node:fs/promises';
 import { expect, type Page } from '@playwright/test';
-import type { ShapeData } from '@/shape/contract';
+import type { ShapeData } from '@lineform/shape/contract';
 
 interface Point {
 	x: number;

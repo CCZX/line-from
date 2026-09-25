@@ -1,0 +1,15 @@
+{
+  "name": "@lineform/types",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "types": "./geometry.d.ts",
+  "exports": {
+    ".": {
+      "types": "./geometry.d.ts"
+    }
+  },
+  "dependencies": {
+    "inversify": "^5.1.1"
+  }
+}

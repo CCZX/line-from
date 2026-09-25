@@ -11,6 +11,30 @@ importers:
       '@base-ui/react':
         specifier: ^1.7.0
         version: 1.7.0(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@lineform/canvas':
+        specifier: workspace:*
+        version: link:src/canvas
+      '@lineform/common':
+        specifier: workspace:*
+        version: link:src/common
+      '@lineform/domain':
+        specifier: workspace:*
+        version: link:src/domain
+      '@lineform/i18n':
+        specifier: workspace:*
+        version: link:src/i18n
+      '@lineform/shape':
+        specifier: workspace:*
+        version: link:src/shape
+      '@lineform/types':
+        specifier: workspace:*
+        version: link:src/types
+      '@lineform/ui':
+        specifier: workspace:*
+        version: link:src/ui
+      '@lineform/widget':
+        specifier: workspace:*
+        version: link:src/widget
       '@pixi/app':
         specifier: ^7.4.3
         version: 7.4.3(@pixi/core@7.4.3)(@pixi/display@7.4.3(@pixi/core@7.4.3))
@@ -126,6 +150,156 @@ importers:
       vitest:
         specifier: 0.34.6
         version: 0.34.6(less@4.3.0)(playwright@1.62.1)(supports-color@8.1.1)(terser@5.41.0)
+
+  src/canvas:
+    dependencies:
+      '@lineform/common':
+        specifier: workspace:*
+        version: link:../common
+      '@pixi/app':
+        specifier: ^7.4.3
+        version: 7.4.3(@pixi/core@7.4.3)(@pixi/display@7.4.3(@pixi/core@7.4.3))
+      '@pixi/core':
+        specifier: ^7.4.3
+        version: 7.4.3
+      '@pixi/display':
+        specifier: ^7.4.3
+        version: 7.4.3(@pixi/core@7.4.3)
+      '@pixi/graphics':
+        specifier: ^7.4.3
+        version: 7.4.3(@pixi/core@7.4.3)(@pixi/display@7.4.3(@pixi/core@7.4.3))(@pixi/sprite@7.4.3(@pixi/core@7.4.3)(@pixi/display@7.4.3(@pixi/core@7.4.3)))
+      lodash:
+        specifier: ^4.18.1
+        version: 4.18.1
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
+
+  src/common:
+    dependencies:
+      '@lineform/domain':
+        specifier: workspace:*
+        version: link:../domain
+      inversify:
+        specifier: ^5.1.1
+        version: 5.1.1
+      inversify-binding-decorators:
+        specifier: ^4.0.0
+        version: 4.0.0
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+
+  src/domain:
+    dependencies:
+      '@lineform/canvas':
+        specifier: workspace:*
+        version: link:../canvas
+      '@lineform/common':
+        specifier: workspace:*
+        version: link:../common
+      '@lineform/i18n':
+        specifier: workspace:*
+        version: link:../i18n
+      '@lineform/shape':
+        specifier: workspace:*
+        version: link:../shape
+      '@pixi/core':
+        specifier: ^7.4.3
+        version: 7.4.3
+      '@pixi/graphics':
+        specifier: ^7.4.3
+        version: 7.4.3(@pixi/core@7.4.3)(@pixi/display@7.4.3(@pixi/core@7.4.3))(@pixi/sprite@7.4.3(@pixi/core@7.4.3)(@pixi/display@7.4.3(@pixi/core@7.4.3)))
+      '@pixi/text':
+        specifier: ^7.4.3
+        version: 7.4.3(@pixi/core@7.4.3)(@pixi/sprite@7.4.3(@pixi/core@7.4.3)(@pixi/display@7.4.3(@pixi/core@7.4.3)))
+      inversify:
+        specifier: ^5.1.1
+        version: 5.1.1
+      inversify-binding-decorators:
+        specifier: ^4.0.0
+        version: 4.0.0
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
+      zustand:
+        specifier: ^4.3.7
+        version: 4.5.7(@types/react@18.3.23)(react@18.3.1)
+
+  src/i18n:
+    dependencies:
+      i18next:
+        specifier: ^26.3.6
+        version: 26.3.6(typescript@5.9.3)
+      react-i18next:
+        specifier: ^17.0.11
+        version: 17.0.11(i18next@26.3.6(typescript@5.9.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
+
+  src/shape:
+    dependencies:
+      '@lineform/common':
+        specifier: workspace:*
+        version: link:../common
+      '@lineform/domain':
+        specifier: workspace:*
+        version: link:../domain
+      '@pixi/display':
+        specifier: ^7.4.3
+        version: 7.4.3(@pixi/core@7.4.3)
+      '@pixi/graphics':
+        specifier: ^7.4.3
+        version: 7.4.3(@pixi/core@7.4.3)(@pixi/display@7.4.3(@pixi/core@7.4.3))(@pixi/sprite@7.4.3(@pixi/core@7.4.3)(@pixi/display@7.4.3(@pixi/core@7.4.3)))
+      '@pixi/text':
+        specifier: ^7.4.3
+        version: 7.4.3(@pixi/core@7.4.3)(@pixi/sprite@7.4.3(@pixi/core@7.4.3)(@pixi/display@7.4.3(@pixi/core@7.4.3)))
+      roughjs:
+        specifier: ^4.6.6
+        version: 4.6.6
+
+  src/types:
+    dependencies:
+      inversify:
+        specifier: ^5.1.1
+        version: 5.1.1
+
+  src/ui:
+    dependencies:
+      '@base-ui/react':
+        specifier: ^1.7.0
+        version: 1.7.0(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+
+  src/widget:
+    dependencies:
+      '@base-ui/react':
+        specifier: ^1.7.0
+        version: 1.7.0(@types/react@18.3.23)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@lineform/canvas':
+        specifier: workspace:*
+        version: link:../canvas
+      '@lineform/common':
+        specifier: workspace:*
+        version: link:../common
+      '@lineform/domain':
+        specifier: workspace:*
+        version: link:../domain
+      '@lineform/i18n':
+        specifier: workspace:*
+        version: link:../i18n
+      '@lineform/shape':
+        specifier: workspace:*
+        version: link:../shape
+      react:
+        specifier: ^18.2.0
+        version: 18.3.1
+      react-i18next:
+        specifier: ^17.0.11
+        version: 17.0.11(i18next@26.3.6(typescript@5.9.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
+      roughjs:
+        specifier: ^4.6.6
+        version: 4.6.6
 
 packages:
 

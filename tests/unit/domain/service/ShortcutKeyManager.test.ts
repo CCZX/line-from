@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { control, IShortcutKey, meta, shift } from '@/domain/contract';
-import { ShortcutKeyManager } from '@/domain/service/ShortcutKey/ShortcutKeyManager';
+import { control, IShortcutKey, meta, shift } from '@lineform/domain/contract';
+import { ShortcutKeyManager } from '@lineform/domain/service/ShortcutKey/ShortcutKeyManager';
 
-vi.mock('@/common/context', () => ({
+vi.mock('@lineform/common/context', () => ({
 	provideMultiple: () => () => undefined,
 }));
 

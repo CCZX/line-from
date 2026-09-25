@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { EventPayload, InteractionState } from '@/domain/contract/EventManager';
-import { TextEditHandler } from '@/domain/service/Events/modes/interaction/handlers/TextEditHandler';
-import { Rectangle } from '@/shape/Rectangle';
-import { ShapeStateEnum } from '@/shape/contract';
+import type { EventPayload, InteractionState } from '@lineform/domain/contract/EventManager';
+import { TextEditHandler } from '@lineform/domain/service/Events/modes/interaction/handlers/TextEditHandler';
+import { Rectangle } from '@lineform/shape/Rectangle';
+import { ShapeStateEnum } from '@lineform/shape/contract';
 
 const state: InteractionState = { hoveredShape: null };
 const payload: EventPayload = {

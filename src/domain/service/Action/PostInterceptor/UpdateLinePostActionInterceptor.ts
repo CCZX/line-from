@@ -1,7 +1,7 @@
-import { IShapeManager } from '@/domain/contract';
-import { ActionTypeEnum, IAction, IPostActionInterceptor } from '@/domain/contract/Action';
-import { ShapeData, ShapePropertyEnum } from '@/shape/contract';
-import { LineProperty } from '@/shape/property/LineProperty';
+import { IShapeManager } from '@lineform/domain/contract';
+import { ActionTypeEnum, IAction, IPostActionInterceptor } from '@lineform/domain/contract/Action';
+import { ShapeData, ShapePropertyEnum } from '@lineform/shape/contract';
+import { LineProperty } from '@lineform/shape/property/LineProperty';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
 

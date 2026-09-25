@@ -3,8 +3,8 @@
   "compilerOptions": {
     "composite": false,
     "noEmit": true,
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals", "@lineform/types"]
   },
-  "include": ["./**/*.ts", "../src/types/**/*.d.ts"],
+  "include": ["./**/*.ts"],
   "references": []
 }

@@ -5,7 +5,7 @@ import { inject, multiInject, optional, postConstruct } from 'inversify';
 import {
 	IPostActionInterceptor,
 	IPreActionInterceptor,
-} from '@/domain/contract/Action/Interceptor';
+} from '@lineform/domain/contract/Action/Interceptor';
 
 @provide(IActionManager)
 export class ActionManager implements IActionManager {

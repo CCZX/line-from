@@ -3,10 +3,10 @@ import { provide } from 'inversify-binding-decorators';
 import {
 	IConnectionSnapService,
 	type ConnectionSnapRequest,
-} from '@/domain/contract/ConnectionSnapService';
-import { IShapeManager } from '@/domain/contract/ShapeManager';
-import type { LineEndpointValue } from '@/shape/contract';
-import { getNearestShapeAnchor } from '@/shape/geometry';
+} from '@lineform/domain/contract/ConnectionSnapService';
+import { IShapeManager } from '@lineform/domain/contract/ShapeManager';
+import type { LineEndpointValue } from '@lineform/shape/contract';
+import { getNearestShapeAnchor } from '@lineform/shape/geometry';
 
 /** 屏幕像素级吸附半径，缩放后会换算为世界坐标。 */
 export const CONNECTION_SNAP_RADIUS = 12;

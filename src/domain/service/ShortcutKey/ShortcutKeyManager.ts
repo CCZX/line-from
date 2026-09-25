@@ -2,8 +2,8 @@ import { provide } from 'inversify-binding-decorators';
 import { control, IShortcutKey, IShortcutKeyManager, meta, shift } from '../../contract';
 import type { FnKey } from '../../contract';
 import { multiInject } from 'inversify';
-import { IDestroyable } from '@/common/contract/Destroyable';
-import { provideMultiple } from '@/common/context';
+import { IDestroyable } from '@lineform/common/contract/Destroyable';
+import { provideMultiple } from '@lineform/common/context';
 
 @provideMultiple(IShortcutKeyManager, IDestroyable)
 export class ShortcutKeyManager implements IShortcutKeyManager, IDestroyable {

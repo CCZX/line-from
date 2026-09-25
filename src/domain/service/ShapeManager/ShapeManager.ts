@@ -1,5 +1,5 @@
 import { Point as PixiPoint } from '@pixi/core';
-import { BaseShape } from '@/shape/BaseShape';
+import { BaseShape } from '@lineform/shape/BaseShape';
 import {
 	IShapeManager,
 	IViewportService,

@@ -1,4 +1,4 @@
-import { ShapeStateEnum } from '@/shape/contract';
+import { ShapeStateEnum } from '@lineform/shape/contract';
 import { Point as PixiPoint } from '@pixi/core';
 import { HandlerEnum, InteractionState, EventPayload } from '../../../../../contract/EventManager';
 import {
@@ -7,11 +7,11 @@ import {
 	ISelectService,
 	IShapeManager,
 	ITextSelectionService,
-} from '@/domain/contract';
-import { IViewportService } from '@/domain/contract/ViewportService';
+} from '@lineform/domain/contract';
+import { IViewportService } from '@lineform/domain/contract/ViewportService';
 import { inject } from 'inversify';
 import { provide } from 'inversify-binding-decorators';
-import { TextEditableShape } from '@/shape/TextEditableShape';
+import { TextEditableShape } from '@lineform/shape/TextEditableShape';
 
 const DOUBLE_CLICK_INTERVAL = 450;
 const DOUBLE_CLICK_DISTANCE = 8;

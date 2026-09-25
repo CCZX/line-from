@@ -1,6 +1,6 @@
 import { Container, BindingScopeEnum } from 'inversify';
 import { buildProviderModule } from 'inversify-binding-decorators';
-import '@/domain';
+import '@lineform/domain';
 import './service';
 
 const container = new Container({

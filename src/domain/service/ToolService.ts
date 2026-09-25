@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { IToolService, ToolType, ToolState } from '@/domain/contract/ToolService';
+import { IToolService, ToolType, ToolState } from '@lineform/domain/contract/ToolService';
 import { provide } from 'inversify-binding-decorators';
 
 const toolStore = create<ToolState>((set) => ({

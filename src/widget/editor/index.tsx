@@ -2,17 +2,17 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import './index.less';
 import { MOCK_SHAPE_DATA } from './shapeData';
-import { Stage } from '@/canvas/core/Stage';
-import { useInject, useMultiInject } from '@/common/context';
+import { Stage } from '@lineform/canvas/core/Stage';
+import { useInject, useMultiInject } from '@lineform/common/context';
 import {
 	ICanvasInitService,
 	IEventManager,
 	IShapeManager,
 	IShortcutKeyManager,
-} from '@/domain/contract';
-import { IViewportService } from '@/domain/contract/ViewportService';
-import { IDestroyable } from '@/common/contract/Destroyable';
-import { getShapesWorldBounds } from '@/domain/service/ShapeManager';
+} from '@lineform/domain/contract';
+import { IViewportService } from '@lineform/domain/contract/ViewportService';
+import { IDestroyable } from '@lineform/common/contract/Destroyable';
+import { getShapesWorldBounds } from '@lineform/domain/service/ShapeManager';
 
 function Editor() {
 	const { t } = useTranslation();

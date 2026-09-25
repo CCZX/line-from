@@ -1,4 +1,4 @@
-import { ShapeData } from '@/shape/contract';
+import { ShapeData } from '@lineform/shape/contract';
 import {
 	IActionLogManager,
 	ICanvasInitService,
@@ -8,8 +8,8 @@ import {
 } from '../contract';
 import { provide } from 'inversify-binding-decorators';
 import { inject } from 'inversify';
-import { IocContainerService, ILoggerService } from '@/common/contract';
-import { createShapeFromData } from '@/shape/ShapeFactory';
+import { IocContainerService, ILoggerService } from '@lineform/common/contract';
+import { createShapeFromData } from '@lineform/shape/ShapeFactory';
 
 @provide(ICanvasInitService)
 export class CanvasInitService implements ICanvasInitService {

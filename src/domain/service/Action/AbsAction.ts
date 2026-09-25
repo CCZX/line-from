@@ -1,4 +1,4 @@
-import { IocContainerService } from '@/common/contract';
+import { IocContainerService } from '@lineform/common/contract';
 import { ActionTypeEnum, IAction } from '../../contract/Action';
 
 export abstract class AbsAction<T = unknown> implements IAction<T> {

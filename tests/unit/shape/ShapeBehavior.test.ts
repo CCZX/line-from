@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { BaseShape } from '@/shape/BaseShape';
-import { Circle } from '@/shape/Circle';
-import { Line } from '@/shape/Line';
-import { ResizeDirection, ShapeTypeEnum } from '@/shape/contract';
+import { BaseShape } from '@lineform/shape/BaseShape';
+import { Circle } from '@lineform/shape/Circle';
+import { Line } from '@lineform/shape/Line';
+import { ResizeDirection, ShapeTypeEnum } from '@lineform/shape/contract';
 
 describe('Shape 多态行为', () => {
 	it('圆形自行约束缩放结果为正方形', () => {

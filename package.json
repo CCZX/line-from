@@ -29,6 +29,14 @@
     "lint:fix": "eslint src tests vitest.config.ts playwright.config.ts tsconfig.json --ext .ts,.tsx --fix"
   },
   "dependencies": {
+    "@lineform/canvas": "workspace:*",
+    "@lineform/common": "workspace:*",
+    "@lineform/domain": "workspace:*",
+    "@lineform/i18n": "workspace:*",
+    "@lineform/shape": "workspace:*",
+    "@lineform/types": "workspace:*",
+    "@lineform/ui": "workspace:*",
+    "@lineform/widget": "workspace:*",
     "@base-ui/react": "^1.7.0",
     "@pixi/app": "^7.4.3",
     "@pixi/core": "^7.4.3",

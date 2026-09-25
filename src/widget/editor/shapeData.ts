@@ -3,7 +3,7 @@ import {
 	type ShapeData,
 	ShapeTypeEnum,
 	type TextPropertyValue,
-} from '@/shape/contract';
+} from '@lineform/shape/contract';
 
 const COLORS = {
 	text: 0x1e293b,
